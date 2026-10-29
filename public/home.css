@@ -1,0 +1,29 @@
+/* Home View Styles */
+.home-card {
+    text-align: center;
+}
+
+.home-card h2 {
+    margin-bottom: 1.5rem;
+}
+
+.home-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.home-actions .btn {
+    margin-top: 0;
+    width: 100%;
+}
+
+.btn-secondary {
+    background-color: #e2e8f0;
+    color: #2d3748;
+    border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+    background-color: #cbd5e1;
+}
