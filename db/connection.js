@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import pg from 'pg';
+import pg from 'pg'
 
-export const client = new pg.Client({
+const pool = new pg.Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
@@ -9,4 +9,17 @@ export const client = new pg.Client({
   database: process.env.DB_NAME,
 });
 
-await client.connect();
+async function query(queryStr, params = []) {
+    const client = await pool.connect();
+    try {
+        const data = await client.query(queryStr, params);
+        return data.rows;
+    } catch (error) {
+        console.error("Database query error:", error);
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+
+export default query;
