@@ -16,7 +16,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(loadSession);
 app.use(express.static(path.join(__dirname, "public")));
-app.use(loggingMiddleware)
+app.use(loggingMiddleware);
+app.use(loadSession);
 
 // Global handlebars
 app.engine("hbs", engine({ extname: ".hbs" }));
@@ -24,7 +25,9 @@ app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use("/", authRouter);
-
+app.get("/", (req, res) => {
+    res.render("home");
+})
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");

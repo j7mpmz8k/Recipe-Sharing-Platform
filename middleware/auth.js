@@ -1,5 +1,5 @@
 export function requireAuth(req, res, next) {
-    if (req.session && req.session.userId) {
+    if (req.session) {
         next();
     } else {
         res.redirect('/login');

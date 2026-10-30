@@ -9,7 +9,7 @@ authRouter.get("/register", (req, res) => {
     res.render("register");
 });
 
-authRouter.post("/register", async (req,res) => {
+authRouter.post("/register", async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
     if (email.split("@").length == 0) {
         return res.render("register", {
@@ -63,6 +63,11 @@ authRouter.post("/login", async (req, res) => {
         maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
     res.redirect("/");
+});
+
+authRouter.post("/logout", async (req, res) => {
+    deleteSession(req.sessionId);
+    res.clearCookie("session_id");
 });
 
 export default authRouter;
