@@ -7,7 +7,7 @@ export function requireAuth(req, res, next) {
 }
 
 export function loadSession(req, res, next) {
-    const session_id = req.cookies.session_token;
+    const session_id = req.cookies.session_id;
     if (!session_id) {//TODO test if safe to remove if check
         req.session = null;
         next();

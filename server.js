@@ -5,7 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { loggingMiddleware } from "./middleware/logging.js";
 import { loadSession } from "./middleware/auth.js";
-import usersRouter from "./controllers/users.js";
+import authRouter from "./controllers/auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,7 +14,6 @@ const app = express();
 // Global Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(loadSession);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(loggingMiddleware);
 app.use(loadSession);

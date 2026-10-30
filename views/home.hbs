@@ -1,9 +1,19 @@
 <div class="auth-container">
     <div class="auth-card home-card">
-        <h2>Sign in or create an account</h2>
-        <div class="home-actions">
-            <a href="/login" class="btn btn-primary">Sign In</a>
-            <a href="/register" class="btn btn-secondary">Create an Account</a>
-        </div>
+        {{#if user}}
+            <h2>Welcome back, {{user.username}}!</h2>
+            <div class="home-actions">
+                <a href="/recipes" class="btn btn-primary">Browse Recipes</a>
+                <form action="/logout" method="POST" class="home-logout-form">
+                    <button type="submit" class="btn btn-secondary">Log Out</button>
+                </form>
+            </div>
+        {{else}}
+            <h2>Sign in or create an account</h2>
+            <div class="home-actions">
+                <a href="/login" class="btn btn-primary">Sign In</a>
+                <a href="/register" class="btn btn-secondary">Create an Account</a>
+            </div>
+        {{/if}}
     </div>
 </div>

@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import {createUser, findUser} from "../models.users";
-import {createSession, deleteSession} from "../models.sessions";
+import {createUser, findUser} from "../models/users.js";
+import {createSession, deleteSession} from "../models/sessions.js";
 
 const authRouter = express.Router();
 
@@ -11,14 +11,6 @@ authRouter.get("/register", (req, res) => {
 
 authRouter.post("/register", async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
-    if (email.split("@").length == 0) {
-        return res.render("register", {
-            error: 'Email not valid eg. "name@example.com"',
-            username,
-            password,
-            confirmPassword
-        })
-    }
     if (password != confirmPassword) {
         return res.render("register", {
             error: "Passwords do not match!",
@@ -26,15 +18,14 @@ authRouter.post("/register", async (req, res) => {
             email
         });
     }
-    const sessionId = createSession();
+    let userId = await createUser(username, email, password);
+    const sessionId = await createSession(userId);
     res.cookie("session_id", sessionId, {
         httpOnly: true,
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
         maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
-    const user = createUser(username, email, password);
-    req.user = res.locals.user = user;
     res.redirect("/");
 });
 
@@ -47,15 +38,13 @@ authRouter.get("/login", (req, res) => {
 
 authRouter.post("/login", async (req, res) => {
     const { username, email, password } = req.body;
-    const user = findUser(username);
-    req.user = req.local.user = user;
-
-    if (!user.username || !bcrypt.compare(password, user.passwordHash)) {
-        return res.render("register", {
+    const user = await findUser(username);
+    if (!user || !await bcrypt.compare(password, user.passwordHash)) {
+        return res.render("login", {
             error: 'No user found with that password!',
         });
     }
-    const sessionId = createSession();
+    const sessionId = await createSession();
     res.cookie("session_id", sessionId, {
         httpOnly: true,
         sameSite: "lax",
@@ -66,7 +55,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/logout", async (req, res) => {
-    deleteSession(req.sessionId);
+    await deleteSession(req.sessionId);
     res.clearCookie("session_id");
 });
 

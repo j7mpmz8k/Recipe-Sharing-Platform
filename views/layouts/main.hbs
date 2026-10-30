@@ -10,8 +10,10 @@
         <a href="/">Home</a>
         <a href="/users">Users</a>
         {{#if user}}
-            <span>Welcome, {{user.username}}</span>
-            <a href="/logout">Logout</a>
+            <span class="nav-user">Welcome, {{user.username}}</span>
+            <form action="/logout" method="POST" class="logout-form">
+                <button type="submit" class="btn-link">Logout</button>
+            </form>
         {{else}}
             <a href="/login">Login</a>
             <a href="/register">Register</a>
