@@ -23,7 +23,7 @@ app.engine("hbs", engine({ extname: ".hbs" }));
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use("/", usersRouter);
+app.use("/", authRouter);
 
 
 app.listen(3000, () => {
