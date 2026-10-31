@@ -3,40 +3,34 @@ import bcrypt from "bcrypt";
 
 export async function createUser(username, email, plainPassword) {
     let hashedPassword = await bcrypt.hash(plainPassword, 10);
-    let userId = await query(`
+    let rows = await query(`
         INSERT INTO users (username, email, password_hash)
         VALUES ($1, $2, $3)
-        RETURNING user_id;
+        RETURNING id;
     `, [username, email, hashedPassword]);
-    return userId;
+    return rows[0].id;
 }
 export async function findUser(username) {
-    let rows = await query(`
-        SELECT username, email, password_hash
+    let user = await query(`
+        SELECT id, password_hash
         FROM users
         WHERE username = $1;
     `, [username]);
-    if (rows.length == 0) {
+    if (user.length == 0) {
         return null;
     }
-    return new User(rows[0].username, rows[0].email, rows[0].password_hash);
+    return user[0];
 }
 export async function loadUser(sessionId) {
-    let rows = await query(`
-        SELECT u.username, u.email, u.password_hash
+    let user = await query(`
+        SELECT u.username, u.email
         FROM users u
-        JOIN session s on u.user_id = s.user_id
+        JOIN sessions s on u.id = s.user_id
         WHERE session_id = $1;
     `, [sessionId]);
-    return new User(rows[0].username, rows[0].email, rows[0].password_hash);
-}
-
-
-export class User {
-    constructor (username, email, passwordHash) {
-        this.username = username;
-        this.email = email;
-        this.passwordHash = passwordHash;
+    if (user.length == 0) {
+        return null;
     }
+    return user[0];
 }
 

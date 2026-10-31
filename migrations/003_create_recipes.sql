@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     ingredients TEXT NOT NULL,
-    instructions TEXT NUT NULL,
+    instructions TEXT NOT NULL,
     prep_time INTEGER, --minutes
     cook_time INTEGER, --minutes
     servings INTEGER,

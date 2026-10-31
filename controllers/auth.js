@@ -37,14 +37,14 @@ authRouter.get("/login", (req, res) => {
 });
 
 authRouter.post("/login", async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, password } = req.body;
     const user = await findUser(username);
-    if (!user || !await bcrypt.compare(password, user.passwordHash)) {
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
         return res.render("login", {
             error: 'No user found with that password!',
         });
     }
-    const sessionId = await createSession();
+    const sessionId = await createSession(user.id);
     res.cookie("session_id", sessionId, {
         httpOnly: true,
         sameSite: "lax",
@@ -55,8 +55,9 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.post("/logout", async (req, res) => {
-    await deleteSession(req.sessionId);
+    await deleteSession(req.session);
     res.clearCookie("session_id");
+    res.redirect("/");
 });
 
 export default authRouter;
