@@ -19,7 +19,7 @@ authRouter.post("/register", async (req, res) => {
             email
         });
     }
-    let userId = await createUser(username, email, password);
+    const userId = await createUser(username, email, password);
     const sessionId = await createSession(userId);
     res.cookie("session_id", sessionId, {
         httpOnly: true,

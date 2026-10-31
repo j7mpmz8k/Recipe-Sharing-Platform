@@ -15,7 +15,7 @@ export async function loadSession(req, res, next) {
         req.session = null;
         req.user = res.locals.user = null;
     } else {
-        let user = await loadUser(session_id);
+        const user = await loadUser(session_id);
         if (!user) {
             req.user = res.locals.user = null;
             req.session = null;
