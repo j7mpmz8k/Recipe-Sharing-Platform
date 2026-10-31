@@ -1,6 +1,6 @@
 import query from "../db/connection.js";
 
-async function createRecipe(title = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "") {
+export async function createRecipe(title = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "") {
     rows = (await query(`
         INSERT INTO recipies (title, ingredients, instructions, prep_time, cook_time, servings, user_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -9,14 +9,13 @@ async function createRecipe(title = "", ingredients = "", instructions = "", pre
     const recipe = new Recipe(rows.id, title, ingredients, instructions, prepTime, cooktime, servings, userId, username, rows.created_at, rows.updated_at);
     return recipe;
 }
-async function loadRecipe(recipeId) {
+export async function getRecipies() {
     const rows = (await query(`
         SELECT r.*, u.username
-        FROM recipis r
+        FROM recipies r
         JOIN users u on r.user_id = u.id
-        WHERE r.id = $1;
-    `, [recipeId]))[0];
-    return new Recipe(rows.id, rows.title, rows.ingredients, rows.instructions, rows.prep_time, rows.cook_time, rows.servings, rows.user_id, rows.username, rows.created_at, rows.updated_at);
+    `));
+    return rows.map(recipe => new Recipe(recipe.id, recipe.title, recipe.ingredients, recipe.instructions, recipe.prep_time, recipe.cook_time, recipe.servings, recipe.user_id, recipe.username, recipe.created_at, recipe.updated_at)) || null;
 }
 
 class Recipe {
