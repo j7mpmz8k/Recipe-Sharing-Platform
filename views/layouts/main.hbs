@@ -1,23 +1,34 @@
-<!-- views/layouts/main.handlebars -->
+<!-- views/layouts/main.hbs -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{{title}}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}{{#if title}} - {{/if}}Recipe Sharing Platform</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <nav>
-        <a href="/">Home</a>
-        <a href="/users">Users</a>
-        {{#if user}}
-            <span class="nav-user">Welcome, {{user.username}}</span>
-            <form action="/logout" method="POST" class="logout-form">
-                <button type="submit" class="btn-link">Logout</button>
-            </form>
-        {{else}}
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
-        {{/if}}
+        <div class="nav-left">
+            <a href="/" class="nav-brand">🍽 RecipeShare</a>
+            <a href="/">Home</a>
+            <a href="/recipes">Recipes</a>
+            {{#if user}}
+                <a href="/my-recipes">My Recipes</a>
+                <a href="/favorites">Favorites</a>
+            {{/if}}
+        </div>
+        <div class="nav-right">
+            {{#if user}}
+                <span class="nav-user">Welcome, {{user.username}}</span>
+                <form action="/logout" method="POST" class="logout-form">
+                    <button type="submit" class="btn-link">Logout</button>
+                </form>
+            {{else}}
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            {{/if}}
+        </div>
     </nav>
 
     <main>
@@ -25,7 +36,7 @@
     </main>
 
     <footer>
-        <p>© 2026 My App</p>
+        <p>© 2026 Recipe Sharing Platform</p>
     </footer>
 </body>
 </html>

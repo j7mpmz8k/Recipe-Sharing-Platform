@@ -1,0 +1,26 @@
+<div class="auth-container error-container">
+    <div class="auth-card error-card">
+        <div class="error-icon">🍳</div>
+        <span class="error-badge">Error 404</span>
+        <h2 class="error-title">
+            {{#if title}}{{title}}{{else}}Recipe Lost in the Pantry{{/if}}
+        </h2>
+        
+        <p class="error-message">
+            {{#if message}}
+                {{message}}
+            {{else}}
+                We checked the cupboards, peeked behind the spice rack, and even looked in the crisper drawer... but this page simply isn't here! Maybe someone ate it already?
+            {{/if}}
+        </p>
+
+        <p class="error-pun">
+            <em>"Don't cry over spilt milk—there are plenty of other tasty recipes waiting for you!"</em>
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">🏠 Back to Kitchen (Home)</a>
+            <a href="/recipes" class="btn btn-secondary">📖 Browse All Recipes</a>
+        </div>
+    </div>
+</div>

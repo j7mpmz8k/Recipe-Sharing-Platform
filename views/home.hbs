@@ -1,19 +1,121 @@
-<div class="auth-container">
-    <div class="auth-card home-card">
-        {{#if user}}
-            <h2>Welcome back, {{user.username}}!</h2>
-            <div class="home-actions">
-                <a href="/recipes" class="btn btn-primary">Browse Recipes</a>
-                <form action="/logout" method="POST" class="home-logout-form">
-                    <button type="submit" class="btn btn-secondary">Log Out</button>
-                </form>
+<div class="home-container">
+    <section class="hero-section">
+        <h1>Share & Discover Delicious Recipes</h1>
+        <p class="hero-subtitle">
+            Explore top-rated dishes, save your favorites, and share your own culinary creations with fellow food lovers.
+        </p>
+        <div class="hero-actions">
+            <a href="/recipes" class="btn btn-primary">Browse All Recipes</a>
+            {{#if user}}
+                <a href="/recipes/new" class="btn btn-secondary">Post a Recipe</a>
+            {{else}}
+                <a href="/register" class="btn btn-secondary">Create an Account</a>
+            {{/if}}
+        </div>
+    </section>
+
+    <section class="featured-section">
+        <div class="section-header">
+            <h2>Featured Recipes</h2>
+            <a href="/recipes" class="view-all-link">View all &rarr;</a>
+        </div>
+
+        {{#if featuredRecipes.length}}
+            <div class="recipe-grid">
+                {{#each featuredRecipes}}
+                    <article class="recipe-card">
+                        <div class="recipe-card-body">
+                            <h3 class="recipe-title">
+                                <a href="/recipes/{{this.id}}">{{this.title}}</a>
+                            </h3>
+                            <p class="recipe-author">
+                                By <a href="/users/{{this.user_id}}">{{this.username}}</a>
+                            </p>
+                            {{#if this.description}}
+                                <p class="recipe-description">{{this.description}}</p>
+                            {{/if}}
+                            <div class="recipe-meta">
+                                {{#if this.prep_time}}
+                                    <span>⏱ {{this.prep_time}}m prep</span>
+                                {{/if}}
+                                {{#if this.cook_time}}
+                                    <span>🍳 {{this.cook_time}}m cook</span>
+                                {{/if}}
+                                {{#if this.servings}}
+                                    <span>🍽 {{this.servings}} servings</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="recipe-card-footer">
+                            <span class="rating-badge">
+                                {{#if this.avg_rating}}
+                                    ★ {{this.avg_rating}}
+                                    {{#if this.rating_count}}({{this.rating_count}}){{/if}}
+                                {{else}}
+                                    ☆ Unrated
+                                {{/if}}
+                            </span>
+                            {{#if this.favorites_count}}
+                                <span class="favorites-badge">❤️ {{this.favorites_count}}</span>
+                            {{/if}}
+                            <a href="/recipes/{{this.id}}" class="btn-text">View Recipe &rarr;</a>
+                        </div>
+                    </article>
+                {{/each}}
+            </div>
+        {{else if recipes.length}}
+            {{! Fallback if route passes 'recipes' instead of 'featuredRecipes' }}
+            <div class="recipe-grid">
+                {{#each recipes}}
+                    <article class="recipe-card">
+                        <div class="recipe-card-body">
+                            <h3 class="recipe-title">
+                                <a href="/recipes/{{this.id}}">{{this.title}}</a>
+                            </h3>
+                            <p class="recipe-author">
+                                By <a href="/users/{{this.user_id}}">{{this.username}}</a>
+                            </p>
+                            {{#if this.description}}
+                                <p class="recipe-description">{{this.description}}</p>
+                            {{/if}}
+                            <div class="recipe-meta">
+                                {{#if this.prep_time}}
+                                    <span>⏱ {{this.prep_time}}m prep</span>
+                                {{/if}}
+                                {{#if this.cook_time}}
+                                    <span>🍳 {{this.cook_time}}m cook</span>
+                                {{/if}}
+                                {{#if this.servings}}
+                                    <span>🍽 {{this.servings}} servings</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="recipe-card-footer">
+                            <span class="rating-badge">
+                                {{#if this.avg_rating}}
+                                    ★ {{this.avg_rating}}
+                                    {{#if this.rating_count}}({{this.rating_count}}){{/if}}
+                                {{else}}
+                                    ☆ Unrated
+                                {{/if}}
+                            </span>
+                            {{#if this.favorites_count}}
+                                <span class="favorites-badge">❤️ {{this.favorites_count}}</span>
+                            {{/if}}
+                            <a href="/recipes/{{this.id}}" class="btn-text">View Recipe &rarr;</a>
+                        </div>
+                    </article>
+                {{/each}}
             </div>
         {{else}}
-            <h2>Sign in or create an account</h2>
-            <div class="home-actions">
-                <a href="/login" class="btn btn-primary">Sign In</a>
-                <a href="/register" class="btn btn-secondary">Create an Account</a>
+            <div class="empty-state">
+                <p>No featured recipes found yet.</p>
+                {{#if user}}
+                    <a href="/recipes/new" class="btn btn-primary">Share the First Recipe</a>
+                {{else}}
+                    <a href="/recipes" class="btn btn-primary">Browse All Recipes</a>
+                {{/if}}
             </div>
         {{/if}}
-    </div>
+    </section>
 </div>

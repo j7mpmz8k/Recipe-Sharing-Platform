@@ -1,0 +1,31 @@
+<div class="auth-container error-container">
+    <div class="auth-card error-card">
+        <div class="error-icon">🍪</div>
+        <span class="error-badge badge-warning">Error 403</span>
+        <h2 class="error-title">
+            {{#if title}}{{title}}{{else}}Hands Off the Secret Sauce!{{/if}}
+        </h2>
+        
+        <p class="error-message">
+            {{#if message}}
+                {{message}}
+            {{else}}
+                Caught with your hand in the cookie jar! This secret family recipe belongs to another chef. You're welcome to admire it and taste it, but only the original cook can change the ingredients!
+            {{/if}}
+        </p>
+
+        <p class="error-pun">
+            <em>"Too many cooks spoil the broth—why not whip up your own original dish instead?"</em>
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">🏠 Back to Safety (Home)</a>
+            {{#if user}}
+                <a href="/recipes/new" class="btn btn-secondary">✨ Cook Your Own Recipe</a>
+            {{else}}
+                <a href="/login" class="btn btn-secondary">🔑 Sign In to Your Kitchen</a>
+            {{/if}}
+            <a href="/recipes" class="btn btn-secondary">📖 Browse Recipes</a>
+        </div>
+    </div>
+</div>

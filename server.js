@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { loggingMiddleware } from "./middleware/logging.js";
 import { loadSession } from "./middleware/auth.js";
+import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import authRouter from "./controllers/auth.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -17,6 +18,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(loggingMiddleware);
 app.use(loadSession);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 // Global handlebars
 app.engine("hbs", engine({ extname: ".hbs" }));
@@ -26,7 +29,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/", authRouter);
 app.get("/", (req, res) => {
     res.render("home");
-})
+});
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000");

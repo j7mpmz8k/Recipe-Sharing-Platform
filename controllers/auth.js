@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import {createUser, findUser} from "../models/users.js";
 import {createSession, deleteSession} from "../models/sessions.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const authRouter = express.Router();
 
@@ -54,7 +55,7 @@ authRouter.post("/login", async (req, res) => {
     res.redirect("/");
 });
 
-authRouter.post("/logout", async (req, res) => {
+authRouter.post("/logout", requireAuth, async (req, res) => {
     await deleteSession(req.session);
     res.clearCookie("session_id");
     res.redirect("/");
