@@ -25,7 +25,7 @@ export async function getAllRecipes() {
         FROM recipes r
         JOIN users u on r.user_id = u.id;
     `));
-    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || null;
+    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || [];
 }
 export async function getUserRecipes(userId) {
     const rows = (await query(`
@@ -34,7 +34,7 @@ export async function getUserRecipes(userId) {
         JOIN users u on r.user_id = u.id
         WHERE u.id = $1;
     `, [userId]));
-    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || null;
+    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || [];
 }
 
 class Recipe {
@@ -68,7 +68,7 @@ class Recipe {
     }
 
     isOwnedBy(userId) {
-        this.isOwner = Boolean(userId && this.userId === userId);
+        this.isOwner = this.userId === userId;
         return this.isOwner;
     }
 

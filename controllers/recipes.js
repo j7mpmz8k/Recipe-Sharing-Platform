@@ -7,7 +7,6 @@ const recipesRouter = express.Router();
 recipesRouter.use(loadRecipes);
 
 recipesRouter.get("/", (req, res) => {
-    (res.locals.recipes || []).forEach(r => r.isOwnedBy(req.user?.id));
     res.render("recipes/index");
 });
 
@@ -27,7 +26,6 @@ recipesRouter.get("/:id", async (req, res) => {
     if (!recipe) {
         return res.status(404).render("not-found");
     }
-    recipe.isOwnedBy(req.user?.id);
     res.locals.recipe = recipe;
     res.render("recipes/show");
 });
