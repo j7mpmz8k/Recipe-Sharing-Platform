@@ -20,7 +20,7 @@
         </div>
         <div class="nav-right">
             {{#if user}}
-                <span class="nav-user">Welcome, {{user.username}}</span>
+                <span class="nav-user">Welcome, <a href="/users/{{user.id}}" style="color: inherit; text-decoration: underline;">{{user.username}}</a></span>
                 <form action="/logout" method="POST" class="logout-form">
                     <button type="submit" class="btn-link">Logout</button>
                 </form>

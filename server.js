@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import { loggingMiddleware } from "./middleware/logging.js";
 import { loadSession } from "./middleware/auth.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
-import authRouter from "./controllers/auth.js";
+import usersRouter from "./controllers/users.js";
 import recipesRouter from "./controllers/recipes.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -26,7 +26,7 @@ app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
 //global routers
-app.use("/", authRouter);
+app.use("/", usersRouter);
 app.use("/recipes", recipesRouter);
 app.get("/", (req, res) => {
     res.render("home");

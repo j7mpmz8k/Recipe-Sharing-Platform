@@ -1,0 +1,83 @@
+<div class="recipes-container">
+    <div class="section-header">
+        <div>
+            <h2>All Recipes</h2>
+            <p class="section-subtitle">Discover community-tested culinary creations</p>
+        </div>
+        {{#if user}}
+            <a href="/recipes/new" class="btn btn-primary">+ Post a Recipe</a>
+        {{/if}}
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <form action="/recipes" method="GET" class="search-form">
+            <div class="search-input-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" name="q" placeholder="Search recipes by title or ingredients..." value="{{searchQuery}}">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    {{#if recipes.length}}
+        <div class="recipe-grid">
+            {{#each recipes}}
+                <article class="recipe-card">
+                    <div class="recipe-card-body">
+                        <h3 class="recipe-title">
+                            <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}">{{this.title}}</a>
+                        </h3>
+                        <p class="recipe-author">
+                            By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{this.username}}</a>
+                        </p>
+                        {{#if this.description}}
+                            <p class="recipe-description">{{this.description}}</p>
+                        {{/if}}
+                        <div class="recipe-meta">
+                            {{#if this.prepTime}}
+                                <span>⏱ {{this.prepTime}}m prep</span>
+                            {{else if this.prep_time}}
+                                <span>⏱ {{this.prep_time}}m prep</span>
+                            {{/if}}
+                            {{#if this.cooktime}}
+                                <span>🍳 {{this.cooktime}}m cook</span>
+                            {{else if this.cook_time}}
+                                <span>🍳 {{this.cook_time}}m cook</span>
+                            {{/if}}
+                            {{#if this.servings}}
+                                <span>🍽 {{this.servings}} servings</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="recipe-card-footer">
+                        <span class="rating-badge">
+                            {{#if this.avgRating}}
+                                ★ {{this.avgRating}} {{#if this.ratingCount}}({{this.ratingCount}}){{/if}}
+                            {{else if this.avg_rating}}
+                                ★ {{this.avg_rating}} {{#if this.rating_count}}({{this.rating_count}}){{/if}}
+                            {{else}}
+                                ☆ Unrated
+                            {{/if}}
+                        </span>
+                        <div class="card-footer-actions">
+                            {{#if this.isOwner}}
+                                <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>
+                            {{/if}}
+                            <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
+                        </div>
+                    </div>
+                </article>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="empty-state">
+            <p>No recipes found.</p>
+            {{#if user}}
+                <a href="/recipes/new" class="btn btn-primary">Share the First Recipe</a>
+            {{else}}
+                <a href="/register" class="btn btn-primary">Sign up to Share Recipes</a>
+            {{/if}}
+        </div>
+    {{/if}}
+</div>

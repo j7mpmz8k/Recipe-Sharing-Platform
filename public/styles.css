@@ -202,6 +202,7 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
 }
 
 .form-group label {
@@ -215,20 +216,83 @@ main {
     color: var(--text-muted);
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    min-width: 0;
     padding: 0.75rem;
     border: 1px solid var(--input-border);
     border-radius: 6px;
     font-size: 1rem;
+    font-family: inherit;
     background-color: var(--input-bg);
     color: var(--input-text);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s, background-color 0.3s ease, color 0.3s ease;
 }
 
-.form-group input:focus {
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Responsive Form Grid for 3-column rows (Prep/Cook/Servings) */
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .form-grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Recipe Form Side-by-Side Row (Meta Column + Ingredients Column) */
+.recipe-form-row {
+    display: grid;
+    grid-template-columns: 75px 1fr;
+    gap: 1.25rem;
+    align-items: stretch;
+}
+
+.recipe-meta-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.85rem;
+    width: 75px;
+}
+
+.recipe-meta-column input {
+    width: 75px;
+    max-width: 75px;
+    padding: 0.5rem 0.25rem;
+    text-align: center;
+}
+
+.recipe-ingredients-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.recipe-ingredients-column textarea {
+    flex: 1;
+    min-height: 220px;
+}
+
+@media (max-width: 600px) {
+    .recipe-form-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Buttons */
@@ -354,10 +418,11 @@ main {
 }
 
 /* Home & Hero */
-.home-container {
+.home-container,
+.recipes-container {
     display: flex;
     flex-direction: column;
-    gap: 2.5rem;
+    gap: 1.25rem;
     width: 100%;
 }
 
@@ -408,6 +473,7 @@ main {
     align-items: baseline;
     border-bottom: 2px solid var(--card-border);
     padding-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
 }
 
 .section-header h2 {
@@ -540,6 +606,20 @@ main {
 
 .btn-text:hover {
     text-decoration: underline;
+}
+
+.card-footer-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.btn-text-edit {
+    color: #e67e22;
+}
+
+.btn-text-edit:hover {
+    color: #d35400;
 }
 
 /* Empty State */

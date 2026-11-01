@@ -20,7 +20,7 @@ export async function findUser(username) {
 }
 export async function loadUser(sessionId) {
     const user = (await query(`
-        SELECT u.username, u.email
+        SELECT u.id, u.username, u.email
         FROM users u
         JOIN sessions s on u.id = s.user_id
         WHERE session_id = $1;

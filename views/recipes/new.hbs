@@ -1,0 +1,55 @@
+<div class="auth-container" style="max-width: 650px;">
+    <div class="auth-card">
+        <h2>Post a New Recipe</h2>
+
+        {{#if error}}
+            <div class="alert alert-error">{{error}}</div>
+        {{/if}}
+
+        <form action="/recipes" method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="title">Recipe Title *</label>
+                <input type="text" id="title" name="title" required placeholder="e.g. Grandma's Classic Lasagna" value="{{formData.title}}">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Short Description</label>
+                <textarea id="description" name="description" rows="2" placeholder="Brief overview of the dish...">{{formData.description}}</textarea>
+            </div>
+
+            <div class="recipe-form-row">
+                <div class="recipe-meta-column">
+                    <div class="form-group">
+                        <label for="prep_time">Prep (mins)</label>
+                        <input type="number" id="prep_time" name="prep_time" min="0" placeholder="15" value="{{formData.prep_time}}">
+                    </div>
+                    <div class="form-group">
+                        <label for="cook_time">Cook (mins)</label>
+                        <input type="number" id="cook_time" name="cook_time" min="0" placeholder="30" value="{{formData.cook_time}}">
+                    </div>
+                    <div class="form-group">
+                        <label for="servings">Servings</label>
+                        <input type="number" id="servings" name="servings" min="1" placeholder="4" value="{{formData.servings}}">
+                    </div>
+                </div>
+
+                <div class="form-group recipe-ingredients-column">
+                    <label for="ingredients">Ingredients *</label>
+                    <span class="form-hint">Enter each ingredient on a new line</span>
+                    <textarea id="ingredients" name="ingredients" required placeholder="2 cups flour&#10;1 tsp salt&#10;3 eggs">{{formData.ingredients}}</textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="instructions">Instructions *</label>
+                <span class="form-hint">Step-by-step cooking instructions</span>
+                <textarea id="instructions" name="instructions" rows="8" required placeholder="1. Preheat the oven to 375°F...&#10;2. Mix dry ingredients...">{{formData.instructions}}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Create Recipe</button>
+                <a href="/recipes" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

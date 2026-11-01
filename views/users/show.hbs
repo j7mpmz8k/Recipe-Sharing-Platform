@@ -1,0 +1,75 @@
+<div class="user-profile-container" style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+    <!-- Profile Header Card -->
+    <header class="recipe-header-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div class="avatar-circle" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                👤
+            </div>
+            <div>
+                <h1 style="margin: 0; font-size: 1.75rem;">{{profileUser.username}}</h1>
+                <p class="text-muted" style="margin: 0.35rem 0 0; font-size: 0.95rem;">
+                    Member since {{profileUser.createdAt}}
+                </p>
+            </div>
+        </div>
+
+        <div class="recipe-meta" style="margin: 0;">
+            <span>🍳 {{#if recipes.length}}{{recipes.length}}{{else}}0{{/if}} Recipes Shared</span>
+        </div>
+    </header>
+
+    <!-- User's Recipes Grid -->
+    <section>
+        <div class="section-header">
+            <h2>Recipes by {{profileUser.username}}</h2>
+        </div>
+
+        {{#if recipes.length}}
+            <div class="recipe-grid">
+                {{#each recipes}}
+                    <article class="recipe-card">
+                        <div class="recipe-card-body">
+                            <h3 class="recipe-title">
+                                <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}">{{this.title}}</a>
+                            </h3>
+                            {{#if this.description}}
+                                <p class="recipe-description">{{this.description}}</p>
+                            {{/if}}
+                            <div class="recipe-meta">
+                                {{#if this.prepTime}}
+                                    <span>⏱ {{this.prepTime}}m prep</span>
+                                {{else if this.prep_time}}
+                                    <span>⏱ {{this.prep_time}}m prep</span>
+                                {{/if}}
+                                {{#if this.cooktime}}
+                                    <span>🍳 {{this.cooktime}}m cook</span>
+                                {{else if this.cook_time}}
+                                    <span>🍳 {{this.cook_time}}m cook</span>
+                                {{/if}}
+                                {{#if this.servings}}
+                                    <span>🍽 {{this.servings}} servings</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="recipe-card-footer">
+                            <span class="rating-badge">
+                                {{#if this.avgRating}}
+                                    ★ {{this.avgRating}}
+                                {{else if this.avg_rating}}
+                                    ★ {{this.avg_rating}}
+                                {{else}}
+                                    ☆ Unrated
+                                {{/if}}
+                            </span>
+                            <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
+                        </div>
+                    </article>
+                {{/each}}
+            </div>
+        {{else}}
+            <div class="empty-state">
+                <p>{{profileUser.username}} hasn't posted any recipes yet.</p>
+            </div>
+        {{/if}}
+    </section>
+</div>
