@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { createUser, findUser } from "../models/users.js";
 import { createSession, deleteSession } from "../models/sessions.js";
 import { requireAuth } from "../middleware/auth.js";
+import { getUserRecipes } from "../models/recipes.js";
 
 const usersRouter = express.Router();
 
@@ -58,7 +59,14 @@ usersRouter.post("/login", async (req, res) => {
 usersRouter.post("/logout", requireAuth, async (req, res) => {
     await deleteSession(req.session);
     res.clearCookie("session_id");
-    res.redirect("/");
+    res.redirect("login");
 });
+
+usersRouter.get("/users/:id", async (req, res) => {
+    const userId = req.params.id;
+    //TODO still needs user info added to locals
+    res.locals.userRecipes = await getUserRecipes(userId);//TODO would rather compose into user class
+    res.render("users/show")
+})
 
 export default usersRouter;

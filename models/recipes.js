@@ -27,6 +27,15 @@ export async function getAllRecipes() {
     `));
     return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || null;
 }
+export async function getUserRecipes(userId) {
+    const rows = (await query(`
+        SELECT r.*, u.username
+        FROM recipes r
+        JOIN users u on r.user_id = u.id
+        WHERE u.id = $1;
+    `, [userId]));
+    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || null;
+}
 
 class Recipe {
     constructor(recipeId, title, description, ingredients, instructions, prepTime, cooktime, servings, userId, username, createdAt, updatedAt) {

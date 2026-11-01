@@ -1,0 +1,57 @@
+<div class="recipes-container">
+    <div class="section-header">
+        <div>
+            <h2>My Favorites ❤️</h2>
+            <p class="section-subtitle">Recipes you have saved to cook again</p>
+        </div>
+        <a href="/recipes" class="btn btn-secondary">Browse More Recipes</a>
+    </div>
+
+    {{#if recipes.length}}
+        <div class="recipe-grid">
+            {{#each recipes}}
+                <article class="recipe-card">
+                    <div class="recipe-card-body">
+                        <h3 class="recipe-title">
+                            <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}">{{this.title}}</a>
+                        </h3>
+                        <p class="recipe-author">
+                            By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{this.username}}</a>
+                        </p>
+                        {{#if this.description}}
+                            <p class="recipe-description">{{this.description}}</p>
+                        {{/if}}
+                        <div class="recipe-meta">
+                            {{#if this.prepTime}}
+                                <span>⏱ {{this.prepTime}}m prep</span>
+                            {{else if this.prep_time}}
+                                <span>⏱ {{this.prep_time}}m prep</span>
+                            {{/if}}
+                            {{#if this.cooktime}}
+                                <span>🍳 {{this.cooktime}}m cook</span>
+                            {{else if this.cook_time}}
+                                <span>🍳 {{this.cook_time}}m cook</span>
+                            {{/if}}
+                            {{#if this.servings}}
+                                <span>🍽 {{this.servings}} servings</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="recipe-card-footer">
+                        <form action="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/favorite" method="POST" style="margin: 0;">
+                            <button type="submit" class="btn-link" style="color: #e53e3e; font-size: 0.85rem; padding: 0.2rem 0.5rem;" title="Remove from favorites">
+                                💔 Remove
+                            </button>
+                        </form>
+                        <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
+                    </div>
+                </article>
+            {{/each}}
+        </div>
+    {{else}}
+        <div class="empty-state">
+            <p>You have not saved any favorite recipes yet.</p>
+            <a href="/recipes" class="btn btn-primary">Browse Recipes to Favorite</a>
+        </div>
+    {{/if}}
+</div>

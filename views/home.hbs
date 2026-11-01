@@ -20,105 +20,29 @@
             <a href="/recipes" class="view-all-link">View all &rarr;</a>
         </div>
 
-        {{#if featuredRecipes.length}}
-            <div class="recipe-grid">
-                {{#each featuredRecipes}}
-                    <article class="recipe-card">
-                        <div class="recipe-card-body">
-                            <h3 class="recipe-title">
-                                <a href="/recipes/{{this.id}}">{{this.title}}</a>
-                            </h3>
-                            <p class="recipe-author">
-                                By <a href="/users/{{this.user_id}}">{{this.username}}</a>
-                            </p>
-                            {{#if this.description}}
-                                <p class="recipe-description">{{this.description}}</p>
-                            {{/if}}
-                            <div class="recipe-meta">
-                                {{#if this.prep_time}}
-                                    <span>⏱ {{this.prep_time}}m prep</span>
-                                {{/if}}
-                                {{#if this.cook_time}}
-                                    <span>🍳 {{this.cook_time}}m cook</span>
-                                {{/if}}
-                                {{#if this.servings}}
-                                    <span>🍽 {{this.servings}} servings</span>
-                                {{/if}}
-                            </div>
-                        </div>
-                        <div class="recipe-card-footer">
-                            <span class="rating-badge">
-                                {{#if this.avg_rating}}
-                                    ★ {{this.avg_rating}}
-                                    {{#if this.rating_count}}({{this.rating_count}}){{/if}}
-                                {{else}}
-                                    ☆ Unrated
-                                {{/if}}
-                            </span>
-                            {{#if this.favorites_count}}
-                                <span class="favorites-badge">❤️ {{this.favorites_count}}</span>
-                            {{/if}}
-                            <a href="/recipes/{{this.id}}" class="btn-text">View Recipe &rarr;</a>
-                        </div>
-                    </article>
-                {{/each}}
-            </div>
-        {{else if recipes.length}}
-            {{! Populated from res.locals.recipes }}
+        {{#if recipes.length}}
             <div class="recipe-grid">
                 {{#each recipes}}
                     <article class="recipe-card">
                         <div class="recipe-card-body">
                             <h3 class="recipe-title">
-                                <a href="/recipes/{{this.recipeId}}">{{this.title}}</a>
+                                <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}">{{this.title}}</a>
                             </h3>
                             <p class="recipe-author">
-                                By <a href="/users/{{this.userId}}">{{this.username}}</a>
+                                By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{this.username}}</a>
                             </p>
+                            {{#if this.description}}
+                                <p class="recipe-description">{{this.description}}</p>
+                            {{/if}}
                             <div class="recipe-meta">
                                 {{#if this.prepTime}}
                                     <span>⏱ {{this.prepTime}}m prep</span>
+                                {{else if this.prep_time}}
+                                    <span>⏱ {{this.prep_time}}m prep</span>
                                 {{/if}}
                                 {{#if this.cooktime}}
                                     <span>🍳 {{this.cooktime}}m cook</span>
-                                {{/if}}
-                                {{#if this.servings}}
-                                    <span>🍽 {{this.servings}} servings</span>
-                                {{/if}}
-                            </div>
-                        </div>
-                        <div class="recipe-card-footer">
-                            <span class="recipe-date">
-                                {{#if this.isUpdated}}
-                                    Updated {{this.updatedAt}}
-                                {{else}}
-                                    {{this.createdAt}}
-                                {{/if}}
-                            </span>
-                            <a href="/recipes/{{this.recipeId}}" class="btn-text">View Recipe &rarr;</a>
-                        </div>
-                    </article>
-                {{/each}}
-            </div>
-        {{else if recipes.length}}
-            <div class="recipe-grid">
-                {{#each recipes}}
-                    <article class="recipe-card">
-                        <div class="recipe-card-body">
-                            <h3 class="recipe-title">
-                                <a href="/recipes/{{this.id}}">{{this.title}}</a>
-                            </h3>
-                            <p class="recipe-author">
-                                By <a href="/users/{{this.user_id}}">{{this.username}}</a>
-                            </p>
-                            {{#if this.description}}
-                                <p class="recipe-description">{{this.description}}</p>
-                            {{/if}}
-                            <div class="recipe-meta">
-                                {{#if this.prep_time}}
-                                    <span>⏱ {{this.prep_time}}m prep</span>
-                                {{/if}}
-                                {{#if this.cook_time}}
+                                {{else if this.cook_time}}
                                     <span>🍳 {{this.cook_time}}m cook</span>
                                 {{/if}}
                                 {{#if this.servings}}
@@ -128,17 +52,20 @@
                         </div>
                         <div class="recipe-card-footer">
                             <span class="rating-badge">
-                                {{#if this.avg_rating}}
-                                    ★ {{this.avg_rating}}
-                                    {{#if this.rating_count}}({{this.rating_count}}){{/if}}
+                                {{#if this.avgRating}}
+                                    ★ {{this.avgRating}} {{#if this.ratingCount}}({{this.ratingCount}}){{/if}}
+                                {{else if this.avg_rating}}
+                                    ★ {{this.avg_rating}} {{#if this.rating_count}}({{this.rating_count}}){{/if}}
                                 {{else}}
                                     ☆ Unrated
                                 {{/if}}
                             </span>
-                            {{#if this.favorites_count}}
+                            {{#if this.favoritesCount}}
+                                <span class="favorites-badge">❤️ {{this.favoritesCount}}</span>
+                            {{else if this.favorites_count}}
                                 <span class="favorites-badge">❤️ {{this.favorites_count}}</span>
                             {{/if}}
-                            <a href="/recipes/{{this.id}}" class="btn-text">View Recipe &rarr;</a>
+                            <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
                         </div>
                     </article>
                 {{/each}}
