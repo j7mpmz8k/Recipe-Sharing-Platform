@@ -65,7 +65,12 @@
                             {{else if this.favorites_count}}
                                 <span class="favorites-badge">❤️ {{this.favorites_count}}</span>
                             {{/if}}
-                            <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
+                            <div class="card-footer-actions">
+                                {{#if this.isOwner}}
+                                    <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>
+                                {{/if}}
+                                <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
+                            </div>
                         </div>
                     </article>
                 {{/each}}

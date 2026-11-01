@@ -1,7 +1,7 @@
 import express from "express";
 import { loadRecipes } from "../middleware/content.js";
 import { requireAuth } from "../middleware/auth.js";
-import { createRecipe, getRecipe } from "../models/recipes.js";
+import { createRecipe } from "../models/recipes.js";
 const recipesRouter = express.Router();
 
 recipesRouter.use(loadRecipes);
@@ -20,9 +20,8 @@ recipesRouter.post("/", requireAuth, async (req, res) => {
     res.redirect(`${recipeId}`);
 });
 
-recipesRouter.get("/:id", async (req, res) => {
-    const recipeId = req.params.id;
-    const recipe = await getRecipe(recipeId);
+recipesRouter.get("/:id", (req, res) => {
+    const recipe = req.recipes.find(i => i.recipeId == req.params.id);
     if (!recipe) {
         return res.status(404).render("not-found");
     }

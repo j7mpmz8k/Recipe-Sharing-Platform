@@ -9,16 +9,6 @@ export async function createRecipe(title = "", description = "", ingredients = "
     return r.id;
 }
 
-export async function getRecipe(recipeId) {
-    const r = (await query(`
-        SELECT r.*, u.username
-        FROM recipes r
-        JOIN users u on r.user_id = u.id
-        WHERE r.id = $1;
-    `, [recipeId]))[0];
-    return new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at) || null;
-}
-
 export async function getAllRecipes() {
     const rows = (await query(`
         SELECT r.*, u.username
