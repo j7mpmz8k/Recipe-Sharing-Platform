@@ -1,6 +1,7 @@
-import { getRecipies } from "../models/recipies.js";
+import { getRecipes } from "../models/recipes.js";
 
-async function loadRecipies(req, res, next) {
-    req.recipies = res.locals.recipies = await getRecipies();
-    next()
+export async function loadRecipes(req, res, next) {
+    const recipes = await getRecipes();
+    req.recipes = res.locals.recipes = recipes;
+    next();
 }

@@ -64,7 +64,43 @@
                 {{/each}}
             </div>
         {{else if recipes.length}}
-            {{! Fallback if route passes 'recipes' instead of 'featuredRecipes' }}
+            {{! Populated from res.locals.recipes }}
+            <div class="recipe-grid">
+                {{#each recipes}}
+                    <article class="recipe-card">
+                        <div class="recipe-card-body">
+                            <h3 class="recipe-title">
+                                <a href="/recipes/{{this.recipeId}}">{{this.title}}</a>
+                            </h3>
+                            <p class="recipe-author">
+                                By <a href="/users/{{this.userId}}">{{this.username}}</a>
+                            </p>
+                            <div class="recipe-meta">
+                                {{#if this.prepTime}}
+                                    <span>⏱ {{this.prepTime}}m prep</span>
+                                {{/if}}
+                                {{#if this.cooktime}}
+                                    <span>🍳 {{this.cooktime}}m cook</span>
+                                {{/if}}
+                                {{#if this.servings}}
+                                    <span>🍽 {{this.servings}} servings</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="recipe-card-footer">
+                            <span class="recipe-date">
+                                {{#if this.isUpdated}}
+                                    Updated {{this.updatedAt}}
+                                {{else}}
+                                    {{this.createdAt}}
+                                {{/if}}
+                            </span>
+                            <a href="/recipes/{{this.recipeId}}" class="btn-text">View Recipe &rarr;</a>
+                        </div>
+                    </article>
+                {{/each}}
+            </div>
+        {{else if recipes.length}}
             <div class="recipe-grid">
                 {{#each recipes}}
                     <article class="recipe-card">
