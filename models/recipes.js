@@ -39,7 +39,7 @@ class Recipe {
         this.servings = servings;
         this.userId = userId;
         this.username = username;
-        this.isOwner = false;
+        this.canEdit = false;
 
         // compare timestamps with 1 second buffer
         this.isUpdated = (new Date(updatedAt) - new Date(createdAt)) > 1000;
@@ -58,8 +58,8 @@ class Recipe {
     }
 
     isOwnedBy(userId) {
-        this.isOwner = this.userId === userId;
-        return this.isOwner;
+        this.canEdit = this.userId === userId;
+        return this.canEdit;
     }
 
     saveEdit = async () => {

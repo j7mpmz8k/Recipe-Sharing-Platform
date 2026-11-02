@@ -3,9 +3,13 @@ export function notFoundHandler(req, res, next) {
 }
 
 export function errorHandler(err, req, res, next) {
-    if (err.status === 403) {
-        return res.status(403).render("unauthorized");
+    switch (err.status) {
+        case 403:
+            return res.status(403).render("unauthorized");
+        case 404:
+            return res.status(404).render("not-found");
+        default:
+            console.error("Server Error:", err);
+            return next(err);
     }
-    console.error("Server Error:", err);
-    next(err);
 }

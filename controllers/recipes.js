@@ -20,13 +20,44 @@ recipesRouter.post("/", requireAuth, async (req, res) => {
     res.redirect(`${recipeId}`);
 });
 
-recipesRouter.get("/:id", (req, res) => {
+recipesRouter.get("/:id", (req, res, next) => {
     const recipe = req.recipes.find(i => i.recipeId == req.params.id);
     if (!recipe) {
-        return res.status(404).render("not-found");
+        next({ status: 404 });
+    } else {
+        res.locals.recipe = recipe;
+        res.render("recipes/show");
     }
-    res.locals.recipe = recipe;
-    res.render("recipes/show");
+});
+
+recipesRouter.get("/:id/edit", requireAuth, (req, res, next) => {
+    const recipe = req.recipes.find(i => i.recipeId == req.params.id);
+    if (!recipe) {
+        next({ status: 404 });
+    } else if (!recipe.canEdit) {
+        next({ status: 403 });
+    } else {
+        res.locals.recipe = recipe;
+        res.render("recipes/edit");
+    }
+});
+
+recipesRouter.post("/:id", requireAuth, async (req, res, next) => {
+    const recipe = req.recipes.find(i => i.recipeId == req.params.id);
+    if (!recipe.canEdit) {
+        next({ status: 403 });
+    } else {
+        const { title, description, prep_time, cook_time, servings, ingredients, instructions } = req.body;
+        recipe.title = title;
+        recipe.description = description;
+        recipe.prepTime = prep_time;
+        recipe.cookTime = cook_time;
+        recipe.servings = servings;
+        recipe.ingredients = ingredients;
+        recipe.instructions = instructions;
+        await recipe.saveEdit();
+        res.redirect(`${recipe.recipeId}`);
+    }
 });
 
 export default recipesRouter;
