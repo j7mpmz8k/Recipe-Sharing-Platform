@@ -17,7 +17,7 @@ recipesRouter.get("/new", requireAuth, (req, res) => {
 recipesRouter.post("/", requireAuth, async (req, res) => {
     const { title, description, prep_time, cook_time, servings, ingredients, instructions } = req.body;
     const recipeId = await createRecipe(title, description, ingredients, instructions, prep_time, cook_time, servings, req.user.id, req.user.username);
-    res.redirect(`${recipeId}`);
+    res.redirect(`/recipes/${recipeId}`);
 });
 
 recipesRouter.get("/:id", (req, res, next) => {
@@ -44,20 +44,34 @@ recipesRouter.get("/:id/edit", requireAuth, (req, res, next) => {
 
 recipesRouter.post("/:id", requireAuth, async (req, res, next) => {
     const recipe = req.recipes.find(i => i.recipeId == req.params.id);
-    if (!recipe.canEdit) {
+    if (!recipe) {
+        next({ status: 404 });
+    } else if (!recipe.canEdit) {
         next({ status: 403 });
     } else {
         const { title, description, prep_time, cook_time, servings, ingredients, instructions } = req.body;
         recipe.title = title;
         recipe.description = description;
-        recipe.prepTime = prep_time;
-        recipe.cookTime = cook_time;
-        recipe.servings = servings;
+        recipe.prepTime = prep_time || 0;
+        recipe.cookTime = cook_time || 0;
+        recipe.servings = servings || 0;
         recipe.ingredients = ingredients;
         recipe.instructions = instructions;
         await recipe.saveEdit();
-        res.redirect(`${recipe.recipeId}`);
+        res.redirect(`/recipes/${recipe.recipeId}`);
     }
 });
+
+recipesRouter.post("/:id/delete", requireAuth, async (req, res, next) => {
+    const recipe = req.recipes.find(i => i.recipeId == req.params.id);
+    if (!recipe) {
+        next({ status: 404 });
+    } else if (!recipe.canEdit) {
+        next({ status: 403 });
+    } else {
+        recipe.delete();
+        res.redirect("/recipes");
+    }
+})
 
 export default recipesRouter;

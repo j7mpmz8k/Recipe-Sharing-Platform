@@ -33,6 +33,11 @@ class Recipe {
         this.title = title;
         this.description = description;
         this.ingredients = ingredients;
+        if (this.ingredients) {//used only for rendering with checkboxes
+            this.ingredientsList = this.ingredients.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+        } else {
+            this.ingredientsList = [];
+        }
         this.instructions = instructions;
         this.prepTime = prepTime;//minutes
         this.cooktime = cooktime;//minutes
@@ -76,5 +81,11 @@ class Recipe {
                 updated_at = NOW()
             WHERE id = $1;
         `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cooktime, this.servings]);
+    }
+    delete = async () => {
+        await query(`
+            DELETE FROM recipes
+            WHERE id = $1;    
+        `, [this.recipeId]);
     }
 }

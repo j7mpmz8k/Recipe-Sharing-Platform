@@ -59,7 +59,7 @@ usersRouter.post("/login", async (req, res) => {
 usersRouter.post("/logout", requireAuth, async (req, res) => {
     await deleteSession(req.session);
     res.clearCookie("session_id");
-    res.redirect("login");
+    res.redirect("/login");
 });
 
 usersRouter.get("/users/:id", async (req, res) => {
