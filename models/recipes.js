@@ -39,6 +39,19 @@ export async function getUserRecipes(userId, viewerId = 0) {
     return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, r.is_favorite)) || [];
 }
 
+export async function getFavoriteRecipes(userId) {
+    const rows = (await query(`
+        SELECT r.*, u.username, COUNT(all_f.id) AS fav_count, true AS is_favorite
+        FROM favorites fav
+        JOIN recipes r ON fav.recipe_id = r.id
+        JOIN users u ON r.user_id = u.id
+        LEFT JOIN favorites all_f ON r.id = all_f.recipe_id
+        WHERE fav.user_id = $1
+        GROUP BY r.id, u.username;
+    `, [userId]));
+    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, true)) || [];
+}
+
 class Recipe {
     constructor(recipeId, title, description, ingredients, instructions, prepTime, cooktime, servings, userId, username, createdAt, updatedAt, favoriteCount, isFavorite) {
         this.recipeId = recipeId;

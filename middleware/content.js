@@ -2,7 +2,7 @@ import { getAllRecipes } from "../models/recipes.js";
 import { getUserData } from "../models/users.js";
 
 export async function loadRecipes(req, res, next) {
-    //used to test if user favorited recipe...set to zero as fallback incase no session user
+    //used to test if user favorited recipe...set to zero as fallback in case no session user
     let userId = 0;
     if (req.user) {
         userId = req.user.id;
@@ -30,8 +30,8 @@ export async function loadUserProfile(req, res, next) {
     }
     if (req.user) {
         user.recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
+        user.favoriteRecipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
     }
-    req.userProfile = res.locals.userProfile = user;
-    req.recipes = res.locals.recipes = user.recipes;
+    res.locals.userProfile = user;
     next();
 }

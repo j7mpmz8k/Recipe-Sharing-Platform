@@ -42,6 +42,20 @@
                             <h3 class="recipe-title">
                                 <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}">{{this.title}}</a>
                             </h3>
+                            <div class="recipe-card-subheading">
+                                <p class="recipe-author">
+                                    By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{this.username}}</a>
+                                </p>
+                                <span class="rating-badge">
+                                    {{#if this.avgRating}}
+                                        ★ {{this.avgRating}} {{#if this.ratingCount}}({{this.ratingCount}}){{/if}}
+                                    {{else if this.avg_rating}}
+                                        ★ {{this.avg_rating}} {{#if this.rating_count}}({{this.rating_count}}){{/if}}
+                                    {{else}}
+                                        ☆ Unrated
+                                    {{/if}}
+                                </span>
+                            </div>
                             {{#if this.description}}
                                 <p class="recipe-description">{{this.description}}</p>
                             {{/if}}
@@ -62,21 +76,14 @@
                             </div>
                         </div>
                         <div class="recipe-card-footer">
-                            <span class="rating-badge">
-                                {{#if this.avgRating}}
-                                    ★ {{this.avgRating}}
-                                {{else if this.avg_rating}}
-                                    ★ {{this.avg_rating}}
-                                {{else}}
-                                    ☆ Unrated
-                                {{/if}}
-                            </span>
+                            {{#if @root.user}}
+                                <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="{{#if this.isFavorite}}Unfavorite this recipe{{else if this.isFavorited}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
+                                    <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                                </button>
+                            {{else}}
+                                <span></span>
+                            {{/if}}
                             <div class="card-footer-actions">
-                                {{#if @root.user}}
-                                    <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="Favorite this recipe">
-                                        <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
-                                    </button>
-                                {{/if}}
                                 {{#if this.canEdit}}
                                     <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>
                                 {{/if}}

@@ -537,6 +537,17 @@ main {
     color: #3498db;
 }
 
+.recipe-card-subheading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.recipe-card-subheading .rating-badge {
+    margin-left: auto;
+}
+
 .recipe-author {
     font-size: 0.875rem;
     color: var(--text-muted);
@@ -588,8 +599,10 @@ main {
 }
 
 .rating-badge {
+    font-size: 0.875rem;
     font-weight: 600;
     color: #d97706;
+    white-space: nowrap;
 }
 
 .favorites-badge {

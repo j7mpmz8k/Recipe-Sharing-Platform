@@ -1,6 +1,6 @@
 const buttons = document.querySelectorAll(".favorite-btn");
 
-for (btn of buttons) {
+for (const btn of buttons) {
     btn.addEventListener("click", async () => {
         const recipeId = btn.dataset.recipeId; 
         const res = await fetch(`/recipes/${recipeId}/favorite`, {
@@ -9,6 +9,7 @@ for (btn of buttons) {
         const data = await res.json();
         const btnIcon = btn.querySelector(".heart-icon");
         btn.classList.toggle("favorited", data.isFavorite);
+        btn.title = data.isFavorite ? "Unfavorite this recipe" : "Favorite this recipe";
         if (data.isFavorite) {
             btnIcon.textContent = "❤️";                                                                                                  
         } else {

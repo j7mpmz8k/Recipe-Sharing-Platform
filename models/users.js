@@ -1,6 +1,6 @@
 import query from "../db/connection.js";
 import bcrypt from "bcrypt";
-import { getUserRecipes } from "./recipes.js";
+import { getUserRecipes, getFavoriteRecipes } from "./recipes.js";
 
 export async function createUser(username, email, plainPassword) {
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
@@ -42,6 +42,7 @@ export async function getUserData(userId, viewerId = 0) {
         year: "numeric"
     });
     user.recipes = await getUserRecipes(userId, viewerId);
+    user.favoriteRecipes = await getFavoriteRecipes(userId);
     return user || null;
 }
 

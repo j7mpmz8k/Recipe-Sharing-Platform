@@ -45,7 +45,7 @@
             <!-- Favorite Button -->
             <div class="favorite-section">
                 {{#if user}}
-                    <button type="button" class="btn btn-secondary btn-sm favorite-btn {{#if isFavorited}}favorited{{else if recipe.isFavorite}}favorited{{/if}}" data-recipe-id="{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}">
+                    <button type="button" class="btn btn-secondary btn-sm favorite-btn {{#if isFavorited}}favorited{{else if recipe.isFavorite}}favorited{{/if}}" data-recipe-id="{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}" title="{{#if isFavorited}}Unfavorite this recipe{{else if recipe.isFavorite}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
                         <span class="heart-icon">{{#if isFavorited}}❤️{{else if recipe.isFavorite}}❤️{{else}}🤍{{/if}}</span>
                         <span class="favorite-text">{{#if isFavorited}}Favorited{{else}}Favorite{{/if}}</span>
                         (<span class="favorite-count">{{#if recipe.favCount}}{{recipe.favCount}}{{else}}0{{/if}}</span>)

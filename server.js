@@ -31,7 +31,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/", usersRouter);
 app.use("/", userRecipiesRouter);
 app.use("/recipes", recipesRouter);
-app.use("/favorits", favRouter);
+app.use("/", favRouter);
 app.get("/", loadRecipes, (req, res) => {
     res.render("home");
 });
