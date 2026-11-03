@@ -9,13 +9,17 @@ export async function createRecipe(title = "", description = "", ingredients = "
     return r.id;
 }
 
-export async function getAllRecipes() {
+export async function getAllRecipes(userId = 0) {
     const rows = (await query(`
-        SELECT r.*, u.username
+        SELECT r.*, u.username,
+               EXISTS(
+                   SELECT 1 FROM favorites f
+                   WHERE f.recipe_id = r.id AND f.user_id = $1
+               ) AS is_favorite
         FROM recipes r
         JOIN users u on r.user_id = u.id;
-    `));
-    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || [];
+    `, [userId]));
+    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.is_favorite, r.created_at, r.updated_at)) || [];
 }
 export async function getUserRecipes(userId) {
     const rows = (await query(`
@@ -24,11 +28,11 @@ export async function getUserRecipes(userId) {
         JOIN users u on r.user_id = u.id
         WHERE u.id = $1;
     `, [userId]));
-    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at)) || [];
+    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, false, r.created_at, r.updated_at)) || [];
 }
 
 class Recipe {
-    constructor(recipeId, title, description, ingredients, instructions, prepTime, cooktime, servings, userId, username, createdAt, updatedAt) {
+    constructor(recipeId, title, description, ingredients, instructions, prepTime, cooktime, servings, userId, username, isFavorite, createdAt, updatedAt) {
         this.recipeId = recipeId;
         this.title = title;
         this.description = description;
@@ -45,6 +49,7 @@ class Recipe {
         this.userId = userId;
         this.username = username;
         this.canEdit = false;
+        this.isFavorite = isFavorite;
 
         // compare timestamps with 1 second buffer
         this.isUpdated = (new Date(updatedAt) - new Date(createdAt)) > 1000;
@@ -81,6 +86,20 @@ class Recipe {
                 updated_at = NOW()
             WHERE id = $1;
         `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cooktime, this.servings]);
+    }
+    toggleFavorite = async (userId) => {
+        if (!this.isFavorite) {
+            await query(`
+                INSERT INTO favorites (recipe_id, user_id)
+                VALUES($1, $2);    
+            `, [this.recipeId, userId]);
+        } else {
+            await query(`
+                DELETE FROM favorites
+                WHERE recipe_id = $1 AND user_id = $2;    
+            `, [this.recipeId, userId]);
+        }
+        this.isFavorite = !this.isFavorite;
     }
     delete = async () => {
         await query(`

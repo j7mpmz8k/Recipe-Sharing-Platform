@@ -61,6 +61,11 @@
                             {{/if}}
                         </span>
                         <div class="card-footer-actions">
+                            {{#if ../user}}
+                                <button type="button" class="btn-link favorite-btn" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="Favorite this recipe">
+                                    <span class="heart-icon">{{#if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                                </button>
+                            {{/if}}
                             {{#if this.canEdit}}
                                 <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>
                             {{/if}}

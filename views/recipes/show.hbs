@@ -42,16 +42,16 @@
                 {{/if}}
             </div>
 
-            <!-- Favorite Form -->
+            <!-- Favorite Button -->
             <div class="favorite-section">
                 {{#if user}}
-                    <form action="/recipes/{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}/favorite" method="POST">
-                        <button type="submit" class="btn btn-secondary btn-sm">
-                            {{#if isFavorited}}❤️ Favorited ({{favoritesCount}}){{else}}🤍 Favorite ({{favoritesCount}}){{/if}}
-                        </button>
-                    </form>
+                    <button type="button" class="btn btn-secondary btn-sm favorite-btn" data-recipe-id="{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}">
+                        <span class="heart-icon">{{#if isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                        <span class="favorite-text">{{#if isFavorited}}Favorited{{else}}Favorite{{/if}}</span>
+                        (<span class="favorite-count">{{#if favoritesCount}}{{favoritesCount}}{{else}}0{{/if}}</span>)
+                    </button>
                 {{else}}
-                    <span class="favorites-badge">❤️ {{favoritesCount}} favorites</span>
+                    <span class="favorites-badge">❤️ {{#if favoritesCount}}{{favoritesCount}}{{else}}0{{/if}} favorites</span>
                 {{/if}}
             </div>
         </div>

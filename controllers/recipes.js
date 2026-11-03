@@ -62,6 +62,16 @@ recipesRouter.post("/:id", requireAuth, async (req, res, next) => {
     }
 });
 
+recipesRouter.post("/:id/favorite", requireAuth, async (req, res, next) => {
+    const recipe = req.recipes.find(i => i.recipeId == req.params.id);
+    if (!recipe) {
+        next({ status: 404 });
+    } else {
+        await recipe.toggleFavorite(req.user.id);
+        res.json({ isFavorite: recipe.isFavorite });
+    }
+})
+
 recipesRouter.post("/:id/delete", requireAuth, async (req, res, next) => {
     const recipe = req.recipes.find(i => i.recipeId == req.params.id);
     if (!recipe) {

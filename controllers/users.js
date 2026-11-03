@@ -66,7 +66,7 @@ usersRouter.get("/users/:id", async (req, res) => {
     const userId = req.params.id;
     //TODO still needs user info added to locals
     res.locals.userRecipes = await getUserRecipes(userId);//TODO would rather compose into user class
-    res.render("users/show")
+    res.render("users/show");
 })
 
 export default usersRouter;
