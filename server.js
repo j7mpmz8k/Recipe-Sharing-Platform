@@ -8,7 +8,7 @@ import { loadSession } from "./middleware/auth.js";
 import { loadRecipes } from "./middleware/content.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import usersRouter from "./controllers/users.js";
-import recipesRouter from "./controllers/recipes.js";
+import { recipesRouter, userRecipiesRouter } from "./controllers/recipes.js";
 import favRouter from "./controllers/favorites.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +29,7 @@ app.set("views", path.join(__dirname, "views"));
 
 //global routers
 app.use("/", usersRouter);
+app.use("/", userRecipiesRouter);
 app.use("/recipes", recipesRouter);
 app.use("/favorits", favRouter);
 app.get("/", loadRecipes, (req, res) => {

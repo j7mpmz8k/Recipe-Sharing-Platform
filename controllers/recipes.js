@@ -1,10 +1,15 @@
 import express from "express";
-import { loadRecipes } from "../middleware/content.js";
+import { loadRecipes, loadUserProfile } from "../middleware/content.js";
 import { requireAuth } from "../middleware/auth.js";
 import { createRecipe } from "../models/recipes.js";
 const recipesRouter = express.Router();
+const userRecipiesRouter = express.Router();
 
 recipesRouter.use(loadRecipes);
+
+userRecipiesRouter.get("/my-recipes", requireAuth, loadUserProfile, async (req, res) => {
+    res.render("my-recipes");
+});
 
 recipesRouter.get("/", (req, res) => {
     res.render("recipes/index");
@@ -87,4 +92,4 @@ recipesRouter.post("/:id/delete", requireAuth, async (req, res, next) => {
     }
 })
 
-export default recipesRouter;
+export { recipesRouter, userRecipiesRouter }

@@ -16,7 +16,10 @@ export async function loadRecipes(req, res, next) {
 }
 
 export async function loadUserProfile(req, res, next) {
-    const userId = req.params.id;
+    let userId = req.params.id;
+    if (!userId && req.user) {
+        userId = req.user.id;
+    }
     let currentUserId = 0;
     if (req.user) {
         currentUserId = req.user.id;
@@ -29,5 +32,6 @@ export async function loadUserProfile(req, res, next) {
         user.recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
     }
     req.userProfile = res.locals.userProfile = user;
+    req.recipes = res.locals.recipes = user.recipes;
     next();
 }
