@@ -5,7 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { loggingMiddleware } from "./middleware/logging.js";
 import { loadSession } from "./middleware/auth.js";
-import { loadRecipes } from "./middleware/content.js";
+import { loadRecipes, loadFeaturedRecipes } from "./middleware/content.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import usersRouter from "./controllers/users.js";
 import { recipesRouter, userRecipiesRouter } from "./controllers/recipes.js";
@@ -32,7 +32,7 @@ app.use("/", usersRouter);
 app.use("/", userRecipiesRouter);
 app.use("/recipes", recipesRouter);
 app.use("/", favRouter);
-app.get("/", loadRecipes, (req, res) => {
+app.get("/", loadFeaturedRecipes, (req, res) => {
     res.render("home");
 });
 

@@ -24,8 +24,8 @@ export async function getAllRecipes(userId = 0, querySearch = "") {
                 OR r.description ILIKE '%' || $2 || '%'
                 OR r.ingredients ILIKE '%' || $2 || '%'
                 OR r.instructions ILIKE '%' || $2 || '%'
-
-            GROUP BY r.id, u.username;
+            GROUP BY r.id, u.username
+            ORDER BY r.id DESC;
         `, [userId, querySearch]));
     return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, r.is_favorite)) || [];
 }
@@ -40,8 +40,26 @@ export async function getUserRecipes(userId, viewerId = 0) {
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites f ON r.id = f.recipe_id
         WHERE r.user_id = $1
-        GROUP BY r.id, u.username;
+        GROUP BY r.id, u.username
+        ORDER BY r.id DESC;
     `, [userId, viewerId]));
+    return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, r.is_favorite)) || [];
+}
+
+export async function getFeaturedRecipes(userId = 0) {
+    const rows = (await query(`
+        SELECT r.*, u.username, COUNT(f.id) AS fav_count,
+            EXISTS(
+                SELECT 1 FROM favorites fav
+                WHERE fav.recipe_id = r.id AND fav.user_id = $1
+            ) AS is_favorite
+        FROM recipes r
+        JOIN users u ON r.user_id = u.id
+        LEFT JOIN favorites f ON r.id = f.recipe_id
+        GROUP BY r.id, u.username
+        ORDER BY fav_count DESC, r.id DESC
+        LIMIT 6;
+    `, [userId]));
     return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, r.is_favorite)) || [];
 }
 
@@ -53,7 +71,8 @@ export async function getFavoriteRecipes(userId) {
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites all_f ON r.id = all_f.recipe_id
         WHERE fav.user_id = $1
-        GROUP BY r.id, u.username;
+        GROUP BY r.id, u.username
+        ORDER BY r.id DESC;
     `, [userId]));
     return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, true)) || [];
 }

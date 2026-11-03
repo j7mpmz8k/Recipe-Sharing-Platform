@@ -835,7 +835,7 @@ main {
 
 .search-input-wrapper input {
     width: 100%;
-    padding: 0.85rem 1rem 0.85rem 2.75rem;
+    padding: 0.85rem 2.5rem 0.85rem 2.75rem;
     border: 1px solid var(--input-border);
     border-radius: 30px;
     background-color: var(--card-bg);
@@ -844,6 +844,29 @@ main {
     outline: none;
     box-shadow: var(--card-shadow);
     transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    line-height: 1;
+    padding: 0.25rem 0.4rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.search-clear-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--card-footer-bg);
 }
 
 .search-input-wrapper input:focus {

@@ -14,7 +14,10 @@
         <form action="/recipes" method="GET" class="search-form">
             <div class="search-input-wrapper">
                 <span class="search-icon">🔍</span>
-                <input type="text" name="search" placeholder="Search recipes by title or ingredients..." value="{{searchQuery}}">
+                <input type="text" id="search-input" name="search" placeholder="Search recipes by title or ingredients..." value="{{searchQuery}}">
+                {{#if searchQuery}}
+                    <a href="/recipes" class="search-clear-btn" title="Clear search" aria-label="Clear search">✕</a>
+                {{/if}}
             </div>
             <button type="submit" class="btn btn-primary">Search</button>
         </form>

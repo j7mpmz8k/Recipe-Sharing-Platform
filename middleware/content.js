@@ -1,4 +1,4 @@
-import { getAllRecipes } from "../models/recipes.js";
+import { getAllRecipes, getFeaturedRecipes } from "../models/recipes.js";
 import { getUserData } from "../models/users.js";
 
 export async function loadRecipes(req, res, next) {
@@ -14,6 +14,19 @@ export async function loadRecipes(req, res, next) {
     }
     req.recipes = res.locals.recipes = recipes;
     res.locals.searchQuery = search;
+    next();
+}
+
+export async function loadFeaturedRecipes(req, res, next) {
+    let userId = 0;
+    if (req.user) {
+        userId = req.user.id;
+    }
+    const recipes = await getFeaturedRecipes(userId);
+    if (req.session) {
+        recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
+    }
+    req.recipes = res.locals.recipes = recipes;
     next();
 }
 
