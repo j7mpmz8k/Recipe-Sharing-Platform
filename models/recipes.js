@@ -9,7 +9,7 @@ export async function createRecipe(title = "", description = "", ingredients = "
     return r.id;
 }
 
-export async function getAllRecipes(userId = 0, titleQuery = "") {
+export async function getAllRecipes(userId = 0, querySearch = "") {
     const rows = (await query(`
             SELECT r.*, u.username, COUNT(f.id) AS fav_count,
                 EXISTS(
@@ -19,9 +19,14 @@ export async function getAllRecipes(userId = 0, titleQuery = "") {
             FROM recipes r
             JOIN users u ON r.user_id = u.id
             LEFT JOIN favorites f ON r.id = f.recipe_id
-            WHERE r.title ILIKE '%' || $2 || '%'
+            WHERE u.username ILIKE '%' || $2 || '%'
+                OR r.title ILIKE '%' || $2 || '%'
+                OR r.description ILIKE '%' || $2 || '%'
+                OR r.ingredients ILIKE '%' || $2 || '%'
+                OR r.instructions ILIKE '%' || $2 || '%'
+
             GROUP BY r.id, u.username;
-        `, [userId, titleQuery]));
+        `, [userId, querySearch]));
     return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, r.is_favorite)) || [];
 }
 export async function getUserRecipes(userId, viewerId = 0) {

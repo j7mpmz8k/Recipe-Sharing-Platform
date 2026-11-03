@@ -7,11 +7,13 @@ export async function loadRecipes(req, res, next) {
     if (req.user) {
         userId = req.user.id;
     }
-    const recipes = await getAllRecipes(userId, req.query.title || "");
+    const search = req.query.search || "";
+    const recipes = await getAllRecipes(userId, search);
     if (req.session) {
         recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
     }
     req.recipes = res.locals.recipes = recipes;
+    res.locals.searchQuery = search;
     next();
 }
 

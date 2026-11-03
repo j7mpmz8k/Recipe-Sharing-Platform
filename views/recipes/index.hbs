@@ -14,7 +14,7 @@
         <form action="/recipes" method="GET" class="search-form">
             <div class="search-input-wrapper">
                 <span class="search-icon">🔍</span>
-                <input type="text" name="title" placeholder="Search recipes by title or ingredients..." value="{{searchQuery}}">
+                <input type="text" name="search" placeholder="Search recipes by title or ingredients..." value="{{searchQuery}}">
             </div>
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
@@ -81,11 +81,15 @@
         </div>
     {{else}}
         <div class="empty-state">
-            <p>No recipes found.</p>
-            {{#if user}}
-                <a href="/recipes/new" class="btn btn-primary">Share the First Recipe</a>
+            <p>No recipes found{{#if searchQuery}} matching "{{searchQuery}}"{{/if}}.</p>
+            {{#if searchQuery}}
+                <a href="/recipes" class="btn btn-secondary">Clear Search</a>
             {{else}}
-                <a href="/register" class="btn btn-primary">Sign up to Share Recipes</a>
+                {{#if user}}
+                    <a href="/recipes/new" class="btn btn-primary">Share the First Recipe</a>
+                {{else}}
+                    <a href="/register" class="btn btn-primary">Sign up to Share Recipes</a>
+                {{/if}}
             {{/if}}
         </div>
     {{/if}}
