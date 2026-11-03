@@ -6,27 +6,37 @@
                 👤
             </div>
             <div>
-                <h1 style="margin: 0; font-size: 1.75rem;">{{profileUser.username}}</h1>
+                <h1 style="margin: 0; font-size: 1.75rem;">{{userProfile.username}}</h1>
                 <p class="text-muted" style="margin: 0.35rem 0 0; font-size: 0.95rem;">
-                    Member since {{profileUser.createdAt}}
+                    Member since {{userProfile.createdAt}}
                 </p>
+                {{#if user}}
+                    <p class="text-muted" style="margin: 0.25rem 0 0; font-size: 0.9rem;">
+                        ✉️ {{userProfile.email}}
+                    </p>
+                {{/if}}
             </div>
         </div>
 
-        <div class="recipe-meta" style="margin: 0;">
-            <span>🍳 {{#if recipes.length}}{{recipes.length}}{{else}}0{{/if}} Recipes Shared</span>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card-footer-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 0.75rem 1.5rem; min-width: 130px; text-align: center;">
+            <span style="font-size: 1.75rem; font-weight: 700; color: #3498db; line-height: 1;">
+                {{#if userProfile.recipes.length}}{{userProfile.recipes.length}}{{else}}0{{/if}}
+            </span>
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-top: 0.35rem;">
+                🍳 Recipes Shared
+            </span>
         </div>
     </header>
 
     <!-- User's Recipes Grid -->
     <section>
         <div class="section-header">
-            <h2>Recipes by {{profileUser.username}}</h2>
+            <h2>Recipes by {{userProfile.username}}</h2>
         </div>
 
-        {{#if recipes.length}}
+        {{#if userProfile.recipes.length}}
             <div class="recipe-grid">
-                {{#each recipes}}
+                {{#each userProfile.recipes}}
                     <article class="recipe-card">
                         <div class="recipe-card-body">
                             <h3 class="recipe-title">
@@ -42,9 +52,9 @@
                                     <span>⏱ {{this.prep_time}}m prep</span>
                                 {{/if}}
                                 {{#if this.cooktime}}
-                                    <span>🍳 {{this.cooktime}}m cook</span>
+                                    <span>🕒 {{this.cooktime}}m cook</span>
                                 {{else if this.cook_time}}
-                                    <span>🍳 {{this.cook_time}}m cook</span>
+                                    <span>🕒 {{this.cook_time}}m cook</span>
                                 {{/if}}
                                 {{#if this.servings}}
                                     <span>🍽 {{this.servings}} servings</span>
@@ -61,14 +71,24 @@
                                     ☆ Unrated
                                 {{/if}}
                             </span>
-                            <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
+                            <div class="card-footer-actions">
+                                {{#if @root.user}}
+                                    <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="Favorite this recipe">
+                                        <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                                    </button>
+                                {{/if}}
+                                {{#if this.canEdit}}
+                                    <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>
+                                {{/if}}
+                                <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" class="btn-text">View Recipe &rarr;</a>
+                            </div>
                         </div>
                     </article>
                 {{/each}}
             </div>
         {{else}}
             <div class="empty-state">
-                <p>{{profileUser.username}} hasn't posted any recipes yet.</p>
+                <p>{{userProfile.username}} hasn't posted any recipes yet.</p>
             </div>
         {{/if}}
     </section>

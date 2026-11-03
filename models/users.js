@@ -1,5 +1,6 @@
 import query from "../db/connection.js";
 import bcrypt from "bcrypt";
+import { getUserRecipes } from "./recipes.js";
 
 export async function createUser(username, email, plainPassword) {
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
@@ -25,6 +26,22 @@ export async function loadUser(sessionId) {
         JOIN sessions s on u.id = s.user_id
         WHERE session_id = $1;
     `, [sessionId]))[0];
+    return user || null;
+}
+
+export async function getUserData(userId, viewerId = 0) {
+    const user = (await query(`
+        SELECT username, email, created_at
+        FROM users
+        WHERE id = $1;
+    `, [userId]))[0];
+    if (!user) return null;
+    user.createdAt = new Date(user.created_at).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+    });
+    user.recipes = await getUserRecipes(userId, viewerId);
     return user || null;
 }
 

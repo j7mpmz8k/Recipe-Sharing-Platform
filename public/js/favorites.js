@@ -8,10 +8,21 @@ for (btn of buttons) {
         });
         const data = await res.json();
         const btnIcon = btn.querySelector(".heart-icon");
+        btn.classList.toggle("favorited", data.isFavorite);
         if (data.isFavorite) {
             btnIcon.textContent = "❤️";                                                                                                  
         } else {
             btnIcon.textContent = "🤍";                                                                                                  
+        }
+
+        const btnText = btn.querySelector(".favorite-text");
+        if (btnText) {
+            btnText.textContent = data.isFavorite ? "Favorited" : "Favorite";
+        }
+
+        const countSpan = btn.querySelector(".favorite-count");
+        if (countSpan && data.favoriteCount !== undefined) {
+            countSpan.textContent = data.favoriteCount;
         }
     });
 }

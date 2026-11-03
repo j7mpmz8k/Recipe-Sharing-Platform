@@ -41,9 +41,9 @@
                                 <span>⏱ {{this.prep_time}}m prep</span>
                             {{/if}}
                             {{#if this.cooktime}}
-                                <span>🍳 {{this.cooktime}}m cook</span>
+                                <span>🕒 {{this.cooktime}}m cook</span>
                             {{else if this.cook_time}}
-                                <span>🍳 {{this.cook_time}}m cook</span>
+                                <span>🕒 {{this.cook_time}}m cook</span>
                             {{/if}}
                             {{#if this.servings}}
                                 <span>🍽 {{this.servings}} servings</span>
@@ -62,8 +62,8 @@
                         </span>
                         <div class="card-footer-actions">
                             {{#if ../user}}
-                                <button type="button" class="btn-link favorite-btn" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="Favorite this recipe">
-                                    <span class="heart-icon">{{#if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                                <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="Favorite this recipe">
+                                    <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
                                 </button>
                             {{/if}}
                             {{#if this.canEdit}}

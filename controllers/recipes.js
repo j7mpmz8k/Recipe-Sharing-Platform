@@ -68,7 +68,10 @@ recipesRouter.post("/:id/favorite", requireAuth, async (req, res, next) => {
         next({ status: 404 });
     } else {
         await recipe.toggleFavorite(req.user.id);
-        res.json({ isFavorite: recipe.isFavorite });
+        res.json({ 
+            isFavorite: recipe.isFavorite,
+            favoriteCount: recipe.favCount
+        });
     }
 })
 

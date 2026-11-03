@@ -41,9 +41,9 @@
                                     <span>⏱ {{this.prep_time}}m prep</span>
                                 {{/if}}
                                 {{#if this.cooktime}}
-                                    <span>🍳 {{this.cooktime}}m cook</span>
+                                    <span>🕒 {{this.cooktime}}m cook</span>
                                 {{else if this.cook_time}}
-                                    <span>🍳 {{this.cook_time}}m cook</span>
+                                    <span>🕒 {{this.cook_time}}m cook</span>
                                 {{/if}}
                                 {{#if this.servings}}
                                     <span>🍽 {{this.servings}} servings</span>
@@ -60,10 +60,8 @@
                                     ☆ Unrated
                                 {{/if}}
                             </span>
-                            {{#if this.favoritesCount}}
-                                <span class="favorites-badge">❤️ {{this.favoritesCount}}</span>
-                            {{else if this.favorites_count}}
-                                <span class="favorites-badge">❤️ {{this.favorites_count}}</span>
+                            {{#if this.favCount}}
+                                <span class="favorites-badge">❤️ {{this.favCount}}</span>
                             {{/if}}
                             <div class="card-footer-actions">
                                 {{#if this.canEdit}}

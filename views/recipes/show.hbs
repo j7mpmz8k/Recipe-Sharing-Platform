@@ -33,9 +33,9 @@
                     <span>⏱ Prep: {{recipe.prep_time}} min</span>
                 {{/if}}
                 {{#if recipe.cooktime}}
-                    <span>🍳 Cook: {{recipe.cooktime}} min</span>
+                    <span>🕒 Cook: {{recipe.cooktime}} min</span>
                 {{else if recipe.cook_time}}
-                    <span>🍳 Cook: {{recipe.cook_time}} min</span>
+                    <span>🕒 Cook: {{recipe.cook_time}} min</span>
                 {{/if}}
                 {{#if recipe.servings}}
                     <span>🍽 Servings: {{recipe.servings}}</span>
@@ -45,13 +45,13 @@
             <!-- Favorite Button -->
             <div class="favorite-section">
                 {{#if user}}
-                    <button type="button" class="btn btn-secondary btn-sm favorite-btn" data-recipe-id="{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}">
-                        <span class="heart-icon">{{#if isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                    <button type="button" class="btn btn-secondary btn-sm favorite-btn {{#if isFavorited}}favorited{{else if recipe.isFavorite}}favorited{{/if}}" data-recipe-id="{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}">
+                        <span class="heart-icon">{{#if isFavorited}}❤️{{else if recipe.isFavorite}}❤️{{else}}🤍{{/if}}</span>
                         <span class="favorite-text">{{#if isFavorited}}Favorited{{else}}Favorite{{/if}}</span>
-                        (<span class="favorite-count">{{#if favoritesCount}}{{favoritesCount}}{{else}}0{{/if}}</span>)
+                        (<span class="favorite-count">{{#if recipe.favCount}}{{recipe.favCount}}{{else}}0{{/if}}</span>)
                     </button>
                 {{else}}
-                    <span class="favorites-badge">❤️ {{#if favoritesCount}}{{favoritesCount}}{{else}}0{{/if}} favorites</span>
+                    <span class="favorites-badge">❤️ {{#if recipe.favCount}}{{recipe.favCount}}{{else}}0{{/if}} favorites</span>
                 {{/if}}
             </div>
         </div>

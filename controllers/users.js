@@ -1,9 +1,8 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import { createUser, findUser } from "../models/users.js";
+import { createUser, findUser, getUserData } from "../models/users.js";
 import { createSession, deleteSession } from "../models/sessions.js";
 import { requireAuth } from "../middleware/auth.js";
-import { getUserRecipes } from "../models/recipes.js";
 
 const usersRouter = express.Router();
 
@@ -62,11 +61,19 @@ usersRouter.post("/logout", requireAuth, async (req, res) => {
     res.redirect("/login");
 });
 
-usersRouter.get("/users/:id", async (req, res) => {
+usersRouter.get("/users/:id", async (req, res, next) => {
     const userId = req.params.id;
-    //TODO still needs user info added to locals
-    res.locals.userRecipes = await getUserRecipes(userId);//TODO would rather compose into user class
-    res.render("users/show");
+    const currentUserId = req.user ? req.user.id : 0;
+    const user = await getUserData(userId, currentUserId);
+    if (!user) {
+        return next({ status: 404 });
+    } else {
+        if (req.user) {
+            user.recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
+        }
+        res.locals.userProfile = user;
+        res.render("users/show");
+    }
 })
 
 export default usersRouter;
