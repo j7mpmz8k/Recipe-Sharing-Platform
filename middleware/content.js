@@ -7,7 +7,7 @@ export async function loadRecipes(req, res, next) {
     if (req.user) {
         userId = req.user.id;
     }
-    const recipes = await getAllRecipes(userId);
+    const recipes = await getAllRecipes(userId, req.query.title || "");
     if (req.session) {
         recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
     }

@@ -5,22 +5,23 @@ export async function createRecipe(title = "", description = "", ingredients = "
         INSERT INTO recipes (title, description, ingredients, instructions, prep_time, cook_time, servings, user_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id;
-        `, [title, description, ingredients, instructions, prepTime, cooktime, servings, userId]))[0];
+        `, [title, description, ingredients, instructions, prepTime || 0, cooktime || 0, servings || 0, userId]))[0];
     return r.id;
 }
 
-export async function getAllRecipes(userId = 0) {
+export async function getAllRecipes(userId = 0, titleQuery = "") {
     const rows = (await query(`
-        SELECT r.*, u.username, COUNT(f.id) AS fav_count,
-            EXISTS(
-                SELECT 1 FROM favorites fav
-                WHERE fav.recipe_id = r.id AND fav.user_id = $1
-            ) AS is_favorite
-        FROM recipes r
-        JOIN users u ON r.user_id = u.id
-        LEFT JOIN favorites f ON r.id = f.recipe_id
-        GROUP BY r.id, u.username;
-    `, [userId]));
+            SELECT r.*, u.username, COUNT(f.id) AS fav_count,
+                EXISTS(
+                    SELECT 1 FROM favorites fav
+                    WHERE fav.recipe_id = r.id AND fav.user_id = $1
+                ) AS is_favorite
+            FROM recipes r
+            JOIN users u ON r.user_id = u.id
+            LEFT JOIN favorites f ON r.id = f.recipe_id
+            WHERE r.title ILIKE '%' || $2 || '%'
+            GROUP BY r.id, u.username;
+        `, [userId, titleQuery]));
     return rows.map(r => new Recipe(r.id, r.title, r.description, r.ingredients, r.instructions, r.prep_time, r.cook_time, r.servings, r.user_id, r.username, r.created_at, r.updated_at, r.fav_count, r.is_favorite)) || [];
 }
 export async function getUserRecipes(userId, viewerId = 0) {
