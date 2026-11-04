@@ -1,0 +1,123 @@
+<div class="recipe-container" style="max-width: 900px; margin: 2rem auto; padding: 0 1rem;">
+    <div class="recipe-header" style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">🔑 Admin: Member Invitations</h1>
+        <p style="color: var(--text-muted);">
+            Manage and issue private invitation links for friends and family. Only registered invitees can create an account.
+        </p>
+    </div>
+
+    {{#if error}}
+        <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+            {{error}}
+        </div>
+    {{/if}}
+
+    {{#if success}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 8px;">
+            <p style="font-weight: 600; margin-bottom: 0.75rem;">{{success}}</p>
+            <div>
+                <label for="inviteLinkInput" style="display: block; font-size: 0.875rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                    Share this unique registration link with your guest:
+                </label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input 
+                        type="text" 
+                        id="inviteLinkInput" 
+                        value="{{inviteUrl}}" 
+                        readonly 
+                        style="flex: 1; padding: 0.65rem 0.75rem; font-family: monospace; font-size: 0.9rem; border-radius: 6px; border: 1px solid var(--input-border, #cbd5e0); background: #fff;"
+                    >
+                    <button 
+                        type="button" 
+                        class="btn btn-primary" 
+                        onclick="navigator.clipboard.writeText(document.getElementById('inviteLinkInput').value); this.innerText = 'Copied!';"
+                        style="white-space: nowrap; padding: 0.65rem 1rem;"
+                    >
+                        📋 Copy Link
+                    </button>
+                </div>
+                <small style="display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.825rem;">
+                    ⏳ This temporary link is valid for 48 hours and automatically becomes invalid once used.
+                </small>
+            </div>
+        </div>
+    {{/if}}
+
+    <!-- Generate Invite Form Card -->
+    <div style="background-color: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Issue a New Invitation</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Enter the email address of the person you want to invite.
+        </p>
+
+        <form action="/admin/invites" method="POST" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <input 
+                type="email" 
+                name="email" 
+                placeholder="friend@example.com" 
+                required 
+                style="flex: 1; min-width: 250px; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
+            >
+            <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
+                ✉️ Create Invite Link
+            </button>
+        </form>
+    </div>
+
+    <!-- Invites History Card -->
+    <div style="background-color: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Invitation History</h2>
+
+        {{#if invites.length}}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                            <th style="padding: 0.75rem 0.5rem;">Email</th>
+                            <th style="padding: 0.75rem 0.5rem;">Status</th>
+                            <th style="padding: 0.75rem 0.5rem;">Created</th>
+                            <th style="padding: 0.75rem 0.5rem;">Expires</th>
+                            <th style="padding: 0.75rem 0.5rem; text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each invites}}
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                                <td style="padding: 0.85rem 0.5rem; font-weight: 500;">
+                                    {{this.email}}
+                                </td>
+                                <td style="padding: 0.85rem 0.5rem;">
+                                    <span style="display: inline-block; padding: 0.2rem 0.55rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; 
+                                        {{#if this.isActive}}background: #def7ec; color: #03543f;{{/if}}
+                                        {{#if this.isUsed}}background: #e1effe; color: #1e429f;{{/if}}
+                                        {{#if this.isExpired}}background: #fde8e8; color: #9b1c1c;{{/if}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.85rem 0.5rem; color: var(--text-muted);">
+                                    {{this.createdAt}}
+                                </td>
+                                <td style="padding: 0.85rem 0.5rem; color: var(--text-muted);">
+                                    {{this.expiresAt}}
+                                </td>
+                                <td style="padding: 0.85rem 0.5rem; text-align: right;">
+                                    {{#if this.isUsable}}
+                                        <a href="/register?token={{this.token}}" class="btn-text" target="_blank" style="font-size: 0.825rem;">
+                                            Open Link ↗
+                                        </a>
+                                    {{else}}
+                                        <span style="color: var(--text-muted); font-size: 0.825rem;">-</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{else}}
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
+                No invitations have been generated yet. Use the form above to invite your first member!
+            </p>
+        {{/if}}
+    </div>
+</div>
