@@ -3,18 +3,20 @@ import bcrypt from "bcrypt";
 import { getUserRecipes, getFavoriteRecipes } from "./recipes.js";
 import { isAdminUser } from "../middleware/auth.js";
 
-export async function createUser(username, email, plainPassword) {
+export async function createUser(username, email, plainPassword, firstName = "", lastName = "") {
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
+    const fName = (firstName || "").trim();
+    const lName = (lastName || "").trim();
     const row = (await query(`
-        INSERT INTO users (username, email, password_hash)
-        VALUES ($1, $2, $3)
+        INSERT INTO users (username, email, password_hash, first_name, last_name)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING id;
-    `, [username, email, hashedPassword]))[0];
+    `, [username, email, hashedPassword, fName, lName]))[0];
     return row.id;
 }
 export async function findUser(username) {
     const user = (await query(`
-        SELECT id, password_hash, is_blocked
+        SELECT id, username, email, password_hash, first_name, last_name, is_blocked
         FROM users
         WHERE username = $1;
     `, [username]))[0];
@@ -22,21 +24,31 @@ export async function findUser(username) {
 }
 export async function loadUser(sessionId) {
     const user = (await query(`
-        SELECT u.id, u.username, u.email, u.is_blocked
+        SELECT u.id, u.username, u.email, u.first_name, u.last_name, u.is_blocked
         FROM users u
         JOIN sessions s on u.id = s.user_id
         WHERE session_id = $1;
     `, [sessionId]))[0];
-    return user || null;
+    if (!user) {
+        return null;
+    }
+    user.displayName = user.first_name || user.username;
+    return user;
 }
 
 export async function getUserData(userId, viewerId = 0) {
     const user = (await query(`
-        SELECT username, email, created_at
+        SELECT id, username, email, first_name, last_name, created_at
         FROM users
         WHERE id = $1;
     `, [userId]))[0];
     if (!user) return null;
+    user.displayName = user.first_name || user.username;
+    let fullName = user.first_name || "";
+    if (user.last_name) {
+        fullName = (fullName + " " + user.last_name).trim();
+    }
+    user.fullName = fullName || user.username;
     user.createdAt = new Date(user.created_at).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -49,7 +61,7 @@ export async function getUserData(userId, viewerId = 0) {
 
 export async function getAllUsers() {
     const rows = await query(`
-        SELECT u.id, u.username, u.email, u.created_at, u.last_active_at, u.is_blocked,
+        SELECT u.id, u.username, u.email, u.first_name, u.last_name, u.created_at, u.last_active_at, u.is_blocked,
                COUNT(r.id) AS recipe_count
         FROM users u
         LEFT JOIN recipes r ON u.id = r.user_id
@@ -84,9 +96,18 @@ export async function getAllUsers() {
             }
         }
 
+        let fullName = u.first_name || "";
+        if (u.last_name) {
+            fullName = (fullName + " " + u.last_name).trim();
+        }
+
         return {
             id: u.id,
             username: u.username,
+            firstName: u.first_name || "",
+            lastName: u.last_name || "",
+            fullName: fullName || u.username,
+            displayName: u.first_name || u.username,
             email: u.email,
             recipeCount: Number(u.recipe_count) || 0,
             isAdmin: isAdminUser(u.id),

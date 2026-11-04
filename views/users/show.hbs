@@ -6,7 +6,7 @@
                 👤
             </div>
             <div>
-                <h1 style="margin: 0; font-size: 1.75rem;">{{userProfile.username}}</h1>
+                <h1 style="margin: 0; font-size: 1.75rem;">{{#if userProfile.first_name}}{{userProfile.first_name}}{{#if userProfile.last_name}} {{userProfile.last_name}}{{/if}}{{else}}{{userProfile.username}}{{/if}}</h1>
                 <p class="text-muted" style="margin: 0.35rem 0 0; font-size: 0.95rem;">
                     Member since {{userProfile.createdAt}}
                 </p>
@@ -31,7 +31,7 @@
     <!-- User's Recipes Grid -->
     <section>
         <div class="section-header">
-            <h2>Recipes by {{userProfile.username}}</h2>
+            <h2>Recipes by {{#if userProfile.first_name}}{{userProfile.first_name}}{{else}}{{userProfile.username}}{{/if}}</h2>
         </div>
 
         {{#if userProfile.recipes.length}}
@@ -43,7 +43,7 @@
                                 <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}">{{this.title}}</a>
                             </h3>
                             <p class="recipe-author">
-                                By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{this.username}}</a>
+                                By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{#if this.authorName}}{{this.authorName}}{{else}}{{this.username}}{{/if}}</a>
                             </p>
                             {{#if this.description}}
                                 <p class="recipe-description">{{this.description}}</p>
@@ -90,7 +90,7 @@
             </div>
         {{else}}
             <div class="empty-state">
-                <p>{{userProfile.username}} hasn't posted any recipes yet.</p>
+                <p>{{#if userProfile.first_name}}{{userProfile.first_name}}{{else}}{{userProfile.username}}{{/if}} hasn't posted any recipes yet.</p>
             </div>
         {{/if}}
     </section>

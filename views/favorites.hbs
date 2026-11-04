@@ -16,7 +16,7 @@
                             <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}">{{this.title}}</a>
                         </h3>
                         <p class="recipe-author">
-                            By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{this.username}}</a>
+                            By <a href="/users/{{#if this.userId}}{{this.userId}}{{else}}{{this.user_id}}{{/if}}">{{#if this.authorName}}{{this.authorName}}{{else}}{{this.username}}{{/if}}</a>
                         </p>
                         {{#if this.description}}
                             <p class="recipe-description">{{this.description}}</p>

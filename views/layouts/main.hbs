@@ -28,7 +28,7 @@
                 <span id="online-count-text">{{onlineCount}} online</span>
             </span>
             {{#if user}}
-                <span class="nav-user">Welcome, <a href="/users/{{user.id}}">{{user.username}}</a></span>
+                <span class="nav-user">Welcome, <a href="/users/{{user.id}}">{{#if user.first_name}}{{user.first_name}}{{else}}{{user.username}}{{/if}}</a></span>
                 <form action="/logout" method="POST" class="logout-form">
                     <button type="submit" class="btn-link">Logout</button>
                 </form>

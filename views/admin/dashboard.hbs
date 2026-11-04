@@ -244,8 +244,11 @@
                             </td>
                             <td style="padding: 0.85rem 0.5rem; font-weight: 600;">
                                 <a href="/users/{{this.id}}" style="color: var(--text-primary); text-decoration: none;">
-                                    {{this.username}}
+                                    {{#if this.firstName}}{{this.firstName}}{{#if this.lastName}} {{this.lastName}}{{/if}}{{else}}{{this.username}}{{/if}}
                                 </a>
+                                <span style="font-size: 0.775rem; color: var(--text-muted); font-weight: 400; margin-left: 0.25rem;">
+                                    (@{{this.username}})
+                                </span>
                                 {{#if this.isAdmin}}
                                     <span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.35rem; font-weight: 700;">
                                         ADMIN

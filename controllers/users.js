@@ -40,7 +40,7 @@ usersRouter.get("/register", async (req, res) => {
 });
 
 usersRouter.post("/register", authLimiter, async (req, res) => {
-    const { token, username, password, confirmPassword } = req.body;
+    const { token, username, password, confirmPassword, first_name, last_name } = req.body;
     if (!token) {
         return res.render("users/register", {
             inviteOnly: true,
@@ -58,12 +58,26 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         });
     }
 
+    if (!first_name || first_name.trim().length === 0) {
+        return res.render("users/register", {
+            inviteOnly: false,
+            token: token,
+            email: invite.email,
+            username: username,
+            first_name: first_name,
+            last_name: last_name,
+            error: "First name is required!"
+        });
+    }
+
     if (password != confirmPassword) {
         return res.render("users/register", {
             inviteOnly: false,
             token: token,
             email: invite.email,
             username: username,
+            first_name: first_name,
+            last_name: last_name,
             error: "Passwords do not match!"
         });
     }
@@ -73,13 +87,15 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
             token: token,
             email: invite.email,
             username: username,
+            first_name: first_name,
+            last_name: last_name,
             error: "Password must be at least 8 characters long!"
         });
     }
 
     let userId;
     try {
-        userId = await createUser(username, invite.email, password);
+        userId = await createUser(username, invite.email, password, first_name, last_name);
     } catch (err) {
         let errorMessage = "An error occurred while creating your account.";
         if (err.code === "23505") {
@@ -90,6 +106,8 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
             token: token,
             email: invite.email,
             username: username,
+            first_name: first_name,
+            last_name: last_name,
             error: errorMessage
         });
     }

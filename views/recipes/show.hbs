@@ -5,7 +5,7 @@
             <div>
                 <h1>{{recipe.title}}</h1>
                 <div class="author-badge">
-                    <span>By <a href="/users/{{#if recipe.userId}}{{recipe.userId}}{{else}}{{recipe.user_id}}{{/if}}">{{recipe.username}}</a></span>
+                    <span>By <a href="/users/{{#if recipe.userId}}{{recipe.userId}}{{else}}{{recipe.user_id}}{{/if}}">{{#if recipe.authorName}}{{recipe.authorName}}{{else}}{{recipe.username}}{{/if}}</a></span>
                     <span class="text-muted">• {{recipe.createdAt}}</span>
                     {{#if recipe.isUpdated}}
                         <span class="text-muted">(Updated {{recipe.updatedAt}})</span>

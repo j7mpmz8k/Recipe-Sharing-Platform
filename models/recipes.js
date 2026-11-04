@@ -11,7 +11,7 @@ export async function createRecipe(title = "", description = "", ingredients = "
 
 export async function getAllRecipes(userId = 0, querySearch = "") {
     const rows = (await query(`
-            SELECT r.*, u.username, 
+            SELECT r.*, u.username, u.first_name, u.last_name,
                 COUNT(f.id) AS fav_count,
                 EXISTS(
                     SELECT 1 FROM favorites fav
@@ -21,18 +21,19 @@ export async function getAllRecipes(userId = 0, querySearch = "") {
             JOIN users u ON r.user_id = u.id
             LEFT JOIN favorites f ON r.id = f.recipe_id
             WHERE u.username ILIKE '%' || $2 || '%'
+                OR u.first_name ILIKE '%' || $2 || '%'
                 OR r.title ILIKE '%' || $2 || '%'
                 OR r.description ILIKE '%' || $2 || '%'
                 OR r.ingredients ILIKE '%' || $2 || '%'
                 OR r.instructions ILIKE '%' || $2 || '%'
-            GROUP BY r.id, u.username
+            GROUP BY r.id, u.username, u.first_name, u.last_name
             ORDER BY r.id DESC;
         `, [userId, querySearch]));
     return rows.map(r => new Recipe(r)) || [];
 }
 export async function getUserRecipes(userId, viewerId = 0) {
     const rows = (await query(`
-        SELECT r.*, u.username, 
+        SELECT r.*, u.username, u.first_name, u.last_name,
             COUNT(f.id) AS fav_count,
             EXISTS(
                 SELECT 1 FROM favorites fav
@@ -42,7 +43,7 @@ export async function getUserRecipes(userId, viewerId = 0) {
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites f ON r.id = f.recipe_id
         WHERE r.user_id = $1
-        GROUP BY r.id, u.username
+        GROUP BY r.id, u.username, u.first_name, u.last_name
         ORDER BY r.id DESC;
     `, [userId, viewerId]));
     return rows.map(r => new Recipe(r)) || [];
@@ -50,7 +51,7 @@ export async function getUserRecipes(userId, viewerId = 0) {
 
 export async function getFeaturedRecipes(userId = 0) {
     const rows = (await query(`
-        SELECT r.*, u.username, 
+        SELECT r.*, u.username, u.first_name, u.last_name,
             COUNT(f.id) AS fav_count,
             EXISTS(
                 SELECT 1 FROM favorites fav
@@ -59,7 +60,7 @@ export async function getFeaturedRecipes(userId = 0) {
         FROM recipes r
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites f ON r.id = f.recipe_id
-        GROUP BY r.id, u.username
+        GROUP BY r.id, u.username, u.first_name, u.last_name
         ORDER BY fav_count DESC, r.id DESC
         LIMIT 6;
     `, [userId]));
@@ -68,7 +69,7 @@ export async function getFeaturedRecipes(userId = 0) {
 
 export async function getFavoriteRecipes(userId) {
     const rows = (await query(`
-        SELECT r.*, u.username, 
+        SELECT r.*, u.username, u.first_name, u.last_name,
             COUNT(all_f.id) AS fav_count, 
             true AS is_favorite
         FROM favorites fav
@@ -76,7 +77,7 @@ export async function getFavoriteRecipes(userId) {
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites all_f ON r.id = all_f.recipe_id
         WHERE fav.user_id = $1
-        GROUP BY r.id, u.username
+        GROUP BY r.id, u.username, u.first_name, u.last_name
         ORDER BY r.id DESC;
     `, [userId]));
     return rows.map(r => new Recipe(r)) || [];
@@ -99,6 +100,9 @@ class Recipe {
         this.servings = row.servings;
         this.userId = row.user_id;
         this.username = row.username;
+        this.firstName = row.first_name || "";
+        this.lastName = row.last_name || "";
+        this.authorName = row.first_name || row.username;
         this.canEdit = false;
         this.favCount = Number(row.fav_count) || 0;
         this.isFavorite = row.is_favorite;
