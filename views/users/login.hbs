@@ -8,6 +8,12 @@
             </div>
         {{/if}}
 
+        {{#if success}}
+            <div class="alert alert-success">
+                {{success}}
+            </div>
+        {{/if}}
+
         <form action="/login" method="POST" class="auth-form">
             <div class="form-group">
                 <label for="username">Username</label>

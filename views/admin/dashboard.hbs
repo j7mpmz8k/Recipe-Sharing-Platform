@@ -1,0 +1,294 @@
+<div class="recipe-container" style="max-width: 1050px; margin: 2rem auto; padding: 0 1rem;">
+    <!-- Admin Header -->
+    <div class="admin-header" style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.85rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>👑</span> Admin Control Center
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Monitor online users, manage member access, generate password reset links, and issue invitations.
+        </p>
+    </div>
+
+    <!-- Alert Notifications -->
+    {{#if error}}
+        <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+            {{error}}
+        </div>
+    {{/if}}
+
+    {{#if resetSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 8px;">
+            <p style="font-weight: 600; margin-bottom: 0.5rem;">🔑 {{resetSuccess}}</p>
+            <div>
+                <label for="resetLinkInput" style="display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                    Send this one-time password reset link to the user:
+                </label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input 
+                        type="text" 
+                        id="resetLinkInput" 
+                        value="{{resetUrl}}" 
+                        readonly 
+                        style="flex: 1; padding: 0.65rem 0.75rem; font-family: monospace; font-size: 0.9rem; border-radius: 6px; border: 1px solid var(--input-border, #cbd5e0); background: #ffffff;"
+                    >
+                    <button 
+                        type="button" 
+                        class="btn btn-primary" 
+                        onclick="navigator.clipboard.writeText(document.getElementById('resetLinkInput').value); this.innerText = 'Copied!';"
+                        style="white-space: nowrap; padding: 0.65rem 1rem;"
+                    >
+                        📋 Copy Link
+                    </button>
+                </div>
+                <small style="display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.825rem;">
+                    ⏳ This password reset link expires in 48 hours and can only be used once.
+                </small>
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if inviteSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 8px;">
+            <p style="font-weight: 600; margin-bottom: 0.5rem;">✉️ {{inviteSuccess}}</p>
+            <div>
+                <label for="inviteLinkInput" style="display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                    Share this unique registration link with your invited guest:
+                </label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input 
+                        type="text" 
+                        id="inviteLinkInput" 
+                        value="{{inviteUrl}}" 
+                        readonly 
+                        style="flex: 1; padding: 0.65rem 0.75rem; font-family: monospace; font-size: 0.9rem; border-radius: 6px; border: 1px solid var(--input-border, #cbd5e0); background: #ffffff;"
+                    >
+                    <button 
+                        type="button" 
+                        class="btn btn-primary" 
+                        onclick="navigator.clipboard.writeText(document.getElementById('inviteLinkInput').value); this.innerText = 'Copied!';"
+                        style="white-space: nowrap; padding: 0.65rem 1rem;"
+                    >
+                        📋 Copy Link
+                    </button>
+                </div>
+                <small style="display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.825rem;">
+                    ⏳ This invite link expires in 48 hours and becomes invalid once an account is registered.
+                </small>
+            </div>
+        </div>
+    {{/if}}
+
+    <!-- Stat Metric Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Registered Users</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{totalUsers}}</div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Online Members</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #16a34a; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="display: inline-block; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e;"></span>
+                <span>{{onlineUsersCount}}</span>
+            </div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Site Visitors Online</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #2563eb;">{{onlineCount}}</div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Invites Issued</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{invites.length}}</div>
+        </div>
+    </div>
+
+    <!-- Section 1: Users, Online Status, Last Online, Reset Password -->
+    <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>👥</span> Community Members
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Real-time online status (active in the last 5 minutes), last activity timestamp, and password reset actions.
+        </p>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                        <th style="padding: 0.75rem 0.5rem;">User</th>
+                        <th style="padding: 0.75rem 0.5rem;">Email</th>
+                        <th style="padding: 0.75rem 0.5rem;">Status</th>
+                        <th style="padding: 0.75rem 0.5rem;">Last Active</th>
+                        <th style="padding: 0.75rem 0.5rem;">Joined</th>
+                        <th style="padding: 0.75rem 0.5rem; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each users}}
+                        <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                            <td style="padding: 0.85rem 0.5rem; font-weight: 600;">
+                                <a href="/users/{{this.id}}" style="color: var(--text-primary); text-decoration: none;">
+                                    {{this.username}}
+                                </a>
+                                {{#if this.isAdmin}}
+                                    <span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.35rem; font-weight: 700;">
+                                        ADMIN
+                                    </span>
+                                {{/if}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; color: var(--text-secondary);">
+                                {{this.email}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem;">
+                                {{#if this.isOnline}}
+                                    <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 600; background: #def7ec; color: #03543f;">
+                                        <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
+                                        Online now
+                                    </span>
+                                {{else}}
+                                    <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 500; background: #f3f4f6; color: #6b7280;">
+                                        <span style="width: 6px; height: 6px; background: #9ca3af; border-radius: 50%;"></span>
+                                        Offline
+                                    </span>
+                                {{/if}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
+                                {{this.lastOnline}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
+                                {{this.createdAt}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; text-align: right;">
+                                <form action="/admin/users/{{this.id}}/reset-password" method="POST" style="margin: 0; display: inline;">
+                                    <button 
+                                        type="submit" 
+                                        class="btn btn-secondary" 
+                                        style="padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600;"
+                                        onclick="return confirm('Generate a temporary password reset link for {{this.username}}?');"
+                                    >
+                                        🔑 Reset Password
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 2: Account Invitations Form & Table -->
+    <div id="invites" style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>✉️</span> Issue Account Invitation
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Send temporary 48-hour registration links to friends and family. Only invited individuals can create an account.
+        </p>
+
+        <form action="/admin/invites" method="POST" style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <input 
+                type="email" 
+                name="email" 
+                placeholder="friend@example.com" 
+                required 
+                style="flex: 1; min-width: 250px; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
+            >
+            <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
+                Create Invite Link
+            </button>
+        </form>
+
+        {{#if invites.length}}
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-secondary);">Recent Invitations</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                            <th style="padding: 0.6rem 0.5rem;">Email</th>
+                            <th style="padding: 0.6rem 0.5rem;">Status</th>
+                            <th style="padding: 0.6rem 0.5rem;">Created</th>
+                            <th style="padding: 0.6rem 0.5rem;">Expires</th>
+                            <th style="padding: 0.6rem 0.5rem; text-align: right;">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each invites}}
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                                <td style="padding: 0.65rem 0.5rem; font-weight: 500;">{{this.email}}</td>
+                                <td style="padding: 0.65rem 0.5rem;">
+                                    <span style="display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+                                        {{#if this.isActive}}background: #def7ec; color: #03543f;{{/if}}
+                                        {{#if this.isUsed}}background: #e1effe; color: #1e429f;{{/if}}
+                                        {{#if this.isExpired}}background: #fde8e8; color: #9b1c1c;{{/if}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.createdAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.expiresAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; text-align: right;">
+                                    {{#if this.isUsable}}
+                                        <a href="/register?token={{this.token}}" class="btn-text" target="_blank">Open Link ↗</a>
+                                    {{else}}
+                                        <span style="color: var(--text-muted);">-</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{/if}}
+    </div>
+
+    <!-- Section 3: Password Resets History -->
+    {{#if passwordResets.length}}
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🔒</span> Generated Password Reset Links
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+                History of temporary reset tokens generated by admin.
+            </p>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                            <th style="padding: 0.6rem 0.5rem;">User</th>
+                            <th style="padding: 0.6rem 0.5rem;">Email</th>
+                            <th style="padding: 0.6rem 0.5rem;">Status</th>
+                            <th style="padding: 0.6rem 0.5rem;">Created</th>
+                            <th style="padding: 0.6rem 0.5rem;">Expires</th>
+                            <th style="padding: 0.6rem 0.5rem; text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each passwordResets}}
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                                <td style="padding: 0.65rem 0.5rem; font-weight: 600;">{{this.username}}</td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-secondary);">{{this.email}}</td>
+                                <td style="padding: 0.65rem 0.5rem;">
+                                    <span style="display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+                                        {{#if this.isActive}}background: #def7ec; color: #03543f;{{/if}}
+                                        {{#if this.isUsed}}background: #e1effe; color: #1e429f;{{/if}}
+                                        {{#if this.isExpired}}background: #fde8e8; color: #9b1c1c;{{/if}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.createdAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.expiresAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; text-align: right;">
+                                    {{#if this.isUsable}}
+                                        <a href="/reset-password?token={{this.token}}" class="btn-text" target="_blank">Reset Form ↗</a>
+                                    {{else}}
+                                        <span style="color: var(--text-muted);">-</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {{/if}}
+</div>

@@ -13,6 +13,7 @@ import { trackActivity } from "./middleware/activity.js";
 import usersRouter from "./controllers/users.js";
 import { recipesRouter, userRecipiesRouter } from "./controllers/recipes.js";
 import favRouter from "./controllers/favorites.js";
+import adminRouter from "./controllers/admin.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,7 @@ app.set("views", path.join(__dirname, "views"));
 
 //global routers
 app.use("/", usersRouter);
+app.use("/admin", adminRouter);
 app.use("/", userRecipiesRouter);
 app.use("/recipes", recipesRouter);
 app.use("/", favRouter);

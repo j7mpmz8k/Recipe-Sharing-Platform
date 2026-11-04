@@ -1,11 +1,12 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import { createUser, findUser } from "../models/users.js";
+import { createUser, findUser, updateUserPassword } from "../models/users.js";
 import { createSession, deleteSession } from "../models/sessions.js";
-import { requireAuth, requireAdmin } from "../middleware/auth.js";
+import { requireAuth } from "../middleware/auth.js";
 import { loadUserProfile } from "../middleware/content.js";
 import { authLimiter } from "../middleware/rateLimiter.js";
-import { createInvite, findValidInvite, markInviteUsed, getAllInvites } from "../models/invites.js";
+import { findValidInvite, markInviteUsed } from "../models/invites.js";
+import { findValidPasswordReset, markPasswordResetUsed } from "../models/passwordResets.js";
 
 const usersRouter = express.Router();
 
@@ -141,35 +142,67 @@ usersRouter.post("/logout", requireAuth, async (req, res) => {
     res.redirect("/login");
 });
 
-// Admin invite management routes (Admin user id = 1)
-usersRouter.get("/admin/invites", requireAuth, requireAdmin, async (req, res) => {
-    const invites = await getAllInvites();
-    res.render("admin/invites", {
-        invites: invites
-    });
-});
-
-usersRouter.post("/admin/invites", requireAuth, requireAdmin, async (req, res) => {
-    const { email } = req.body;
-    if (!email || !email.includes("@")) {
-        const invites = await getAllInvites();
-        return res.render("admin/invites", {
-            invites: invites,
-            error: "Please enter a valid email address."
+// Password Reset consumption routes
+usersRouter.get("/reset-password", async (req, res) => {
+    const token = req.query.token;
+    if (!token) {
+        return res.render("users/reset-password", {
+            error: "A valid password reset token is required."
         });
     }
 
-    const newInvite = await createInvite(email.trim().toLowerCase(), req.user.id);
-    const invites = await getAllInvites();
+    const reset = await findValidPasswordReset(token);
+    if (!reset) {
+        return res.render("users/reset-password", {
+            error: "This password reset link is invalid or has expired."
+        });
+    }
 
-    const host = req.get("host");
-    let protocol = req.protocol;
-    const inviteUrl = `${protocol}://${host}/register?token=${newInvite.token}`;
+    res.render("users/reset-password", {
+        token: token,
+        username: reset.username,
+        email: reset.email
+    });
+});
 
-    res.render("admin/invites", {
-        invites: invites,
-        success: `Invite created successfully for ${newInvite.email}!`,
-        inviteUrl: inviteUrl
+usersRouter.post("/reset-password", authLimiter, async (req, res) => {
+    const { token, password, confirmPassword } = req.body;
+    if (!token) {
+        return res.render("users/reset-password", {
+            error: "A valid password reset token is required."
+        });
+    }
+
+    const reset = await findValidPasswordReset(token);
+    if (!reset) {
+        return res.render("users/reset-password", {
+            error: "This password reset link is invalid or has expired."
+        });
+    }
+
+    if (password != confirmPassword) {
+        return res.render("users/reset-password", {
+            token: token,
+            username: reset.username,
+            email: reset.email,
+            error: "Passwords do not match!"
+        });
+    }
+
+    if (!password || password.length < 8) {
+        return res.render("users/reset-password", {
+            token: token,
+            username: reset.username,
+            email: reset.email,
+            error: "Password must be at least 8 characters long!"
+        });
+    }
+
+    await updateUserPassword(reset.user_id, password);
+    await markPasswordResetUsed(token);
+
+    res.render("users/login", {
+        success: "Your password has been reset successfully! Please log in with your new password."
     });
 });
 
