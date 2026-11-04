@@ -70,6 +70,19 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         });
     }
 
+    const cleanUsername = (username || "").trim();
+    if (!cleanUsername || cleanUsername.length < 3) {
+        return res.render("users/register", {
+            inviteOnly: false,
+            token: token,
+            email: invite.email,
+            username: username,
+            first_name: first_name,
+            last_name: last_name,
+            error: "Username must be at least 3 characters long!"
+        });
+    }
+
     if (password != confirmPassword) {
         return res.render("users/register", {
             inviteOnly: false,
@@ -81,7 +94,7 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
             error: "Passwords do not match!"
         });
     }
-    if (!password || password.length < 8) {
+    if (!password || password.length < 12) {
         return res.render("users/register", {
             inviteOnly: false,
             token: token,
@@ -89,13 +102,13 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
             username: username,
             first_name: first_name,
             last_name: last_name,
-            error: "Password must be at least 8 characters long!"
+            error: "Password must be at least 12 characters long!"
         });
     }
 
     let userId;
     try {
-        userId = await createUser(username, invite.email, password, first_name, last_name);
+        userId = await createUser(cleanUsername, invite.email, password, first_name, last_name);
     } catch (err) {
         let errorMessage = "An error occurred while creating your account.";
         if (err.code === "23505") {
@@ -216,12 +229,12 @@ usersRouter.post("/reset-password", authLimiter, async (req, res) => {
         });
     }
 
-    if (!password || password.length < 8) {
+    if (!password || password.length < 12) {
         return res.render("users/reset-password", {
             token: token,
             username: reset.username,
             email: reset.email,
-            error: "Password must be at least 8 characters long!"
+            error: "Password must be at least 12 characters long!"
         });
     }
 

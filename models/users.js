@@ -7,19 +7,22 @@ export async function createUser(username, email, plainPassword, firstName = "",
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
     const fName = (firstName || "").trim();
     const lName = (lastName || "").trim();
+    const cleanUsername = (username || "").trim();
+    const cleanEmail = (email || "").trim().toLowerCase();
     const row = (await query(`
         INSERT INTO users (username, email, password_hash, first_name, last_name)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING id;
-    `, [username, email, hashedPassword, fName, lName]))[0];
+    `, [cleanUsername, cleanEmail, hashedPassword, fName, lName]))[0];
     return row.id;
 }
 export async function findUser(username) {
+    const cleanUsername = (username || "").trim();
     const user = (await query(`
         SELECT id, username, email, password_hash, first_name, last_name, is_blocked
         FROM users
-        WHERE username = $1;
-    `, [username]))[0];
+        WHERE LOWER(username) = LOWER($1);
+    `, [cleanUsername]))[0];
     return user || null;
 }
 export async function loadUser(sessionId) {

@@ -93,13 +93,14 @@
                         placeholder="Choose a username" 
                         value="{{username}}"
                         required
+                        minlength="3"
                         autocomplete="username"
                     >
                     <small style="color: var(--text-muted); font-size: 0.8rem;">Your username is private and only used to log in. Other members will see your first name.</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password (at least 8 characters)</label>
+                    <label for="password">Password (at least 12 characters)</label>
                     <input 
                         type="password" 
                         id="password" 
@@ -107,7 +108,7 @@
                         placeholder="Create a password" 
                         required
                         autocomplete="new-password"
-                        minlength="8"
+                        minlength="12"
                     >
                 </div>
 
@@ -120,7 +121,7 @@
                         placeholder="Confirm your password" 
                         required
                         autocomplete="new-password"
-                        minlength="8"
+                        minlength="12"
                     >
                 </div>
 
