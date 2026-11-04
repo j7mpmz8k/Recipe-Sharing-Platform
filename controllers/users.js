@@ -7,6 +7,7 @@ import { loadUserProfile } from "../middleware/content.js";
 import { authLimiter } from "../middleware/rateLimiter.js";
 import { findValidInvite, markInviteUsed } from "../models/invites.js";
 import { findValidPasswordReset, markPasswordResetUsed } from "../models/passwordResets.js";
+import { removeActiveUser } from "../middleware/activity.js";
 
 const usersRouter = express.Router();
 
@@ -142,6 +143,9 @@ usersRouter.post("/login", authLimiter, async (req, res) => {
 });
 
 usersRouter.post("/logout", requireAuth, async (req, res) => {
+    if (req.user && req.user.id) {
+        removeActiveUser(req.user.id);
+    }
     await deleteSession(req.session);
     res.clearCookie("session_id");
     res.redirect("/login");

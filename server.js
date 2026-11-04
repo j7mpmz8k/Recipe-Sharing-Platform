@@ -9,7 +9,7 @@ import { loadRecipes, loadFeaturedRecipes } from "./middleware/content.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import { securityHeaders } from "./middleware/security.js";
 import { generalLimiter } from "./middleware/rateLimiter.js";
-import { trackActivity } from "./middleware/activity.js";
+import { trackActivity, getOnlineCount } from "./middleware/activity.js";
 import usersRouter from "./controllers/users.js";
 import { recipesRouter, userRecipiesRouter } from "./controllers/recipes.js";
 import favRouter from "./controllers/favorites.js";
@@ -41,6 +41,10 @@ app.use("/admin", adminRouter);
 app.use("/", userRecipiesRouter);
 app.use("/recipes", recipesRouter);
 app.use("/", favRouter);
+app.get("/api/online-count", (req, res) => {
+    res.json({ count: getOnlineCount() });
+});
+
 app.get("/", loadFeaturedRecipes, (req, res) => {
     res.render("home");
 });

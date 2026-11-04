@@ -4,11 +4,10 @@ import { requireAuth } from "../middleware/auth.js";
 import { createRecipe } from "../models/recipes.js";
 const recipesRouter = express.Router();
 const userRecipiesRouter = express.Router();
-userRecipiesRouter.use(loadUserProfile);
 
 recipesRouter.use(loadRecipes);
 
-userRecipiesRouter.get("/my-recipes", requireAuth, async (req, res) => {
+userRecipiesRouter.get("/my-recipes", requireAuth, loadUserProfile, async (req, res) => {
     res.render("my-recipes");
 });
 

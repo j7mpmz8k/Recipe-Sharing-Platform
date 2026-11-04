@@ -25,7 +25,7 @@
         <div class="nav-right">
             <span class="online-status-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.825rem; font-weight: 500; color: #16a34a; background: #dcfce7; padding: 0.2rem 0.6rem; border-radius: 9999px;">
                 <span style="display: inline-block; width: 7px; height: 7px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 4px #22c55e;"></span>
-                <span>{{onlineCount}} online</span>
+                <span id="online-count-text">{{onlineCount}} online</span>
             </span>
             {{#if user}}
                 <span class="nav-user">Welcome, <a href="/users/{{user.id}}">{{user.username}}</a></span>
@@ -61,5 +61,21 @@
             ✉️ Questions, feedback, or invite requests? <a href="mailto:recipes.online872@passmail.com" style="color: var(--text-secondary, #4a5568); text-decoration: underline;">recipes.online872@passmail.com</a>
         </p>
     </footer>
+
+    <script>
+        // Smoothly refresh online counter every 15 seconds
+        setInterval(async function() {
+            try {
+                const res = await fetch('/api/online-count');
+                if (res.ok) {
+                    const data = await res.json();
+                    const el = document.getElementById('online-count-text');
+                    if (el && typeof data.count === 'number') {
+                        el.textContent = data.count + ' online';
+                    }
+                }
+            } catch (err) {}
+        }, 15000);
+    </script>
 </body>
 </html>
