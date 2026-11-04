@@ -23,6 +23,10 @@
             {{/if}}
         </div>
         <div class="nav-right">
+            <span class="online-status-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.825rem; font-weight: 500; color: #16a34a; background: #dcfce7; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                <span style="display: inline-block; width: 7px; height: 7px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 4px #22c55e;"></span>
+                <span>{{onlineCount}} online</span>
+            </span>
             {{#if user}}
                 <span class="nav-user">Welcome, <a href="/users/{{user.id}}">{{user.username}}</a></span>
                 <form action="/logout" method="POST" class="logout-form">
@@ -50,13 +54,7 @@
     </main>
 
     <footer>
-        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 0.5rem;">
-            <span class="online-status-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; font-weight: 500; color: #16a34a; background: #dcfce7; padding: 0.2rem 0.65rem; border-radius: 9999px;">
-                <span style="display: inline-block; width: 7px; height: 7px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 4px #22c55e;"></span>
-                <span>{{onlineCount}} online</span>
-            </span>
-        </div>
-        <p class="donate-text" style="font-size: 0.85rem; color: var(--text-muted, #718096); margin: 0 0 0.4rem 0;">
+        <p class="donate-text" style="font-size: 0.85rem; color: var(--text-muted, #718096); margin: 0 0 0.35rem 0;">
             ☕ Enjoying the site? Please consider supporting on Venmo: <a href="https://venmo.com/u/Jacob-Cardon" target="_blank" rel="noopener noreferrer" style="color: #008cff; font-weight: 600; text-decoration: underline;">@Jacob-Cardon</a>
         </p>
         <p class="contact-text" style="font-size: 0.825rem; color: var(--text-muted, #718096); margin: 0;">
