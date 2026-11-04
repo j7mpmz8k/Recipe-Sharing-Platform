@@ -4,6 +4,7 @@ import { createUser, findUser } from "../models/users.js";
 import { createSession, deleteSession } from "../models/sessions.js";
 import { requireAuth } from "../middleware/auth.js";
 import { loadUserProfile } from "../middleware/content.js";
+import { authLimiter } from "../middleware/rateLimiter.js";
 
 const usersRouter = express.Router();
 
@@ -11,7 +12,7 @@ usersRouter.get("/register", (req, res) => {
     res.render("users/register");
 });
 
-usersRouter.post("/register", async (req, res) => {
+usersRouter.post("/register", authLimiter, async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
     if (password != confirmPassword) {
         return res.render("users/register", {
@@ -20,7 +21,29 @@ usersRouter.post("/register", async (req, res) => {
             email
         });
     }
-    const userId = await createUser(username, email, password);
+    if (!password || password.length < 8) {
+        return res.render("users/register", {
+            error: "Password must be at least 8 characters long!",
+            username,
+            email
+        });
+    }
+
+    let userId;
+    try {
+        userId = await createUser(username, email, password);
+    } catch (err) {
+        let errorMessage = "An error occurred while creating your account.";
+        if (err.code === "23505") {
+            errorMessage = "A user with that username or email already exists!";
+        }
+        return res.render("users/register", {
+            error: errorMessage,
+            username,
+            email
+        });
+    }
+
     const sessionId = await createSession(userId);
     res.cookie("session_id", sessionId, {
         httpOnly: true,
@@ -38,8 +61,13 @@ usersRouter.get("/login", (req, res) => {
     res.render("users/login");
 });
 
-usersRouter.post("/login", async (req, res) => {
+usersRouter.post("/login", authLimiter, async (req, res) => {
     const { username, password } = req.body;
+    if (!username || !password) {
+        return res.render("users/login", {
+            error: "Username and password are required!"
+        });
+    }
     const user = await findUser(username);
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
         return res.render("users/login", {

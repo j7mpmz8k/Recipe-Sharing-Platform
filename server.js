@@ -7,6 +7,8 @@ import { loggingMiddleware } from "./middleware/logging.js";
 import { loadSession } from "./middleware/auth.js";
 import { loadRecipes, loadFeaturedRecipes } from "./middleware/content.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
+import { securityHeaders } from "./middleware/security.js";
+import { generalLimiter } from "./middleware/rateLimiter.js";
 import usersRouter from "./controllers/users.js";
 import { recipesRouter, userRecipiesRouter } from "./controllers/recipes.js";
 import favRouter from "./controllers/favorites.js";
@@ -16,10 +18,12 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // global middleware
+app.use(securityHeaders);
+app.use(express.static(path.join(__dirname, "public")));
+app.use(generalLimiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(loggingMiddleware);
 app.use(loadSession);
 
