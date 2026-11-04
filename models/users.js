@@ -1,6 +1,7 @@
 import query from "../db/connection.js";
 import bcrypt from "bcrypt";
 import { getUserRecipes, getFavoriteRecipes } from "./recipes.js";
+import { isAdminUser } from "../middleware/auth.js";
 
 export async function createUser(username, email, plainPassword) {
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
@@ -13,7 +14,7 @@ export async function createUser(username, email, plainPassword) {
 }
 export async function findUser(username) {
     const user = (await query(`
-        SELECT id, password_hash
+        SELECT id, password_hash, is_blocked
         FROM users
         WHERE username = $1;
     `, [username]))[0];
@@ -21,7 +22,7 @@ export async function findUser(username) {
 }
 export async function loadUser(sessionId) {
     const user = (await query(`
-        SELECT u.id, u.username, u.email
+        SELECT u.id, u.username, u.email, u.is_blocked
         FROM users u
         JOIN sessions s on u.id = s.user_id
         WHERE session_id = $1;
@@ -48,7 +49,7 @@ export async function getUserData(userId, viewerId = 0) {
 
 export async function getAllUsers() {
     const rows = await query(`
-        SELECT u.id, u.username, u.email, u.created_at, u.last_active_at,
+        SELECT u.id, u.username, u.email, u.created_at, u.last_active_at, u.is_blocked,
                COUNT(r.id) AS recipe_count
         FROM users u
         LEFT JOIN recipes r ON u.id = r.user_id
@@ -88,7 +89,8 @@ export async function getAllUsers() {
             username: u.username,
             email: u.email,
             recipeCount: Number(u.recipe_count) || 0,
-            isAdmin: u.id === 1,
+            isAdmin: isAdminUser(u.id),
+            isBlocked: Boolean(u.is_blocked),
             isOnline: isOnline,
             lastOnline: lastOnlineText,
             createdAt: new Date(u.created_at).toLocaleDateString("en-US", {
@@ -98,6 +100,14 @@ export async function getAllUsers() {
             })
         };
     });
+}
+
+export async function toggleUserBlocked(userId) {
+    await query(`
+        UPDATE users
+        SET is_blocked = NOT is_blocked
+        WHERE id = $1;
+    `, [userId]);
 }
 
 export async function updateUserLastActive(userId) {

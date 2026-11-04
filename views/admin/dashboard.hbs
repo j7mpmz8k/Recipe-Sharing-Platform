@@ -79,7 +79,7 @@
     {{/if}}
 
     <!-- Stat Metric Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
             <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Registered Users</div>
             <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{totalUsers}}</div>
@@ -92,7 +92,11 @@
             </div>
         </div>
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Site Visitors Online</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Blocked Users</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #dc2626;">{{blockedUsersCount}}</div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Visitors Online</div>
             <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #2563eb;">{{onlineCount}}</div>
         </div>
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
@@ -107,24 +111,28 @@
             <span>👥</span> Community Members
         </h2>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
-            Real-time online status (active in the last 5 minutes), last activity timestamp, and password reset actions.
+            Real-time online status (active in the last 5 minutes), last activity timestamp, and moderation controls.
         </p>
 
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
                 <thead>
                     <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                        <th style="padding: 0.75rem 0.5rem;">ID</th>
                         <th style="padding: 0.75rem 0.5rem;">User</th>
                         <th style="padding: 0.75rem 0.5rem;">Email</th>
                         <th style="padding: 0.75rem 0.5rem;">Status</th>
                         <th style="padding: 0.75rem 0.5rem;">Last Active</th>
                         <th style="padding: 0.75rem 0.5rem;">Joined</th>
-                        <th style="padding: 0.75rem 0.5rem; text-align: right;">Action</th>
+                        <th style="padding: 0.75rem 0.5rem; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{#each users}}
                         <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                            <td style="padding: 0.85rem 0.5rem; font-family: monospace; font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">
+                                #{{this.id}}
+                            </td>
                             <td style="padding: 0.85rem 0.5rem; font-weight: 600;">
                                 <a href="/users/{{this.id}}" style="color: var(--text-primary); text-decoration: none;">
                                     {{this.username}}
@@ -139,16 +147,23 @@
                                 {{this.email}}
                             </td>
                             <td style="padding: 0.85rem 0.5rem;">
-                                {{#if this.isOnline}}
-                                    <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 600; background: #def7ec; color: #03543f;">
-                                        <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
-                                        Online now
+                                {{#if this.isBlocked}}
+                                    <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 700; background: #fee2e2; color: #991b1b;">
+                                        <span style="width: 6px; height: 6px; background: #ef4444; border-radius: 50%;"></span>
+                                        Blocked
                                     </span>
                                 {{else}}
-                                    <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 500; background: #f3f4f6; color: #6b7280;">
-                                        <span style="width: 6px; height: 6px; background: #9ca3af; border-radius: 50%;"></span>
-                                        Offline
-                                    </span>
+                                    {{#if this.isOnline}}
+                                        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 600; background: #def7ec; color: #03543f;">
+                                            <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
+                                            Online now
+                                        </span>
+                                    {{else}}
+                                        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 500; background: #f3f4f6; color: #6b7280;">
+                                            <span style="width: 6px; height: 6px; background: #9ca3af; border-radius: 50%;"></span>
+                                            Offline
+                                        </span>
+                                    {{/if}}
                                 {{/if}}
                             </td>
                             <td style="padding: 0.85rem 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
@@ -158,16 +173,44 @@
                                 {{this.createdAt}}
                             </td>
                             <td style="padding: 0.85rem 0.5rem; text-align: right;">
-                                <form action="/admin/users/{{this.id}}/reset-password" method="POST" style="margin: 0; display: inline;">
-                                    <button 
-                                        type="submit" 
-                                        class="btn btn-secondary" 
-                                        style="padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600;"
-                                        onclick="return confirm('Generate a temporary password reset link for {{this.username}}?');"
-                                    >
-                                        🔑 Reset Password
-                                    </button>
-                                </form>
+                                <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                                    {{#if this.isAdmin}}
+                                        <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Protected</span>
+                                    {{else}}
+                                        <form action="/admin/users/{{this.id}}/toggle-block" method="POST" style="margin: 0; display: inline;">
+                                            {{#if this.isBlocked}}
+                                                <button 
+                                                    type="submit" 
+                                                    class="btn" 
+                                                    style="padding: 0.35rem 0.65rem; font-size: 0.775rem; font-weight: 600; background: #def7ec; color: #03543f; border: 1px solid #bcf0da;"
+                                                    onclick="return confirm('Unblock user {{this.username}}?');"
+                                                >
+                                                    ✅ Unblock
+                                                </button>
+                                            {{else}}
+                                                <button 
+                                                    type="submit" 
+                                                    class="btn" 
+                                                    style="padding: 0.35rem 0.65rem; font-size: 0.775rem; font-weight: 600; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;"
+                                                    onclick="return confirm('Are you sure you want to block user {{this.username}}? They will be signed out immediately and unable to log in.');"
+                                                >
+                                                    🚫 Block
+                                                </button>
+                                            {{/if}}
+                                        </form>
+                                    {{/if}}
+
+                                    <form action="/admin/users/{{this.id}}/reset-password" method="POST" style="margin: 0; display: inline;">
+                                        <button 
+                                            type="submit" 
+                                            class="btn btn-secondary" 
+                                            style="padding: 0.35rem 0.75rem; font-size: 0.775rem; font-weight: 600;"
+                                            onclick="return confirm('Generate a temporary password reset link for {{this.username}}?');"
+                                        >
+                                            🔑 Reset Password
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     {{/each}}

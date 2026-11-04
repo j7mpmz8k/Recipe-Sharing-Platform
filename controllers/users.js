@@ -126,6 +126,11 @@ usersRouter.post("/login", authLimiter, async (req, res) => {
             error: 'No user found with that password!',
         });
     }
+    if (user.is_blocked) {
+        return res.render("users/login", {
+            error: "This account has been suspended by an administrator."
+        });
+    }
     const sessionId = await createSession(user.id);
     res.cookie("session_id", sessionId, {
         httpOnly: true,
