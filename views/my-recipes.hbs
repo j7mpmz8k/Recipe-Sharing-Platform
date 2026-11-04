@@ -48,6 +48,7 @@
                     <div class="recipe-card-footer">
                         <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="{{#if this.isFavorite}}Unfavorite this recipe{{else if this.isFavorited}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
                             <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                            <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
                         </button>
                         <div class="card-footer-actions">
                             <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>

@@ -16,6 +16,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // global middleware
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));

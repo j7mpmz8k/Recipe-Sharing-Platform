@@ -688,6 +688,28 @@ main {
     filter: none;
 }
 
+.recipe-card-footer .favorite-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    text-decoration: none;
+}
+
+.recipe-card-footer .favorite-count {
+    font-size: 0.825rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.recipe-card-footer .favorites-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0.1rem 0.35rem;
+}
+
 .btn-text-edit {
     color: #e67e22;
 }

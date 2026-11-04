@@ -2,6 +2,7 @@ import express from "express";
 import { loadRecipes, loadUserProfile } from "../middleware/content.js";
 import { requireAuth } from "../middleware/auth.js";
 import { createRecipe } from "../models/recipes.js";
+import { getRatings } from "../models/ratings.js";
 const recipesRouter = express.Router();
 const userRecipiesRouter = express.Router();
 userRecipiesRouter.use(loadUserProfile);
@@ -65,6 +66,33 @@ recipesRouter.post("/:id", requireAuth, async (req, res, next) => {
         recipe.instructions = instructions;
         await recipe.saveEdit();
         res.redirect(`/recipes/${recipe.recipeId}`);
+    }
+});
+
+recipesRouter.post("/:id/rate", requireAuth, async (req, res, next) => {
+    const recipe = req.recipes.find(i => i.recipeId == req.params.id);
+    if (!recipe) {
+        next({ status: 404 });
+    } else if (recipe.userId === req.user.id) {
+        next({ status: 403 });
+    } else {
+        const rating = req.body.rating;
+        if (rating) {
+            await recipe.setRating(req.user.id, rating);
+        }
+        const ratings = await getRatings(req.user.id);
+        const updated = ratings[recipe.recipeId];
+        let avgRating = null;
+        let ratingCount = 0;
+        if (updated) {
+            avgRating = updated.avgRating;
+            ratingCount = updated.ratingCount;
+        }
+        res.json({
+            userRating: Number(rating),
+            avgRating: avgRating,
+            ratingCount: ratingCount
+        });
     }
 });
 

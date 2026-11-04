@@ -12,7 +12,7 @@
                 </p>
                 {{#if user}}
                     <p class="text-muted" style="margin: 0.25rem 0 0; font-size: 0.9rem;">
-                        ✉️ {{userProfile.email}}
+                        ✉️ <a href="mailto:{{userProfile.email}}" style="color: inherit; text-decoration: underline;">{{userProfile.email}}</a>
                     </p>
                 {{/if}}
             </div>
@@ -79,9 +79,13 @@
                             {{#if @root.user}}
                                 <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="{{#if this.isFavorite}}Unfavorite this recipe{{else if this.isFavorited}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
                                     <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                                    <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
                                 </button>
                             {{else}}
-                                <span></span>
+                                <span class="favorites-display">
+                                    <span class="heart-icon">❤️</span>
+                                    <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
+                                </span>
                             {{/if}}
                             <div class="card-footer-actions">
                                 {{#if this.canEdit}}
