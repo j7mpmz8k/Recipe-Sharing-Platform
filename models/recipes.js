@@ -1,5 +1,4 @@
 import query from "../db/connection.js";
-import { getRatings } from "./ratings.js";
 
 export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "") {
     const r = (await query(`
@@ -29,8 +28,7 @@ export async function getAllRecipes(userId = 0, querySearch = "") {
             GROUP BY r.id, u.username
             ORDER BY r.id DESC;
         `, [userId, querySearch]));
-    const ratings = await getRatings(userId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 export async function getUserRecipes(userId, viewerId = 0) {
     const rows = (await query(`
@@ -47,8 +45,7 @@ export async function getUserRecipes(userId, viewerId = 0) {
         GROUP BY r.id, u.username
         ORDER BY r.id DESC;
     `, [userId, viewerId]));
-    const ratings = await getRatings(viewerId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 
 export async function getFeaturedRecipes(userId = 0) {
@@ -66,8 +63,7 @@ export async function getFeaturedRecipes(userId = 0) {
         ORDER BY fav_count DESC, r.id DESC
         LIMIT 6;
     `, [userId]));
-    const ratings = await getRatings(userId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 
 export async function getFavoriteRecipes(userId) {
@@ -83,12 +79,11 @@ export async function getFavoriteRecipes(userId) {
         GROUP BY r.id, u.username
         ORDER BY r.id DESC;
     `, [userId]));
-    const ratings = await getRatings(userId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 
 class Recipe {
-    constructor(row, ratings = null) {
+    constructor(row) {
         this.recipeId = row.id;
         this.title = row.title;
         this.description = row.description;
@@ -107,10 +102,6 @@ class Recipe {
         this.canEdit = false;
         this.favCount = Number(row.fav_count) || 0;
         this.isFavorite = row.is_favorite;
-        const rating = ratings?.[this.recipeId] || {};
-        this.avgRating = rating.avgRating || null;
-        this.ratingCount = rating.ratingCount || 0;
-        this.userRating = rating.userRating || null;
 
         // compare timestamps with 1 second buffer
         this.isUpdated = (new Date(row.updated_at) - new Date(row.created_at)) > 1000;
@@ -131,27 +122,6 @@ class Recipe {
     isOwnedBy(userId) {
         this.canEdit = this.userId === userId;
         return this.canEdit;
-    }
-
-    setRating = async (userId, rating) => {
-        const existing = (await query(`
-            SELECT id FROM ratings
-            WHERE recipe_id = $1 AND user_id = $2;
-        `, [this.recipeId, userId]))[0];
-
-        if (existing) {
-            await query(`
-                UPDATE ratings
-                SET rating = $3
-                WHERE recipe_id = $1 AND user_id = $2;
-            `, [this.recipeId, userId, rating]);
-        } else {
-            await query(`
-                INSERT INTO ratings (recipe_id, user_id, rating)
-                VALUES ($1, $2, $3);
-            `, [this.recipeId, userId, rating]);
-        }
-        this.userRating = Number(rating);
     }
 
     saveEdit = async () => {
