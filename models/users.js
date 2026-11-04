@@ -127,4 +127,20 @@ export async function updateUserPassword(userId, plainPassword) {
     `, [userId, hashedPassword]);
 }
 
+export async function updateUsername(userId, newUsername) {
+    await query(`
+        UPDATE users
+        SET username = $2
+        WHERE id = $1;
+    `, [userId, newUsername.trim()]);
+}
+
+export async function deleteUser(userId) {
+    await query(`
+        DELETE FROM users
+        WHERE id = $1;
+    `, [userId]);
+}
+
+
 

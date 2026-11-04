@@ -82,18 +82,43 @@ export function createRateLimiter(options) {
 
         next();
     };
+
+    rateLimiter.getBlockedCount = function() {
+        const now = Date.now();
+        let blocked = 0;
+        for (const timestamps of ipHits.values()) {
+            const active = timestamps.filter(ts => (now - ts) < windowMs);
+            if (active.length >= max) {
+                blocked = blocked + 1;
+            }
+        }
+        return blocked;
+    };
+
+    return rateLimiter;
 }
 
-// Strict limiter for sensitive auth routes (5 attempts per 15 minutes)
+// Strict limiter for sensitive auth routes (10 attempts per 15 minutes)
 export const authLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 10,
     message: "Too many authentication attempts. Please wait 15 minutes before trying again."
 });
 
-// General limiter for public endpoints (100 requests per 15 minutes)
+// General limiter for public endpoints (200 requests per 15 minutes)
 export const generalLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 200,
     message: "Too many requests. Please slow down and try again in a few minutes."
 });
+
+export function getTotalRateLimitedCount() {
+    let count = 0;
+    if (authLimiter && authLimiter.getBlockedCount) {
+        count = count + authLimiter.getBlockedCount();
+    }
+    if (generalLimiter && generalLimiter.getBlockedCount) {
+        count = count + generalLimiter.getBlockedCount();
+    }
+    return count;
+}

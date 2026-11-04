@@ -1,5 +1,6 @@
 // middleware/activity.js
 import { updateUserLastActive } from "../models/users.js";
+import { getSiteBanner } from "../models/banner.js";
 
 // In-memory map of active visitor identifiers -> timestamp of last request
 const activeVisitors = new Map();
@@ -37,7 +38,7 @@ export function getOnlineCount() {
     return count;
 }
 
-export function trackActivity(req, res, next) {
+export async function trackActivity(req, res, next) {
     const now = Date.now();
     let visitorKey = "guest:" + (req.ip || req.socket.remoteAddress || "unknown");
 
@@ -56,8 +57,9 @@ export function trackActivity(req, res, next) {
 
     activeVisitors.set(visitorKey, now);
 
-    // Make online count available to all Handlebars templates
+    // Make online count and site banner available to all Handlebars templates
     res.locals.onlineCount = getOnlineCount();
+    res.locals.siteBanner = await getSiteBanner();
 
     next();
 }

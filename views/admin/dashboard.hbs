@@ -5,7 +5,7 @@
             <span>👑</span> Admin Control Center
         </h1>
         <p style="color: var(--text-muted); font-size: 0.95rem;">
-            Monitor online users, manage member access, generate password reset links, and issue invitations.
+            Monitor online users, manage member access, broadcast announcement banners, and generate credentials.
         </p>
     </div>
 
@@ -13,6 +13,18 @@
     {{#if error}}
         <div class="alert alert-error" style="margin-bottom: 1.5rem;">
             {{error}}
+        </div>
+    {{/if}}
+
+    {{#if actionSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem;">
+            {{actionSuccess}}
+        </div>
+    {{/if}}
+
+    {{#if bannerSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem;">
+            {{bannerSuccess}}
         </div>
     {{/if}}
 
@@ -92,8 +104,8 @@
             </div>
         </div>
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Blocked Users</div>
-            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #dc2626;">{{blockedUsersCount}}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Rate-Limited Clients</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #dc2626;">{{rateLimitedCount}}</div>
         </div>
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
             <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Visitors Online</div>
@@ -105,13 +117,110 @@
         </div>
     </div>
 
-    <!-- Section 1: Users, Online Status, Last Online, Reset Password -->
+    <!-- Announcement Banner Manager Card -->
+    <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2 style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📢</span> Site-Wide Announcement Banner
+            </h2>
+            {{#if banner.isActive}}
+                <span style="font-size: 0.8rem; background: #def7ec; color: #03543f; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
+                    ● LIVE ON SITE
+                </span>
+            {{else}}
+                <span style="font-size: 0.8rem; background: #f3f4f6; color: #6b7280; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 500;">
+                    ○ INACTIVE
+                </span>
+            {{/if}}
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Broadcast an urgent or informative notice across the top of all pages (e.g. <em>"Site shutdown in 1 hour for maintenance"</em>).
+        </p>
+
+        {{#if banner.isActive}}
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600;">Current Live Preview:</label>
+                <div style="padding: 0.75rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.925rem; text-align: center;
+                    {{#if banner.isWarning}}background: #fef08a; color: #854d0e; border: 1px solid #facc15;{{/if}}
+                    {{#if banner.isAlert}}background: #fee2e2; color: #991b1b; border: 1px solid #f87171;{{/if}}
+                    {{#if banner.isInfo}}background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;{{/if}}
+                    {{#if banner.isSuccess}}background: #dcfce7; color: #166534; border: 1px solid #4ade80;{{/if}}
+                ">
+                    {{#if banner.isWarning}}⚠️{{/if}}
+                    {{#if banner.isAlert}}🚨{{/if}}
+                    {{#if banner.isInfo}}ℹ️{{/if}}
+                    {{#if banner.isSuccess}}📢{{/if}}
+                    {{banner.message}}
+                </div>
+            </div>
+        {{/if}}
+
+        <form action="/admin/banner" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label for="bannerMessage" style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">
+                    Banner Message
+                </label>
+                <input 
+                    type="text" 
+                    id="bannerMessage" 
+                    name="message" 
+                    value="{{banner.message}}" 
+                    placeholder="e.g. Site shutdown in 1 hour for scheduled maintenance"
+                    required
+                    style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
+                >
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <label for="bannerType" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
+                        Banner Style
+                    </label>
+                    <select id="bannerType" name="banner_type" style="padding: 0.6rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.9rem; background: #fff;">
+                        <option value="warning" {{#if banner.isWarning}}selected{{/if}}>⚠️ Warning / Shutdown (Yellow)</option>
+                        <option value="alert" {{#if banner.isAlert}}selected{{/if}}>🚨 Urgent Alert (Red)</option>
+                        <option value="info" {{#if banner.isInfo}}selected{{/if}}>ℹ️ Informational Notice (Blue)</option>
+                        <option value="success" {{#if banner.isSuccess}}selected{{/if}}>📢 General Announcement (Green)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.4rem;">
+                    <input 
+                        type="checkbox" 
+                        id="is_active" 
+                        name="is_active" 
+                        {{#if banner.isActive}}checked{{/if}} 
+                        style="width: 1.15rem; height: 1.15rem; cursor: pointer;"
+                    >
+                    <label for="is_active" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+                        Active (Visible across all site pages)
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
+                    💾 Save &amp; Publish Banner
+                </button>
+            </div>
+        </form>
+
+        {{#if banner.isActive}}
+            <form action="/admin/banner/disable" method="POST" style="margin-top: 0.75rem;">
+                <button type="submit" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    Disable Banner
+                </button>
+            </form>
+        {{/if}}
+    </div>
+
+    <!-- Section 1: Community Members -->
     <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
         <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
             <span>👥</span> Community Members
         </h2>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
-            Real-time online status (active in the last 5 minutes), last activity timestamp, and moderation controls.
+            Real-time online status (active in the last 5 minutes), last activity timestamp, username management, and moderation controls.
         </p>
 
         <div style="overflow-x: auto;">
@@ -142,6 +251,17 @@
                                         ADMIN
                                     </span>
                                 {{/if}}
+                                <button 
+                                    type="button" 
+                                    class="btn-text" 
+                                    style="font-size: 0.75rem; margin-left: 0.4rem; color: #2563eb; cursor: pointer; border: none; background: none; padding: 0;"
+                                    onclick="const n = prompt('Enter new username for {{this.username}}:', '{{this.username}}'); if (n &amp;&amp; n.trim() &amp;&amp; n.trim() !== '{{this.username}}') { const f = document.getElementById('renameForm-{{this.id}}'); f.newUsername.value = n.trim(); f.submit(); }"
+                                >
+                                    ✏️ Rename
+                                </button>
+                                <form id="renameForm-{{this.id}}" action="/admin/users/{{this.id}}/change-username" method="POST" style="display:none;">
+                                    <input type="hidden" name="newUsername">
+                                </form>
                             </td>
                             <td style="padding: 0.85rem 0.5rem; color: var(--text-secondary);">
                                 {{this.email}}
@@ -150,7 +270,7 @@
                                 {{#if this.isBlocked}}
                                     <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 700; background: #fee2e2; color: #991b1b;">
                                         <span style="width: 6px; height: 6px; background: #ef4444; border-radius: 50%;"></span>
-                                        Blocked
+                                        Suspended
                                     </span>
                                 {{else}}
                                     {{#if this.isOnline}}
@@ -177,26 +297,15 @@
                                     {{#if this.isAdmin}}
                                         <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Protected</span>
                                     {{else}}
-                                        <form action="/admin/users/{{this.id}}/toggle-block" method="POST" style="margin: 0; display: inline;">
-                                            {{#if this.isBlocked}}
-                                                <button 
-                                                    type="submit" 
-                                                    class="btn" 
-                                                    style="padding: 0.35rem 0.65rem; font-size: 0.775rem; font-weight: 600; background: #def7ec; color: #03543f; border: 1px solid #bcf0da;"
-                                                    onclick="return confirm('Unblock user {{this.username}}?');"
-                                                >
-                                                    ✅ Unblock
-                                                </button>
-                                            {{else}}
-                                                <button 
-                                                    type="submit" 
-                                                    class="btn" 
-                                                    style="padding: 0.35rem 0.65rem; font-size: 0.775rem; font-weight: 600; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;"
-                                                    onclick="return confirm('Are you sure you want to block user {{this.username}}? They will be signed out immediately and unable to log in.');"
-                                                >
-                                                    🚫 Block
-                                                </button>
-                                            {{/if}}
+                                        <form action="/admin/users/{{this.id}}/delete" method="POST" style="margin: 0; display: inline;">
+                                            <button 
+                                                type="submit" 
+                                                class="btn" 
+                                                style="padding: 0.35rem 0.65rem; font-size: 0.775rem; font-weight: 600; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;"
+                                                onclick="return confirm('WARNING: Are you sure you want to permanently delete user {{this.username}} and all their recipes? This cannot be undone.');"
+                                            >
+                                                🗑️ Delete
+                                            </button>
                                         </form>
                                     {{/if}}
 
