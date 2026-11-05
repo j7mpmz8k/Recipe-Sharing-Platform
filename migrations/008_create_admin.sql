@@ -4,10 +4,10 @@ INSERT INTO users (id, username, email, password_hash, first_name, last_name)
 VALUES (
     1,
     'admin',
-    'recipes.online872@passmail.com',
+    'contact@recipes.jcardon.me',
     '$2b$10$.8k6xQCqJ3dl85OH1/Z6ue35NmIKEfpJXd7W52tPp9u9tVi.MGwSi',
-    'Jacob',
-    'Cardon'
+    'John',
+    'Doe'
 )
 ON CONFLICT (id) DO UPDATE SET
     username = EXCLUDED.username,
