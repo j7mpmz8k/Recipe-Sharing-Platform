@@ -35,6 +35,9 @@ export async function loadUserProfile(req, res, next) {
     if (!userId && req.user) {
         userId = req.user.id;
     }
+    if (!userId) {
+        return next();
+    }
     let currentUserId = 0;
     if (req.user) {
         currentUserId = req.user.id;
