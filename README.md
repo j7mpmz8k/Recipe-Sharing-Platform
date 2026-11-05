@@ -338,6 +338,15 @@ This command:
 4. Prunes old container images and prints container health status.
 *(Note: It does not push any local branches—it assumes code has already been merged into `master`).*
 
+### Accessing Production via SSH Tunnel (From Laptop)
+To view or test the production website securely in your laptop browser without opening port 3000 to the public:
+```bash
+npm run tunnel
+```
+This forwards `http://localhost:8080` on your laptop directly to `127.0.0.1:3000` on your production server. Open `http://localhost:8080` in your browser. Press `Ctrl+C` whenever you want to close the tunnel.
+
+*(Optional: forward to a custom local port, e.g. `npm run tunnel -- 9000`).*
+
 ### Manual Server-Side Deploy
 If you are logged directly into the production server, you can trigger updates using:
 ```bash

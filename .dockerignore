@@ -23,6 +23,7 @@ docker/Dockerfile
 # Local host scripts (keep scripts/migrate.js for container startup)
 scripts/pull_prod_db*
 scripts/deploy*
+scripts/tunnel*
 scripts/setup-wsl*
 scripts/*.bat
 scripts/*.ps1
