@@ -4,8 +4,15 @@
 # ==============================================================================
 set -eo pipefail
 
-echo "==> Fetching latest changes from git..."
-git pull origin main
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${PROJECT_ROOT}"
+
+echo "==> Ensuring repository is on master branch..."
+git checkout master
+
+echo "==> Fetching latest changes from git on master..."
+git pull origin master
 
 echo "==> Building hardened container image..."
 docker compose build --pull

@@ -5,10 +5,11 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "migrate": "node migrate.js",
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "migrate": "node scripts/migrate.js",
     "db:pull": "./scripts/pull_prod_db.sh",
-    "db:pull-prod": "./scripts/pull_prod_db.sh"
+    "deploy": "./scripts/deploy_prod.sh"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

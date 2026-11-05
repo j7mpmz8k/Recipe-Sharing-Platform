@@ -5,22 +5,30 @@
 set -eo pipefail
 
 # Auto-load variables from .env in the project root if present
-if [ -f ".env" ]; then
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+ENV_FILE="${ENV_FILE:-${PROJECT_ROOT}/.env}"
+if [ -f "${ENV_FILE}" ]; then
     set -a
-    # shellcheck disable=SC1091
-    . .env
+    # shellcheck disable=SC1090
+    . "${ENV_FILE}"
     set +a
 fi
+
+DB_NAME="${DB_NAME:-recipe_db}"
+DB_USER="${DB_USER:-admin}"
+DB_HOST="${DB_HOST:-localhost}"
+DB_PORT="${DB_PORT:-5432}"
 
 PROD_SSH_HOST="${PROD_SSH_HOST:-$1}"
 PROD_SSH_PORT="${PROD_SSH_PORT:-48222}"
 PROD_DB_NAME="${PROD_DB_NAME:-recipe_db}"
 PROD_DB_USER="${PROD_DB_USER:-postgres}"
 
-LOCAL_DB_NAME="${LOCAL_DB_NAME:-${DB_NAME:-recipe_db}}"
-LOCAL_DB_USER="${LOCAL_DB_USER:-${DB_USER:-admin}}"
-LOCAL_DB_HOST="${LOCAL_DB_HOST:-${DB_HOST:-localhost}}"
-LOCAL_DB_PORT="${LOCAL_DB_PORT:-${DB_PORT:-5432}}"
+if [ -n "${DB_PASSWORD:-}" ]; then
+    export PGPASSWORD="${DB_PASSWORD}"
+fi
 
 echo "=================================================="
 echo "   Recipe Sharing Platform - Database Sync Tool   "
@@ -37,21 +45,35 @@ fi
 
 echo ""
 echo "Sync Configuration:"
-echo "  Source (Remote):  ${PROD_DB_USER}@${PROD_SSH_HOST}:${PROD_SSH_PORT} -> Database: \"${PROD_DB_NAME}\""
-echo "  Target (Local):   ${LOCAL_DB_USER}@${LOCAL_DB_HOST}:${LOCAL_DB_PORT} -> Database: \"${LOCAL_DB_NAME}\""
+echo "  Remote Host:      ${PROD_SSH_HOST}:${PROD_SSH_PORT}"
+echo "  Remote DB:        ${PROD_DB_NAME} (User: ${PROD_DB_USER})"
+echo "  Target (Local):   ${DB_USER}@${DB_HOST}:${DB_PORT} -> Database: \"${DB_NAME}\""
 echo "  Method:           Direct SSH Stream (pg_dump | psql)"
 echo ""
 
-read -rp "⚠️  WARNING: Overwrite local database \"${LOCAL_DB_NAME}\" with production data? [y/N]: " CONFIRM
+read -rp "⚠️  WARNING: Overwrite local database \"${DB_NAME}\" with production data? [y/N]: " CONFIRM
 if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
     echo "Operation canceled by user."
     exit 0
 fi
 
-echo ""
-echo "Streaming database from production to local staging..."
-ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" "pg_dump -U ${PROD_DB_USER} -d ${PROD_DB_NAME} --clean --if-exists --no-owner --no-privileges" \
-    | psql -h "${LOCAL_DB_HOST}" -p "${LOCAL_DB_PORT}" -U "${LOCAL_DB_USER}" -d "${LOCAL_DB_NAME}"
+# Ensure local target database exists before streaming into it
+if ! psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = '${DB_NAME}'" 2>/dev/null | grep -q 1; then
+    echo "Local database \"${DB_NAME}\" does not exist. Creating it now..."
+    psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d postgres -c "CREATE DATABASE \"${DB_NAME}\";" 2>/dev/null || true
+fi
 
 echo ""
-echo "✓ Database successfully synced from production to \"${LOCAL_DB_NAME}\"!"
+echo "Streaming database from production to local staging..."
+
+REMOTE_DUMP_CMD="if command -v docker >/dev/null 2>&1 && docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^recipe_db$'; then
+    docker exec -i recipe_db pg_dump -U ${PROD_DB_USER} -d ${PROD_DB_NAME} --clean --if-exists --no-owner --no-privileges
+else
+    pg_dump -U ${PROD_DB_USER} -d ${PROD_DB_NAME} --clean --if-exists --no-owner --no-privileges
+fi"
+
+ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" "${REMOTE_DUMP_CMD}" \
+    | psql -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}"
+
+echo ""
+echo "✓ Database successfully synced from production to \"${DB_NAME}\"!"

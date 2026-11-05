@@ -1,10 +1,28 @@
 node_modules
 npm-debug.log
+
+# Version control & editor configs
 .git
 .gitignore
 .vscode
+
+# Environment files & templates
 .env
 .env.*
-!.env.example
+*.env
+
+# Documentation & unused assets
 README.md
+*.md
+.pdf
+
+# Docker configuration files
+docker-compose*.yml
+docker/Dockerfile
+
+# Local host scripts (keep scripts/migrate.js for container startup)
 scripts/pull_prod_db*
+scripts/deploy*
+scripts/setup-wsl*
+scripts/*.bat
+scripts/*.ps1

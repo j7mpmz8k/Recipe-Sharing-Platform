@@ -44,7 +44,7 @@ COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node . .
 
 # Copy and set executable permissions for entrypoint script
-COPY --chown=node:node docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY --chown=node:node docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Run as non-privileged node user (UID 1000)

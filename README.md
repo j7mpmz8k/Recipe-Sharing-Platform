@@ -8,11 +8,11 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 
 ```text
 +------------------------------------+                    +------------------------------------------------------+
-|    CLIENT MACHINE (Linux Laptop)   |                    |               PRODUCTION SERVER                      |
+|    CLIENT MACHINE (Linux Laptop)   |                    |               PRODUCTION SERVER (Linux / WSL 2)      |
 |                                    |                    |                                                      |
-|  - Local Development (`npm dev`)   |    HTTPS (443)     |  [ Reverse Proxy: Nginx / Nginx Proxy Manager ]       |
-|  - Database Sync (`npm db:pull`)   | -----------------> |       | (forwards to 127.0.0.1:3000)                 |
-|                                    |                    |       ▼                                              |
+|  - Local Dev (`npm run dev`)       |    HTTPS (443)     |  [ Reverse Proxy: Nginx / Nginx Proxy Manager ]       |
+|  - Push Deploy (`npm run deploy`)  | -----------------> |       │ (forwards to 127.0.0.1:3000)                 |
+|  - Pull DB (`npm run db:pull`)     |                    |       ▼                                              |
 |                                    |    SSH (48222)     |  [ App Container ] (Node 20, non-root, read-only)   |
 |                                    | -----------------> |       │                                              |
 |                                    |                    |       ▼ (internal bridge network: db:5432)           |
@@ -20,28 +20,28 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 +------------------------------------+                    +------------------------------------------------------+
 ```
 
-### Key Security Features
-- **Multi-Stage Build**: Development dependencies and compiler build-tools (`g++`, `make`, `python3`) are discarded after building native modules (`bcrypt`), yielding a minimal attack surface.
+### Key Security & Architecture Features
+- **Multi-Stage Container Build**: Compiler build-tools (`g++`, `make`, `python3`) are isolated to the build stage and discarded from runtime, keeping the image minimal and hardened.
 - **Unprivileged Execution**: The Node.js application runs under the unprivileged `node` user (`UID 1000`). Root execution is disabled.
-- **Read-Only Root Filesystem**: The container root filesystem is mounted `read_only: true`. Temporary runtime storage is provided via an isolated in-memory `tmpfs` (`/tmp:noexec,nosuid,size=64m`).
+- **Read-Only Root Filesystem**: The container filesystem is mounted `read_only: true`. Temporary runtime storage is provided via an isolated in-memory `tmpfs` (`/tmp:noexec,nosuid,size=64m`).
 - **Capability Hardening**: Drops all Linux kernel capabilities (`cap_drop: [ ALL ]`) and enforces `no-new-privileges:true`.
 - **Localhost-Only Port Bindings**: Ports `3000` (Node.js) and `5432` (PostgreSQL) are bound strictly to `127.0.0.1` on the host, preventing the public internet from bypassing the reverse proxy or accessing the raw database.
-- **Automated Healthchecks**: Built-in container healthchecks monitor HTTP and PostgreSQL readiness. Application migrations run automatically on startup via `docker-entrypoint.sh` only after the database reports healthy.
+- **Automatic Database Migrations**: Self-contained migrations auto-create the database and tables on container startup via `docker/docker-entrypoint.sh` only after the PostgreSQL service reports healthy.
 
 ---
 
 ## Table of Contents
-1. [Server Setup: Native Linux (Ubuntu / Debian VPS)](#1-server-setup-native-linux-ubuntu--debian-vps)
+1. [Server Setup: Native Linux VPS](#1-server-setup-native-linux-vps)
 2. [Server Setup: Windows Host with WSL 2](#2-server-setup-windows-host-with-wsl-2)
 3. [Reverse Proxy Configuration (Nginx / Nginx Proxy Manager)](#3-reverse-proxy-configuration)
-4. [Client Setup: Linux Laptop (Development & DB Sync)](#4-client-setup-linux-laptop)
-5. [Maintenance & Operations](#5-maintenance--operations)
+4. [Client Setup: Linux Laptop (Development & Sync)](#4-client-setup-linux-laptop)
+5. [Deploying & Operations](#5-deploying--operations)
 
 ---
 
-## 1. Server Setup: Native Linux (Ubuntu / Debian VPS)
+## 1. Server Setup: Native Linux VPS
 
-Follow this section if your production server is running standalone Ubuntu or Debian.
+Follow this section if your production server is running standalone Linux (Ubuntu, Debian, etc.).
 
 ### Step 1.1: Install Docker & Docker Compose
 ```bash
@@ -100,38 +100,27 @@ mkdir -p ~/docker_services
 cd ~/docker_services
 git clone <repository-url> recipe-sharing-platform
 cd recipe-sharing-platform
-```
 
-Create `.env`:
-```bash
-cp .env.example .env
+# Create production environment file from server template
+cp server_template.env .env
 chmod 600 .env
 nano .env
 ```
 
-Set your production variables:
+Ensure your `.env` has a strong database password:
 ```env
+NODE_ENV=production
 PORT=3000
 RUN_MIGRATIONS=true
 
 DB_HOST=db
 DB_PORT=5432
 DB_USER=postgres
-DB_PASSWORD=<GenerateAStrongRandomPassword>
+DB_PASSWORD="your_strong_random_password"
 DB_NAME=recipe_db
 ```
 
-### Step 1.4: Add Database Dump Forwarder
-To allow the client laptop to run `npm run db:pull` over SSH without exposing the database to the internet:
-```bash
-sudo tee /usr/local/bin/pg_dump << 'EOF'
-#!/bin/sh
-docker exec -i recipe_db pg_dump "$@"
-EOF
-sudo chmod +x /usr/local/bin/pg_dump
-```
-
-### Step 1.5: Launch the Production Stack
+### Step 1.4: Launch the Production Stack
 ```bash
 docker compose up -d --build
 docker compose ps
@@ -142,10 +131,10 @@ Both `recipe_app` and `recipe_db` will report status `Up (healthy)`.
 
 ## 2. Server Setup: Windows Host with WSL 2
 
-Follow this section if your server is running on a Windows PC with WSL 2.
+Follow this section if your production or homelab server runs on Windows with WSL 2.
 
 ### Step 2.1: Enable WSL Integration in Docker Desktop
-1. In Windows, open **Docker Desktop**.
+1. Open **Docker Desktop** on Windows.
 2. Go to **Settings -> General** and verify **Use the WSL 2 based engine** is checked.
 3. Under **Settings -> Resources -> WSL Integration**, toggle your Linux distribution (e.g. `Ubuntu`) **ON**.
 
@@ -175,37 +164,28 @@ EOF
 sudo service fail2ban restart
 ```
 
-### Step 2.3: Forward the Port in Windows (One Click)
-Because Windows owns the physical network card, outside devices connect to the Windows IP. 
+### Step 2.3: Forward the SSH Port in Windows
+Because Windows owns the physical network card, inbound traffic hits Windows first. 
 
-Run the automated helper script in Windows:
-1. Navigate to your project directory in File Explorer.
-2. **Right-click `setup-wsl-portforward.bat` -> Run as Administrator**.
-   *(This automatically queries your current WSL IP, adds the Windows Firewall rule for TCP 48222, and configures `netsh portproxy` routing).*
+To route port 48222 directly into your WSL distribution:
+1. Open File Explorer in Windows and browse to the project's `scripts/` folder.
+2. **Right-click `setup-wsl-portforward.ps1` &rarr; Run with PowerShell**.
+3. The script automatically self-elevates to Administrator, detects the current internal WSL IP, adds the Windows Firewall rule, and configures `netsh portproxy`.
 
 ### Step 2.4: Deploy in WSL
-Inside WSL:
+Inside your WSL terminal:
 ```bash
 mkdir -p ~/docker_services
 cd ~/docker_services
 git clone <repository-url> recipe-sharing-platform
 cd recipe-sharing-platform
 
-cp .env.example .env
+cp server_template.env .env
 chmod 600 .env
 nano .env
-```
-Add the `pg_dump` wrapper:
-```bash
-sudo tee /usr/local/bin/pg_dump << 'EOF'
-#!/bin/sh
-docker exec -i recipe_db pg_dump "$@"
-EOF
-sudo chmod +x /usr/local/bin/pg_dump
-```
-Start the containers:
-```bash
+
 docker compose up -d --build
+docker compose ps
 ```
 
 ---
@@ -219,7 +199,7 @@ The application listens internally on `127.0.0.1:3000`. A reverse proxy handles 
 2. Navigate to **Proxy Hosts -> Add Proxy Host**:
    - **Domain Names**: `recipes.your-domain.com`
    - **Scheme**: `http`
-   - **Forward Hostname / IP**: `host.docker.internal` (or server LAN IP)
+   - **Forward Hostname / IP**: `127.0.0.1` (or host LAN IP)
    - **Forward Port**: `3000`
    - Enable: **Block Common Exploits**, **Websockets Support**
 3. Under the **SSL** tab:
@@ -269,84 +249,114 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ## 4. Client Setup: Linux Laptop
 
-Follow this section to set up your local development environment on your Linux laptop and enable database syncing.
+Follow this section to set up your local development environment on your Linux laptop.
 
-### Step 4.1: Install Dependencies
+### Step 4.1: Clone & Install Dependencies
 ```bash
-# Clone the repository
 git clone <repository-url> recipe-sharing-platform
 cd recipe-sharing-platform
 
 # Install Node.js dependencies
 npm install
 
-# Make scripts executable
+# Ensure scripts are executable
 chmod +x ./scripts/*.sh
 ```
 
-### Step 4.2: Copy SSH Key to the Server
-If you haven't already, install your laptop's SSH key on the production server so database syncs do not require entering a password:
+### Step 4.2: Authorize Your SSH Key with the Server
+Install your laptop's SSH public key on the production server so that deployments and database syncs do not require entering a password:
 ```bash
+# Generate an SSH key if you do not have one yet
 ssh-keygen -t ed25519 -C "laptop-dev"
+
+# Copy key to your server
 ssh-copy-id -p 48222 <server-user>@<server-ip-or-domain>
 ```
 
 ### Step 4.3: Configure Local `.env`
-Create `.env` in the project root:
-```env
-# Local Application & Staging Database (Where data is restored TO)
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=<your-local-laptop-db-user>
-DB_PASSWORD=<your-local-laptop-db-password>
-DB_NAME=recipe_db
-PORT=3000
+Copy the client template:
+```bash
+cp client_template.env .env
+nano .env
+```
 
-# Remote Production Server (Where data is pulled FROM)
+Configure your local database credentials and remote SSH connection:
+```env
+NODE_ENV=development
+PORT=3000
+RUN_MIGRATIONS=false
+
+# Local Database Connection (Linux socket or localhost)
+DB_HOST=/run/postgresql
+DB_PORT=5432
+DB_USER=admin
+DB_PASSWORD="your_local_db_password"
+DB_NAME=recipe_db
+
+# Remote Production Server (for npm run db:pull & npm run deploy)
 PROD_SSH_HOST=<server-user>@<server-ip-or-domain>
 PROD_SSH_PORT=48222
 PROD_DB_NAME=recipe_db
 PROD_DB_USER=postgres
 ```
 
-### Step 4.4: Pull the Production Database to Staging
-To clone the production database schema and data into your local staging database:
-```bash
-npm run db:pull
-```
-The script will confirm your target, establish an encrypted SSH pipe directly to the remote container, execute `pg_dump`, and restore it locally via `psql`.
+### Step 4.4: Initialize Local Database (Choose One)
 
-### Step 4.5: Run Local Development
+You can populate your local database in one of two ways:
+
+* **Option A: Pull real data from production (`npm run db:pull`)**
+  ```bash
+  npm run db:pull
+  ```
+  The script automatically creates `recipe_db` locally if it doesn't exist, establishes an encrypted SSH pipe, dumps the production database, and restores it locally.
+
+* **Option B: Start fresh with empty tables (`npm run migrate`)**
+  ```bash
+  npm run migrate
+  ```
+  The migration runner auto-creates `recipe_db` locally via `migrations/000_create_database.sql` and applies all migration files (`001` through `008`).
+
+### Step 4.5: Run Local Development Server
 ```bash
 npm run dev
 ```
-Open `http://localhost:3000` in your browser.
+Starts the local server on `http://localhost:3000` with **automatic hot-reloading (`--watch`)**. Any edits to templates, routes, or models restart the server instantly.
 
 ---
 
-## 5. Maintenance & Operations
+## 5. Deploying & Operations
 
-### Zero-Downtime Server Updates
-When you push code updates to Git, update the production server in one command:
+### Deploying to Production (From Laptop)
+Once you have merged your pull request into the `master` branch on GitHub:
 ```bash
-./deploy.sh
+npm run deploy
 ```
-This script pulls new changes, builds the image with caching, recreates containers with minimal downtime, and prunes orphaned images.
+This command:
+1. Connects to your production server over SSH.
+2. Ensures the server is on `master` and pulls the latest merged code (`git pull origin master`).
+3. Rebuilds and reloads the Docker containers with zero downtime (`docker compose build --pull && docker compose up -d`).
+4. Prunes old container images and prints container health status.
+*(Note: It does not push any local branches—it assumes code has already been merged into `master`).*
+
+### Manual Server-Side Deploy
+If you are logged directly into the production server, you can trigger updates using:
+```bash
+./scripts/deploy.sh
+```
 
 ### Changing the Database Password
-PostgreSQL volumes retain the password set during initial creation. To change the password on an active server:
-
-1. Update the password inside the live database:
+To update the PostgreSQL password on an active server:
+1. Update the password inside PostgreSQL:
    ```bash
    docker compose exec db psql -U postgres -d recipe_db -c "ALTER USER postgres WITH PASSWORD '<NewSecurePassword>';"
    ```
 2. Update `DB_PASSWORD=<NewSecurePassword>` in your server's `.env`.
-3. Restart the web application:
+3. Restart the web app:
    ```bash
    docker compose restart app
    ```
 
-### Viewing Logs
+### Viewing Production Logs
 ```bash
 # Web application logs
 docker compose logs -f app
