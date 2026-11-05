@@ -1,4 +1,3 @@
--- 010_create_site_banner.sql
 CREATE TABLE IF NOT EXISTS site_banner (
     id INTEGER PRIMARY KEY DEFAULT 1,
     message TEXT DEFAULT '',
