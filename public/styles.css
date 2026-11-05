@@ -563,10 +563,6 @@ main {
     gap: 0.5rem;
 }
 
-.recipe-card-subheading .rating-badge {
-    margin-left: auto;
-}
-
 .recipe-author {
     font-size: 0.875rem;
     color: var(--text-muted);
@@ -612,12 +608,6 @@ main {
     gap: 0.5rem;
 }
 
-.recipe-card .recipe-meta .rating-badge {
-    margin-left: auto;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
 .recipe-meta span {
     background-color: var(--card-footer-bg);
     border: 1px solid var(--card-border);
@@ -639,13 +629,6 @@ main {
     align-items: center;
     font-size: 0.875rem;
     transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.rating-badge {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #d97706;
-    white-space: nowrap;
 }
 
 .favorites-badge {
@@ -805,35 +788,6 @@ main {
 .error-actions .btn {
     font-size: 0.95rem;
     padding: 0.65rem 1.25rem;
-}
-
-/* Pure CSS Interactive Star Rating Component (Zero JS) */
-.star-rating {
-    display: inline-flex;
-    flex-direction: row-reverse;
-    gap: 0.35rem;
-    font-size: 1.85rem;
-    line-height: 1;
-}
-
-.star-rating input[type="radio"] {
-    display: none;
-}
-
-.star-rating label {
-    color: var(--card-border);
-    cursor: pointer;
-    transition: color 0.15s ease, transform 0.15s ease;
-}
-
-.star-rating label:hover,
-.star-rating label:hover ~ label,
-.star-rating input[type="radio"]:checked ~ label {
-    color: #f59e0b; /* warm gold */
-}
-
-.star-rating label:hover {
-    transform: scale(1.15);
 }
 
 /* Search & Filter Component (Zero JS) */

@@ -1,5 +1,4 @@
 import query from "../db/connection.js";
-import { getRatings } from "./ratings.js";
 
 export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "") {
     const r = (await query(`
@@ -12,7 +11,7 @@ export async function createRecipe(title = "", description = "", ingredients = "
 
 export async function getAllRecipes(userId = 0, querySearch = "") {
     const rows = (await query(`
-            SELECT r.*, u.username, 
+            SELECT r.*, u.username, u.first_name, u.last_name,
                 COUNT(f.id) AS fav_count,
                 EXISTS(
                     SELECT 1 FROM favorites fav
@@ -22,19 +21,19 @@ export async function getAllRecipes(userId = 0, querySearch = "") {
             JOIN users u ON r.user_id = u.id
             LEFT JOIN favorites f ON r.id = f.recipe_id
             WHERE u.username ILIKE '%' || $2 || '%'
+                OR u.first_name ILIKE '%' || $2 || '%'
                 OR r.title ILIKE '%' || $2 || '%'
                 OR r.description ILIKE '%' || $2 || '%'
                 OR r.ingredients ILIKE '%' || $2 || '%'
                 OR r.instructions ILIKE '%' || $2 || '%'
-            GROUP BY r.id, u.username
+            GROUP BY r.id, u.username, u.first_name, u.last_name
             ORDER BY r.id DESC;
         `, [userId, querySearch]));
-    const ratings = await getRatings(userId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 export async function getUserRecipes(userId, viewerId = 0) {
     const rows = (await query(`
-        SELECT r.*, u.username, 
+        SELECT r.*, u.username, u.first_name, u.last_name,
             COUNT(f.id) AS fav_count,
             EXISTS(
                 SELECT 1 FROM favorites fav
@@ -44,16 +43,15 @@ export async function getUserRecipes(userId, viewerId = 0) {
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites f ON r.id = f.recipe_id
         WHERE r.user_id = $1
-        GROUP BY r.id, u.username
+        GROUP BY r.id, u.username, u.first_name, u.last_name
         ORDER BY r.id DESC;
     `, [userId, viewerId]));
-    const ratings = await getRatings(viewerId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 
 export async function getFeaturedRecipes(userId = 0) {
     const rows = (await query(`
-        SELECT r.*, u.username, 
+        SELECT r.*, u.username, u.first_name, u.last_name,
             COUNT(f.id) AS fav_count,
             EXISTS(
                 SELECT 1 FROM favorites fav
@@ -62,17 +60,16 @@ export async function getFeaturedRecipes(userId = 0) {
         FROM recipes r
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites f ON r.id = f.recipe_id
-        GROUP BY r.id, u.username
+        GROUP BY r.id, u.username, u.first_name, u.last_name
         ORDER BY fav_count DESC, r.id DESC
         LIMIT 6;
     `, [userId]));
-    const ratings = await getRatings(userId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 
 export async function getFavoriteRecipes(userId) {
     const rows = (await query(`
-        SELECT r.*, u.username, 
+        SELECT r.*, u.username, u.first_name, u.last_name,
             COUNT(all_f.id) AS fav_count, 
             true AS is_favorite
         FROM favorites fav
@@ -80,15 +77,14 @@ export async function getFavoriteRecipes(userId) {
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites all_f ON r.id = all_f.recipe_id
         WHERE fav.user_id = $1
-        GROUP BY r.id, u.username
+        GROUP BY r.id, u.username, u.first_name, u.last_name
         ORDER BY r.id DESC;
     `, [userId]));
-    const ratings = await getRatings(userId);
-    return rows.map(r => new Recipe(r, ratings)) || [];
+    return rows.map(r => new Recipe(r)) || [];
 }
 
 class Recipe {
-    constructor(row, ratings = null) {
+    constructor(row) {
         this.recipeId = row.id;
         this.title = row.title;
         this.description = row.description;
@@ -104,13 +100,12 @@ class Recipe {
         this.servings = row.servings;
         this.userId = row.user_id;
         this.username = row.username;
+        this.firstName = row.first_name || "";
+        this.lastName = row.last_name || "";
+        this.authorName = row.first_name || row.username;
         this.canEdit = false;
         this.favCount = Number(row.fav_count) || 0;
         this.isFavorite = row.is_favorite;
-        const rating = ratings?.[this.recipeId] || {};
-        this.avgRating = rating.avgRating || null;
-        this.ratingCount = rating.ratingCount || 0;
-        this.userRating = rating.userRating || null;
 
         // compare timestamps with 1 second buffer
         this.isUpdated = (new Date(row.updated_at) - new Date(row.created_at)) > 1000;
@@ -131,27 +126,6 @@ class Recipe {
     isOwnedBy(userId) {
         this.canEdit = this.userId === userId;
         return this.canEdit;
-    }
-
-    setRating = async (userId, rating) => {
-        const existing = (await query(`
-            SELECT id FROM ratings
-            WHERE recipe_id = $1 AND user_id = $2;
-        `, [this.recipeId, userId]))[0];
-
-        if (existing) {
-            await query(`
-                UPDATE ratings
-                SET rating = $3
-                WHERE recipe_id = $1 AND user_id = $2;
-            `, [this.recipeId, userId, rating]);
-        } else {
-            await query(`
-                INSERT INTO ratings (recipe_id, user_id, rating)
-                VALUES ($1, $2, $3);
-            `, [this.recipeId, userId, rating]);
-        }
-        this.userRating = Number(rating);
     }
 
     saveEdit = async () => {

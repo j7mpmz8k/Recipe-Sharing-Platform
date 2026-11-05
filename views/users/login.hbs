@@ -8,6 +8,12 @@
             </div>
         {{/if}}
 
+        {{#if success}}
+            <div class="alert alert-success">
+                {{success}}
+            </div>
+        {{/if}}
+
         <form action="/login" method="POST" class="auth-form">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -36,7 +42,7 @@
         </form>
 
         <p class="auth-switch">
-            Don't have an account? <a href="/register">Sign up</a>
+            Don't have an account? <a href="/register">Request an invite</a>
         </p>
     </div>
 </div>

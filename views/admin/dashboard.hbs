@@ -1,0 +1,509 @@
+<div class="recipe-container" style="max-width: 1050px; margin: 2rem auto; padding: 0 1rem;">
+    <!-- Admin Header -->
+    <div class="admin-header" style="margin-bottom: 2rem;">
+        <h1 style="font-size: 1.85rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>👑</span> Admin Control Center
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Monitor online users, manage member access, broadcast announcement banners, and generate credentials.
+        </p>
+    </div>
+
+    <!-- Alert Notifications -->
+    {{#if error}}
+        <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+            {{error}}
+        </div>
+    {{/if}}
+
+    {{#if actionSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem;">
+            {{actionSuccess}}
+        </div>
+    {{/if}}
+
+    {{#if bannerSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem;">
+            {{bannerSuccess}}
+        </div>
+    {{/if}}
+
+    {{#if resetSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 8px;">
+            <p style="font-weight: 600; margin-bottom: 0.5rem;">🔑 {{resetSuccess}}</p>
+            <div>
+                <label for="resetLinkInput" style="display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                    Send this one-time password reset link to the user:
+                </label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input 
+                        type="text" 
+                        id="resetLinkInput" 
+                        value="{{resetUrl}}" 
+                        readonly 
+                        style="flex: 1; padding: 0.65rem 0.75rem; font-family: monospace; font-size: 0.9rem; border-radius: 6px; border: 1px solid var(--input-border, #cbd5e0); background: #ffffff;"
+                    >
+                    <button 
+                        type="button" 
+                        class="btn btn-primary" 
+                        onclick="navigator.clipboard.writeText(document.getElementById('resetLinkInput').value); this.innerText = 'Copied!';"
+                        style="white-space: nowrap; padding: 0.65rem 1rem;"
+                    >
+                        📋 Copy Link
+                    </button>
+                </div>
+                <small style="display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.825rem;">
+                    ⏳ This password reset link expires in 48 hours and can only be used once.
+                </small>
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if inviteSuccess}}
+        <div class="alert alert-success" style="margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 8px;">
+            <p style="font-weight: 600; margin-bottom: 0.5rem;">✉️ {{inviteSuccess}}</p>
+            <div>
+                <label for="inviteLinkInput" style="display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                    Share this unique registration link with your invited guest:
+                </label>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <input 
+                        type="text" 
+                        id="inviteLinkInput" 
+                        value="{{inviteUrl}}" 
+                        readonly 
+                        style="flex: 1; padding: 0.65rem 0.75rem; font-family: monospace; font-size: 0.9rem; border-radius: 6px; border: 1px solid var(--input-border, #cbd5e0); background: #ffffff;"
+                    >
+                    <button 
+                        type="button" 
+                        class="btn btn-primary" 
+                        onclick="navigator.clipboard.writeText(document.getElementById('inviteLinkInput').value); this.innerText = 'Copied!';"
+                        style="white-space: nowrap; padding: 0.65rem 1rem;"
+                    >
+                        📋 Copy Link
+                    </button>
+                </div>
+                <small style="display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.825rem;">
+                    ⏳ This invite link expires in 48 hours and becomes invalid once an account is registered.
+                </small>
+            </div>
+        </div>
+    {{/if}}
+
+    <!-- Stat Metric Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Registered Users</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{totalUsers}}</div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Online Members</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #16a34a; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="display: inline-block; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e;"></span>
+                <span>{{onlineUsersCount}}</span>
+            </div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Rate-Limited Clients</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #dc2626;">{{rateLimitedCount}}</div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Visitors Online</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #2563eb;">{{onlineCount}}</div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Invites Issued</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{invites.length}}</div>
+        </div>
+    </div>
+
+    <!-- Announcement Banner Manager Card -->
+    <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2 style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📢</span> Site-Wide Announcement Banner
+            </h2>
+            {{#if banner.isActive}}
+                <span style="font-size: 0.8rem; background: #def7ec; color: #03543f; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
+                    ● LIVE ON SITE
+                </span>
+            {{else}}
+                <span style="font-size: 0.8rem; background: #f3f4f6; color: #6b7280; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 500;">
+                    ○ INACTIVE
+                </span>
+            {{/if}}
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Broadcast an urgent or informative notice across the top of all pages (e.g. <em>"Site shutdown in 1 hour for maintenance"</em>).
+        </p>
+
+        {{#if banner.isActive}}
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600;">Current Live Preview:</label>
+                <div style="padding: 0.75rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.925rem; text-align: center;
+                    {{#if banner.isWarning}}background: #fef08a; color: #854d0e; border: 1px solid #facc15;{{/if}}
+                    {{#if banner.isAlert}}background: #fee2e2; color: #991b1b; border: 1px solid #f87171;{{/if}}
+                    {{#if banner.isInfo}}background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;{{/if}}
+                    {{#if banner.isSuccess}}background: #dcfce7; color: #166534; border: 1px solid #4ade80;{{/if}}
+                ">
+                    {{#if banner.isWarning}}⚠️{{/if}}
+                    {{#if banner.isAlert}}🚨{{/if}}
+                    {{#if banner.isInfo}}ℹ️{{/if}}
+                    {{#if banner.isSuccess}}📢{{/if}}
+                    {{banner.message}}
+                </div>
+            </div>
+        {{/if}}
+
+        <form action="/admin/banner" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label for="bannerMessage" style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">
+                    Banner Message
+                </label>
+                <input 
+                    type="text" 
+                    id="bannerMessage" 
+                    name="message" 
+                    value="{{banner.message}}" 
+                    placeholder="e.g. Site shutdown in 1 hour for scheduled maintenance"
+                    required
+                    style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
+                >
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <label for="bannerType" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
+                        Banner Style
+                    </label>
+                    <select id="bannerType" name="banner_type" style="padding: 0.6rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.9rem; background: #fff;">
+                        <option value="warning" {{#if banner.isWarning}}selected{{/if}}>⚠️ Warning / Shutdown (Yellow)</option>
+                        <option value="alert" {{#if banner.isAlert}}selected{{/if}}>🚨 Urgent Alert (Red)</option>
+                        <option value="info" {{#if banner.isInfo}}selected{{/if}}>ℹ️ Informational Notice (Blue)</option>
+                        <option value="success" {{#if banner.isSuccess}}selected{{/if}}>📢 General Announcement (Green)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.4rem;">
+                    <input 
+                        type="checkbox" 
+                        id="is_active" 
+                        name="is_active" 
+                        {{#if banner.isActive}}checked{{/if}} 
+                        style="width: 1.15rem; height: 1.15rem; cursor: pointer;"
+                    >
+                    <label for="is_active" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+                        Active (Visible across all site pages)
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
+                    💾 Save &amp; Publish Banner
+                </button>
+            </div>
+        </form>
+
+        {{#if banner.isActive}}
+            <form action="/admin/banner/disable" method="POST" style="margin-top: 0.75rem;">
+                <button type="submit" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    Disable Banner
+                </button>
+            </form>
+        {{/if}}
+    </div>
+
+    <!-- Section 1: Community Members -->
+    <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>👥</span> Community Members
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Real-time online status (active in the last 5 minutes), last activity timestamp, username management, and moderation controls.
+        </p>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                        <th style="padding: 0.75rem 0.5rem;">ID</th>
+                        <th style="padding: 0.75rem 0.5rem;">User</th>
+                        <th style="padding: 0.75rem 0.5rem;">Email</th>
+                        <th style="padding: 0.75rem 0.5rem;">Status</th>
+                        <th style="padding: 0.75rem 0.5rem;">Last Active</th>
+                        <th style="padding: 0.75rem 0.5rem;">Joined</th>
+                        <th style="padding: 0.75rem 0.5rem; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each users}}
+                        <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                            <td style="padding: 0.85rem 0.5rem; font-family: monospace; font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">
+                                #{{this.id}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; font-weight: 600;">
+                                <a href="/users/{{this.id}}" style="color: var(--text-primary); text-decoration: none;">
+                                    {{#if this.firstName}}{{this.firstName}}{{#if this.lastName}} {{this.lastName}}{{/if}}{{else}}{{this.username}}{{/if}}
+                                </a>
+                                <span style="font-size: 0.775rem; color: var(--text-muted); font-weight: 400; margin-left: 0.25rem;">
+                                    (@{{this.username}})
+                                </span>
+                                {{#if this.isAdmin}}
+                                    <span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.35rem; font-weight: 700;">
+                                        ADMIN
+                                    </span>
+                                {{/if}}
+                                <button 
+                                    type="button" 
+                                    class="btn-text" 
+                                    style="font-size: 0.75rem; margin-left: 0.4rem; color: #2563eb; cursor: pointer; border: 1px solid #bfdbfe; background: #eff6ff; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600;"
+                                    onclick="openEditUserModal('{{this.id}}', '{{this.username}}', '{{this.firstName}}', '{{this.lastName}}')"
+                                    title="Edit first name, last name, and username"
+                                >
+                                    ✏️ Edit
+                                </button>
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; color: var(--text-secondary);">
+                                {{this.email}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem;">
+                                {{#if this.isBlocked}}
+                                    <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 700; background: #fee2e2; color: #991b1b;">
+                                        <span style="width: 6px; height: 6px; background: #ef4444; border-radius: 50%;"></span>
+                                        Suspended
+                                    </span>
+                                {{else}}
+                                    {{#if this.isOnline}}
+                                        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 600; background: #def7ec; color: #03543f;">
+                                            <span style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></span>
+                                            Online now
+                                        </span>
+                                    {{else}}
+                                        <span style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.775rem; font-weight: 500; background: #f3f4f6; color: #6b7280;">
+                                            <span style="width: 6px; height: 6px; background: #9ca3af; border-radius: 50%;"></span>
+                                            Offline
+                                        </span>
+                                    {{/if}}
+                                {{/if}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
+                                {{this.lastOnline}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
+                                {{this.createdAt}}
+                            </td>
+                            <td style="padding: 0.85rem 0.5rem; text-align: right;">
+                                <div style="display: flex; gap: 0.4rem; justify-content: flex-end; align-items: center;">
+                                    {{#if this.isAdmin}}
+                                        <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Protected</span>
+                                    {{else}}
+                                        <form action="/admin/users/{{this.id}}/delete" method="POST" style="margin: 0; display: inline;">
+                                            <button 
+                                                type="submit" 
+                                                class="btn" 
+                                                style="padding: 0.35rem 0.65rem; font-size: 0.775rem; font-weight: 600; background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;"
+                                                onclick="return confirm('WARNING: Are you sure you want to permanently delete user {{this.username}} and all their recipes? This cannot be undone.');"
+                                            >
+                                                🗑️ Delete
+                                            </button>
+                                        </form>
+                                    {{/if}}
+
+                                    <form action="/admin/users/{{this.id}}/reset-password" method="POST" style="margin: 0; display: inline;">
+                                        <button 
+                                            type="submit" 
+                                            class="btn btn-secondary" 
+                                            style="padding: 0.35rem 0.75rem; font-size: 0.775rem; font-weight: 600;"
+                                            onclick="return confirm('Generate a temporary password reset link for {{this.username}}?');"
+                                        >
+                                            🔑 Reset Password
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 2: Account Invitations Form & Table -->
+    <div id="invites" style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span>✉️</span> Issue Account Invitation
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Send temporary 48-hour registration links to friends and family. Only invited individuals can create an account.
+        </p>
+
+        <form action="/admin/invites" method="POST" style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <input 
+                type="email" 
+                name="email" 
+                placeholder="friend@example.com" 
+                required 
+                style="flex: 1; min-width: 250px; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
+            >
+            <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
+                Create Invite Link
+            </button>
+        </form>
+
+        {{#if invites.length}}
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-secondary);">Recent Invitations</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                            <th style="padding: 0.6rem 0.5rem;">Email</th>
+                            <th style="padding: 0.6rem 0.5rem;">Status</th>
+                            <th style="padding: 0.6rem 0.5rem;">Created</th>
+                            <th style="padding: 0.6rem 0.5rem;">Expires</th>
+                            <th style="padding: 0.6rem 0.5rem; text-align: right;">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each invites}}
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                                <td style="padding: 0.65rem 0.5rem; font-weight: 500;">{{this.email}}</td>
+                                <td style="padding: 0.65rem 0.5rem;">
+                                    <span style="display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+                                        {{#if this.isActive}}background: #def7ec; color: #03543f;{{/if}}
+                                        {{#if this.isUsed}}background: #e1effe; color: #1e429f;{{/if}}
+                                        {{#if this.isExpired}}background: #fde8e8; color: #9b1c1c;{{/if}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.createdAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.expiresAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; text-align: right;">
+                                    {{#if this.isUsable}}
+                                        <a href="/register?token={{this.token}}" class="btn-text" target="_blank">Open Link ↗</a>
+                                    {{else}}
+                                        <span style="color: var(--text-muted);">-</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{/if}}
+    </div>
+
+    <!-- Section 3: Password Resets History -->
+    {{#if passwordResets.length}}
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🔒</span> Generated Password Reset Links
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+                History of temporary reset tokens generated by admin.
+            </p>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                            <th style="padding: 0.6rem 0.5rem;">User</th>
+                            <th style="padding: 0.6rem 0.5rem;">Email</th>
+                            <th style="padding: 0.6rem 0.5rem;">Status</th>
+                            <th style="padding: 0.6rem 0.5rem;">Created</th>
+                            <th style="padding: 0.6rem 0.5rem;">Expires</th>
+                            <th style="padding: 0.6rem 0.5rem; text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each passwordResets}}
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                                <td style="padding: 0.65rem 0.5rem; font-weight: 600;">{{this.username}}</td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-secondary);">{{this.email}}</td>
+                                <td style="padding: 0.65rem 0.5rem;">
+                                    <span style="display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 600;
+                                        {{#if this.isActive}}background: #def7ec; color: #03543f;{{/if}}
+                                        {{#if this.isUsed}}background: #e1effe; color: #1e429f;{{/if}}
+                                        {{#if this.isExpired}}background: #fde8e8; color: #9b1c1c;{{/if}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.createdAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; color: var(--text-muted);">{{this.expiresAt}}</td>
+                                <td style="padding: 0.65rem 0.5rem; text-align: right;">
+                                    {{#if this.isUsable}}
+                                        <a href="/reset-password?token={{this.token}}" class="btn-text" target="_blank">Reset Form ↗</a>
+                                    {{else}}
+                                        <span style="color: var(--text-muted);">-</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {{/if}}
+
+    <!-- Edit Member Profile Modal -->
+    <div id="editUserModalBackdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--card-bg, #ffffff); border-radius: 8px; width: 90%; max-width: 480px; padding: 1.75rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--card-border, #e2e8f0);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 id="editUserModalTitle" style="margin: 0; font-size: 1.25rem;">Edit Member Profile</h3>
+                <button type="button" onclick="closeEditUserModal()" style="background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <form id="editUserForm" method="POST" action="">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 140px;">
+                        <label for="edit_first_name" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">First Name</label>
+                        <input type="text" id="edit_first_name" name="first_name" required style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;">
+                    </div>
+                    <div style="flex: 1; min-width: 140px;">
+                        <label for="edit_last_name" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Last Name <small style="color: var(--text-muted); font-weight: normal;">(optional)</small></label>
+                        <input type="text" id="edit_last_name" name="last_name" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 1.25rem;">
+                    <label for="edit_username" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Username (Login ID)</label>
+                    <input type="text" id="edit_username" name="username" required minlength="3" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;">
+                    <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 0.25rem;">Usernames are private credentials used only for signing into the platform.</small>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()" style="padding: 0.55rem 1rem;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-weight: 600;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function openEditUserModal(id, username, firstName, lastName) {
+        var modal = document.getElementById('editUserModalBackdrop');
+        var form = document.getElementById('editUserForm');
+        var title = document.getElementById('editUserModalTitle');
+        var uInput = document.getElementById('edit_username');
+        var fnInput = document.getElementById('edit_first_name');
+        var lnInput = document.getElementById('edit_last_name');
+
+        form.action = '/admin/users/' + encodeURIComponent(id) + '/edit';
+        title.textContent = 'Edit Profile (User #' + id + ')';
+        uInput.value = username || '';
+        fnInput.value = firstName || '';
+        lnInput.value = lastName || '';
+
+        modal.style.display = 'flex';
+    }
+
+    function closeEditUserModal() {
+        var modal = document.getElementById('editUserModalBackdrop');
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking outside dialog container
+    document.getElementById('editUserModalBackdrop').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditUserModal();
+        }
+    });
+    </script>
+</div>

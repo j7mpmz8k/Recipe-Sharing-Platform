@@ -7,7 +7,6 @@
     <title>{{title}}{{#if title}} - {{/if}}Recipe Sharing Platform</title>
     <link rel="stylesheet" href="/styles.css">
     <script src="/js/favorites.js" defer></script>
-    <script src="/js/ratings.js" defer></script>
 </head>
 <body>
     <nav>
@@ -18,11 +17,18 @@
             {{#if user}}
                 <a href="/my-recipes">My Recipes</a>
                 <a href="/favorites">Favorites</a>
+                {{#if user.isAdmin}}
+                    <a href="/admin" style="color: #d97706; font-weight: 600;">👑 Admin Dashboard</a>
+                {{/if}}
             {{/if}}
         </div>
         <div class="nav-right">
+            <span class="online-status-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.825rem; font-weight: 500; color: #16a34a; background: #dcfce7; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                <span style="display: inline-block; width: 7px; height: 7px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 4px #22c55e;"></span>
+                <span id="online-count-text">{{onlineCount}} online</span>
+            </span>
             {{#if user}}
-                <span class="nav-user">Welcome, <a href="/users/{{user.id}}">{{user.username}}</a></span>
+                <span class="nav-user">Welcome, <a href="/users/{{user.id}}">{{#if user.first_name}}{{user.first_name}}{{else}}{{user.username}}{{/if}}</a></span>
                 <form action="/logout" method="POST" class="logout-form">
                     <button type="submit" class="btn-link">Logout</button>
                 </form>
@@ -33,12 +39,43 @@
         </div>
     </nav>
 
+    {{#if siteBanner.isActive}}
+        <div class="site-announcement-banner site-banner-{{siteBanner.bannerType}}" role="alert" style="text-align: center; padding: 0.75rem 1rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); {{#if siteBanner.isWarning}}background-color: #fef08a; color: #854d0e; border-bottom: 2px solid #facc15;{{/if}}{{#if siteBanner.isAlert}}background-color: #fee2e2; color: #991b1b; border-bottom: 2px solid #f87171;{{/if}}{{#if siteBanner.isInfo}}background-color: #dbeafe; color: #1e40af; border-bottom: 2px solid #60a5fa;{{/if}}{{#if siteBanner.isSuccess}}background-color: #dcfce7; color: #166534; border-bottom: 2px solid #4ade80;{{/if}}">
+            {{#if siteBanner.isWarning}}<span>⚠️</span>{{/if}}
+            {{#if siteBanner.isAlert}}<span>🚨</span>{{/if}}
+            {{#if siteBanner.isInfo}}<span>ℹ️</span>{{/if}}
+            {{#if siteBanner.isSuccess}}<span>📢</span>{{/if}}
+            <span>{{siteBanner.message}}</span>
+        </div>
+    {{/if}}
+
     <main>
         {{{body}}}
     </main>
 
     <footer>
-        <p>© 2026 Recipe Sharing Platform</p>
+        <p class="donate-text" style="font-size: 0.85rem; color: var(--text-muted, #718096); margin: 0 0 0.35rem 0;">
+            ☕ Enjoying the site? Please consider supporting on Venmo: <a href="https://venmo.com/u/Jacob-Cardon" target="_blank" rel="noopener noreferrer" style="color: #008cff; font-weight: 600; text-decoration: underline;">@Jacob-Cardon</a>
+        </p>
+        <p class="contact-text" style="font-size: 0.825rem; color: var(--text-muted, #718096); margin: 0;">
+            ✉️ Questions, feedback, or invite requests? <a href="mailto:recipes.online872@passmail.com" style="color: var(--text-secondary, #4a5568); text-decoration: underline;">recipes.online872@passmail.com</a>
+        </p>
     </footer>
+
+    <script>
+        // Smoothly refresh online counter every 15 seconds
+        setInterval(async function() {
+            try {
+                const res = await fetch('/api/online-count');
+                if (res.ok) {
+                    const data = await res.json();
+                    const el = document.getElementById('online-count-text');
+                    if (el && typeof data.count === 'number') {
+                        el.textContent = data.count + ' online';
+                    }
+                }
+            } catch (err) {}
+        }, 15000);
+    </script>
 </body>
 </html>

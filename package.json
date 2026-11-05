@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "node server.js",
-    "migrate": "node migrate.js"
+    "migrate": "node migrate.js",
+    "db:pull-prod": "node scripts/pull_prod_db.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

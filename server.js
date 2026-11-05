@@ -7,21 +7,28 @@ import { loggingMiddleware } from "./middleware/logging.js";
 import { loadSession } from "./middleware/auth.js";
 import { loadRecipes, loadFeaturedRecipes } from "./middleware/content.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
+import { securityHeaders } from "./middleware/security.js";
+import { generalLimiter } from "./middleware/rateLimiter.js";
+import { trackActivity, getOnlineCount } from "./middleware/activity.js";
 import usersRouter from "./controllers/users.js";
 import { recipesRouter, userRecipiesRouter } from "./controllers/recipes.js";
 import favRouter from "./controllers/favorites.js";
+import adminRouter from "./controllers/admin.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
 // global middleware
+app.use(securityHeaders);
+app.use(express.static(path.join(__dirname, "public")));
+app.use(generalLimiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(loggingMiddleware);
 app.use(loadSession);
+app.use(trackActivity);
 
 // global handlebars
 app.engine("hbs", engine({ extname: ".hbs" }));
@@ -30,9 +37,14 @@ app.set("views", path.join(__dirname, "views"));
 
 //global routers
 app.use("/", usersRouter);
+app.use("/admin", adminRouter);
 app.use("/", userRecipiesRouter);
 app.use("/recipes", recipesRouter);
 app.use("/", favRouter);
+app.get("/api/online-count", (req, res) => {
+    res.json({ count: getOnlineCount() });
+});
+
 app.get("/", loadFeaturedRecipes, (req, res) => {
     res.render("home");
 });

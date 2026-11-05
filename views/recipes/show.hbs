@@ -5,7 +5,7 @@
             <div>
                 <h1>{{recipe.title}}</h1>
                 <div class="author-badge">
-                    <span>By <a href="/users/{{#if recipe.userId}}{{recipe.userId}}{{else}}{{recipe.user_id}}{{/if}}">{{recipe.username}}</a></span>
+                    <span>By <a href="/users/{{#if recipe.userId}}{{recipe.userId}}{{else}}{{recipe.user_id}}{{/if}}">{{#if recipe.authorName}}{{recipe.authorName}}{{else}}{{recipe.username}}{{/if}}</a></span>
                     <span class="text-muted">• {{recipe.createdAt}}</span>
                     {{#if recipe.isUpdated}}
                         <span class="text-muted">(Updated {{recipe.updatedAt}})</span>
@@ -83,37 +83,4 @@
             <div class="instructions-text">{{recipe.instructions}}</div>
         </section>
     </div>
-
-    <!-- Rating Section -->
-    <section class="recipe-header-card rating-section">
-        <h3>Recipe Rating</h3>
-        <p id="avg-rating-text">
-            Average Rating: <strong>★ {{#if recipe.avgRating}}{{recipe.avgRating}}{{else}}Unrated{{/if}}</strong>
-            {{#if recipe.ratingCount}}({{recipe.ratingCount}} ratings){{/if}}
-        </p>
-
-        {{#if user}}
-            {{#if recipe.canEdit}}
-                <p class="text-muted" style="margin-top: 0.75rem;">👨‍🍳 Nice try, Chef! You can't give yourself 5 stars.</p>
-            {{else}}
-                <div class="rating-controls">
-                    <p id="user-rating-text">{{#if recipe.userRating}}Your rating: <strong>★ {{recipe.userRating}}/5</strong> (select a star to change):{{else}}Rate this recipe:{{/if}}</p>
-                    <div class="star-rating" data-recipe-id="{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}" data-user-rating="{{recipe.userRating}}">
-                        <input type="radio" id="star5" name="rating" value="5" required>
-                        <label for="star5" title="5 stars">★</label>
-                        <input type="radio" id="star4" name="rating" value="4">
-                        <label for="star4" title="4 stars">★</label>
-                        <input type="radio" id="star3" name="rating" value="3">
-                        <label for="star3" title="3 stars">★</label>
-                        <input type="radio" id="star2" name="rating" value="2">
-                        <label for="star2" title="2 stars">★</label>
-                        <input type="radio" id="star1" name="rating" value="1">
-                        <label for="star1" title="1 star">★</label>
-                    </div>
-                </div>
-            {{/if}}
-        {{else}}
-            <p><a href="/login">Log in</a> to rate or favorite this recipe.</p>
-        {{/if}}
-    </section>
 </div>
