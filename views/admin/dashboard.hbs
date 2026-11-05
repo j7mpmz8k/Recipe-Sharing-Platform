@@ -257,14 +257,12 @@
                                 <button 
                                     type="button" 
                                     class="btn-text" 
-                                    style="font-size: 0.75rem; margin-left: 0.4rem; color: #2563eb; cursor: pointer; border: none; background: none; padding: 0;"
-                                    onclick="const n = prompt('Enter new username for {{this.username}}:', '{{this.username}}'); if (n &amp;&amp; n.trim() &amp;&amp; n.trim() !== '{{this.username}}') { const f = document.getElementById('renameForm-{{this.id}}'); f.newUsername.value = n.trim(); f.submit(); }"
+                                    style="font-size: 0.75rem; margin-left: 0.4rem; color: #2563eb; cursor: pointer; border: 1px solid #bfdbfe; background: #eff6ff; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600;"
+                                    onclick="openEditUserModal('{{this.id}}', '{{this.username}}', '{{this.firstName}}', '{{this.lastName}}')"
+                                    title="Edit first name, last name, and username"
                                 >
-                                    ✏️ Rename
+                                    ✏️ Edit
                                 </button>
-                                <form id="renameForm-{{this.id}}" action="/admin/users/{{this.id}}/change-username" method="POST" style="display:none;">
-                                    <input type="hidden" name="newUsername">
-                                </form>
                             </td>
                             <td style="padding: 0.85rem 0.5rem; color: var(--text-secondary);">
                                 {{this.email}}
@@ -446,4 +444,66 @@
             </div>
         </div>
     {{/if}}
+
+    <!-- Edit Member Profile Modal -->
+    <div id="editUserModalBackdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--card-bg, #ffffff); border-radius: 8px; width: 90%; max-width: 480px; padding: 1.75rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--card-border, #e2e8f0);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 id="editUserModalTitle" style="margin: 0; font-size: 1.25rem;">Edit Member Profile</h3>
+                <button type="button" onclick="closeEditUserModal()" style="background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <form id="editUserForm" method="POST" action="">
+                <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 140px;">
+                        <label for="edit_first_name" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">First Name</label>
+                        <input type="text" id="edit_first_name" name="first_name" required style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;">
+                    </div>
+                    <div style="flex: 1; min-width: 140px;">
+                        <label for="edit_last_name" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Last Name <small style="color: var(--text-muted); font-weight: normal;">(optional)</small></label>
+                        <input type="text" id="edit_last_name" name="last_name" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 1.25rem;">
+                    <label for="edit_username" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Username (Login ID)</label>
+                    <input type="text" id="edit_username" name="username" required minlength="3" style="width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;">
+                    <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 0.25rem;">Usernames are private credentials used only for signing into the platform.</small>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()" style="padding: 0.55rem 1rem;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.55rem 1.25rem; font-weight: 600;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function openEditUserModal(id, username, firstName, lastName) {
+        var modal = document.getElementById('editUserModalBackdrop');
+        var form = document.getElementById('editUserForm');
+        var title = document.getElementById('editUserModalTitle');
+        var uInput = document.getElementById('edit_username');
+        var fnInput = document.getElementById('edit_first_name');
+        var lnInput = document.getElementById('edit_last_name');
+
+        form.action = '/admin/users/' + encodeURIComponent(id) + '/edit';
+        title.textContent = 'Edit Profile (User #' + id + ')';
+        uInput.value = username || '';
+        fnInput.value = firstName || '';
+        lnInput.value = lastName || '';
+
+        modal.style.display = 'flex';
+    }
+
+    function closeEditUserModal() {
+        var modal = document.getElementById('editUserModalBackdrop');
+        modal.style.display = 'none';
+    }
+
+    // Close modal when clicking outside dialog container
+    document.getElementById('editUserModalBackdrop').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditUserModal();
+        }
+    });
+    </script>
 </div>

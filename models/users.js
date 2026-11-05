@@ -159,6 +159,17 @@ export async function updateUsername(userId, newUsername) {
     `, [userId, newUsername.trim()]);
 }
 
+export async function updateUserProfile(userId, username, firstName, lastName) {
+    const cleanUsername = (username || "").trim();
+    const cleanFirstName = (firstName || "").trim();
+    const cleanLastName = (lastName || "").trim();
+    await query(`
+        UPDATE users
+        SET username = $2, first_name = $3, last_name = $4
+        WHERE id = $1;
+    `, [userId, cleanUsername, cleanFirstName, cleanLastName]);
+}
+
 export async function deleteUser(userId) {
     await query(`
         DELETE FROM users

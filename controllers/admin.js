@@ -1,7 +1,7 @@
 // controllers/admin.js
 import express from "express";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
-import { getAllUsers, toggleUserBlocked, updateUsername, deleteUser } from "../models/users.js";
+import { getAllUsers, toggleUserBlocked, updateUsername, updateUserProfile, deleteUser } from "../models/users.js";
 import { createInvite, getAllInvites } from "../models/invites.js";
 import { createPasswordReset, getAllPasswordResets } from "../models/passwordResets.js";
 import { getSiteBanner, updateSiteBanner } from "../models/banner.js";
@@ -85,6 +85,60 @@ adminRouter.post("/banner/disable", async (req, res) => {
     const data = await getDashboardData();
     data.bannerSuccess = "Site announcement banner has been deactivated.";
     res.render("admin/dashboard", data);
+});
+
+// Endpoint: Edit Member Profile (First Name, Last Name, Username)
+adminRouter.post("/users/:id/edit", async (req, res) => {
+    const targetUserId = parseInt(req.params.id, 10);
+    const { username, first_name, last_name } = req.body;
+
+    const data = await getDashboardData();
+
+    const cleanUsername = (username || "").trim();
+    const cleanFirstName = (first_name || "").trim();
+    const cleanLastName = (last_name || "").trim();
+
+    if (!cleanFirstName) {
+        data.error = "First name is required.";
+        return res.render("admin/dashboard", data);
+    }
+
+    if (!cleanUsername || cleanUsername.length < 3) {
+        data.error = "Username must be at least 3 characters long.";
+        return res.render("admin/dashboard", data);
+    }
+
+    let targetUser = null;
+    for (const u of data.users) {
+        if (u.id === targetUserId) {
+            targetUser = u;
+            break;
+        }
+    }
+
+    if (!targetUser) {
+        data.error = "User not found.";
+        return res.status(404).render("admin/dashboard", data);
+    }
+
+    try {
+        await updateUserProfile(targetUserId, cleanUsername, cleanFirstName, cleanLastName);
+    } catch (err) {
+        if (err.code === "23505") {
+            data.error = `Username "${cleanUsername}" is already taken by another account!`;
+            return res.render("admin/dashboard", data);
+        }
+        data.error = "Failed to update member profile.";
+        return res.render("admin/dashboard", data);
+    }
+
+    const updatedData = await getDashboardData();
+    let displayName = cleanFirstName;
+    if (cleanLastName) {
+        displayName = displayName + " " + cleanLastName;
+    }
+    updatedData.actionSuccess = `Successfully updated User #${targetUserId}: ${displayName} (@${cleanUsername}).`;
+    res.render("admin/dashboard", updatedData);
 });
 
 // Endpoint: Change User's Username
