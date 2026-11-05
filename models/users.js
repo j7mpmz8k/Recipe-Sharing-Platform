@@ -142,6 +142,15 @@ export async function updateUserLastActive(userId) {
     `, [userId]);
 }
 
+export async function getUserPasswordHash(userId) {
+    const row = (await query(`
+        SELECT password_hash
+        FROM users
+        WHERE id = $1;
+    `, [userId]))[0];
+    return row ? row.password_hash : null;
+}
+
 export async function updateUserPassword(userId, plainPassword) {
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
     await query(`

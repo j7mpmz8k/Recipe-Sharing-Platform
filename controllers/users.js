@@ -1,6 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import { createUser, findUser, updateUserPassword } from "../models/users.js";
+import { createUser, findUser, updateUserPassword, getUserPasswordHash } from "../models/users.js";
 import { createSession, deleteSession } from "../models/sessions.js";
 import { requireAuth } from "../middleware/auth.js";
 import { loadUserProfile } from "../middleware/content.js";
@@ -246,7 +246,67 @@ usersRouter.post("/reset-password", authLimiter, async (req, res) => {
     });
 });
 
+usersRouter.get("/account", requireAuth, (req, res) => {
+    res.redirect(`/users/${req.user.id}`);
+});
+
+usersRouter.get("/profile", requireAuth, (req, res) => {
+    res.redirect(`/users/${req.user.id}`);
+});
+
+usersRouter.get("/change-password", requireAuth, (req, res) => {
+    res.render("users/change-password");
+});
+
+usersRouter.post("/change-password", requireAuth, authLimiter, async (req, res) => {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.render("users/change-password", {
+            error: "All password fields are required."
+        });
+    }
+
+    const currentHash = await getUserPasswordHash(req.user.id);
+    if (!currentHash || !(await bcrypt.compare(currentPassword, currentHash))) {
+        return res.render("users/change-password", {
+            error: "Your current password is incorrect."
+        });
+    }
+
+    if (newPassword !== confirmPassword) {
+        return res.render("users/change-password", {
+            error: "New passwords do not match."
+        });
+    }
+
+    if (newPassword.length < 12) {
+        return res.render("users/change-password", {
+            error: "New password must be at least 12 characters long."
+        });
+    }
+
+    if (currentPassword === newPassword) {
+        return res.render("users/change-password", {
+            error: "New password must be different from your current password."
+        });
+    }
+
+    await updateUserPassword(req.user.id, newPassword);
+
+    res.render("users/change-password", {
+        success: "Your password has been changed successfully!"
+    });
+});
+
+usersRouter.all("/users/change-password", requireAuth, (req, res) => {
+    res.redirect("/change-password");
+});
+
 usersRouter.get("/users/:id", loadUserProfile, (req, res) => {
+    if (req.query.updated === "password") {
+        res.locals.passwordSuccess = "Your password has been changed successfully!";
+    }
     res.render("users/show");
 });
 

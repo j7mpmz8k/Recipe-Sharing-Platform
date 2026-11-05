@@ -15,6 +15,13 @@
                         ✉️ <a href="mailto:{{userProfile.email}}" style="color: inherit; text-decoration: underline;">{{userProfile.email}}</a>
                     </p>
                 {{/if}}
+                {{#if userProfile.isSelf}}
+                    <div style="margin-top: 0.75rem;">
+                        <a href="/change-password" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.4rem 0.85rem; border-radius: 6px; text-decoration: none; border: 1px solid var(--card-border, #cbd5e0); background: var(--bg-secondary, #f8fafc); color: var(--text-primary, #2d3748); font-weight: 500;">
+                            <span>🔐</span> Change Password
+                        </a>
+                    </div>
+                {{/if}}
             </div>
         </div>
 
@@ -27,6 +34,12 @@
             </span>
         </div>
     </header>
+
+    {{#if passwordSuccess}}
+        <div class="alert alert-success" style="margin: 0;">
+            {{passwordSuccess}}
+        </div>
+    {{/if}}
 
     <!-- User's Recipes Grid -->
     <section>

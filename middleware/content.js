@@ -47,8 +47,11 @@ export async function loadUserProfile(req, res, next) {
         return next({ status: 404 });
     }
     if (req.user) {
+        user.isSelf = Boolean(Number(req.user.id) === Number(user.id));
         user.recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
         user.favoriteRecipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
+    } else {
+        user.isSelf = false;
     }
     res.locals.userProfile = user;
     next();
