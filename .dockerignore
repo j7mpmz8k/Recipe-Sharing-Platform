@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.vscode
+.env
+.env.*
+!.env.example
+README.md
+scripts/pull_prod_db*

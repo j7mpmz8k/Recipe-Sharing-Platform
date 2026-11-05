@@ -4,11 +4,20 @@
 
 set -eo pipefail
 
+# Auto-load variables from .env in the project root if present
+if [ -f ".env" ]; then
+    set -a
+    # shellcheck disable=SC1091
+    . .env
+    set +a
+fi
+
 PROD_SSH_HOST="${PROD_SSH_HOST:-$1}"
+PROD_SSH_PORT="${PROD_SSH_PORT:-48222}"
 PROD_DB_NAME="${PROD_DB_NAME:-recipe_db}"
 PROD_DB_USER="${PROD_DB_USER:-postgres}"
 
-LOCAL_DB_NAME="${LOCAL_DB_NAME:-${DB_NAME:-recipe_db_staging}}"
+LOCAL_DB_NAME="${LOCAL_DB_NAME:-${DB_NAME:-recipe_db}}"
 LOCAL_DB_USER="${LOCAL_DB_USER:-${DB_USER:-admin}}"
 LOCAL_DB_HOST="${LOCAL_DB_HOST:-${DB_HOST:-localhost}}"
 LOCAL_DB_PORT="${LOCAL_DB_PORT:-${DB_PORT:-5432}}"
@@ -28,7 +37,7 @@ fi
 
 echo ""
 echo "Sync Configuration:"
-echo "  Source (Remote):  ${PROD_DB_USER}@${PROD_SSH_HOST} -> Database: \"${PROD_DB_NAME}\""
+echo "  Source (Remote):  ${PROD_DB_USER}@${PROD_SSH_HOST}:${PROD_SSH_PORT} -> Database: \"${PROD_DB_NAME}\""
 echo "  Target (Local):   ${LOCAL_DB_USER}@${LOCAL_DB_HOST}:${LOCAL_DB_PORT} -> Database: \"${LOCAL_DB_NAME}\""
 echo "  Method:           Direct SSH Stream (pg_dump | psql)"
 echo ""
@@ -41,7 +50,7 @@ fi
 
 echo ""
 echo "Streaming database from production to local staging..."
-ssh "${PROD_SSH_HOST}" "pg_dump -U ${PROD_DB_USER} -d ${PROD_DB_NAME} --clean --if-exists --no-owner --no-privileges" \
+ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" "pg_dump -U ${PROD_DB_USER} -d ${PROD_DB_NAME} --clean --if-exists --no-owner --no-privileges" \
     | psql -h "${LOCAL_DB_HOST}" -p "${LOCAL_DB_PORT}" -U "${LOCAL_DB_USER}" -d "${LOCAL_DB_NAME}"
 
 echo ""
