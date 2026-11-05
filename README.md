@@ -28,6 +28,37 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 - **Localhost-Only Port Bindings**: Ports `3000` (Node.js) and `5432` (PostgreSQL) are bound strictly to `127.0.0.1` on the host, preventing the public internet from bypassing the reverse proxy or accessing the raw database.
 - **Automatic Database Migrations**: Self-contained migrations auto-create the database and tables on container startup via `docker/docker-entrypoint.sh` only after the PostgreSQL service reports healthy.
 
+### Quick Reference: NPM Commands
+
+| Command | Target Environment | Purpose |
+| :--- | :--- | :--- |
+| **`npm run dev`** | Local Laptop | Runs local Node.js application with automatic hot-reloading (`--watch`) |
+| **`npm start`** | Production / Container | Starts Node.js application (`node server.js`) |
+| **`npm run migrate`** | Local Laptop | Applies database migrations (auto-creates `recipe_db` if missing) |
+| **`npm run db:pull`** | Local Laptop | Encrypted SSH database sync from production PostgreSQL to local machine |
+| **`npm run deploy`** | Local Laptop | Triggers automated production deployment of `master` over SSH |
+| **`npm run tunnel`** | Local Laptop | Forwards remote `127.0.0.1:3000` to local `http://localhost:8080` via SSH |
+
+### Project Structure
+
+```text
+├── docker/
+│   ├── Dockerfile                  # Hardened multi-stage container build
+│   └── docker-entrypoint.sh        # Container entrypoint: runs migrations then node
+├── docker-compose.yml              # Root stack orchestration (127.0.0.1 bindings)
+├── migrations/                     # SQL schema migrations (000_create_database to 008)
+├── scripts/
+│   ├── deploy_prod.sh              # npm run deploy: pull master & rebuild on remote server
+│   ├── tunnel_prod.sh              # npm run tunnel: encrypted port-forwarding to port 8080
+│   ├── pull_prod_db.sh             # npm run db:pull: encrypted database sync from prod
+│   ├── migrate.js                  # Migration runner with auto-database creation
+│   ├── setup-wsl-portforward.ps1   # Self-elevating PowerShell script for WSL SSH port 48222
+│   └── deploy.sh                   # Manual server-side deployment script
+├── server_template.env             # Environment template for production server
+├── client_template.env             # Environment template for local Linux laptop
+└── views/                          # Handlebars templates and user pages
+```
+
 ---
 
 ## Table of Contents
@@ -35,7 +66,7 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 2. [Server Setup: Windows Host with WSL 2](#2-server-setup-windows-host-with-wsl-2)
 3. [Reverse Proxy Configuration (Nginx / Nginx Proxy Manager)](#3-reverse-proxy-configuration)
 4. [Client Setup: Linux Laptop (Development & Sync)](#4-client-setup-linux-laptop)
-5. [Deploying & Operations](#5-deploying--operations)
+5. [Deploying, Operations & Git Workflow](#5-deploying-operations--git-workflow)
 
 ---
 
@@ -188,6 +219,15 @@ docker compose up -d --build
 docker compose ps
 ```
 
+### Step 2.5: Fix Docker Credential Helper in WSL (Required for SSH Deployments)
+When Docker Desktop is installed on Windows, it automatically injects `"credsStore": "desktop.exe"` into WSL's `~/.docker/config.json`. When you connect to WSL over **SSH**, the session runs in a clean Linux environment without Windows executable paths, causing Docker builds or image pulls to fail with `docker-credential-desktop.exe: executable file not found in $PATH`.
+
+To prevent this error, reset the Docker config inside WSL:
+```bash
+echo "{}" > ~/.docker/config.json
+```
+This allows Docker inside WSL to pull public base images directly over SSH without attempting to invoke Windows executables.
+
 ---
 
 ## 3. Reverse Proxy Configuration
@@ -324,10 +364,47 @@ Starts the local server on `http://localhost:3000` with **automatic hot-reloadin
 
 ---
 
-## 5. Deploying & Operations
+## 5. Deploying, Operations & Git Workflow
+
+### Git Branching & Release Workflow
+This project uses a clean, two-branch workflow:
+* **`staging`**: Active development and testing branch.
+* **`master`**: Production release branch (mirrored on the production server).
+
+#### Recommended Development & Deployment Cycle:
+1. **Develop and test on `staging`**:
+   ```bash
+   git checkout staging
+   # Make your changes and test locally
+   npm run dev
+   git add <files>
+   git commit -m "feat: description of change"
+   git push origin staging
+   ```
+
+2. **Merge `staging` into `master`**:
+   Once tested and ready for production:
+   ```bash
+   git checkout master
+   git merge staging -m "Merge branch 'staging' into master"
+   git push origin master
+   ```
+
+3. **Deploy `master` to production**:
+   ```bash
+   npm run deploy
+   ```
+   *(Connects over SSH, pulls the latest merged `master`, rebuilds containers with `--pull`, and restarts services).*
+
+4. **Switch back to `staging`**:
+   ```bash
+   git checkout staging
+   ```
+
+---
 
 ### Deploying to Production (From Laptop)
-Once you have merged your pull request into the `master` branch on GitHub:
+Once you have pushed your changes to `master` on GitHub:
 ```bash
 npm run deploy
 ```
@@ -336,7 +413,7 @@ This command:
 2. Ensures the server is on `master` and pulls the latest merged code (`git pull origin master`).
 3. Rebuilds and reloads the Docker containers with zero downtime (`docker compose build --pull && docker compose up -d`).
 4. Prunes old container images and prints container health status.
-*(Note: It does not push any local branches—it assumes code has already been merged into `master`).*
+*(Note: It does not push any local branches—it assumes code has already been merged into `master` on GitHub).*
 
 ### Accessing Production via SSH Tunnel (From Laptop)
 To view or test the production website securely in your laptop browser without opening port 3000 to the public:
@@ -346,6 +423,16 @@ npm run tunnel
 This forwards `http://localhost:8080` on your laptop directly to `127.0.0.1:3000` on your production server. Open `http://localhost:8080` in your browser. Press `Ctrl+C` whenever you want to close the tunnel.
 
 *(Optional: forward to a custom local port, e.g. `npm run tunnel -- 9000`).*
+
+### Default Admin Account & Password Management
+* **Initial Admin Credentials**: On initial database migration, `008_create_admin.sql` seeds the primary administrator account:
+  * **Username**: `admin`
+  * **Password**: `password`
+* **In-App Password Changes**: Any logged-in user can update their password at any time by clicking their name in the top-right header and selecting **`🔐 Change Password`** (`/change-password`). This verifies their current password against the stored bcrypt hash and requires confirming a new password (min. 12 characters).
+
+### Patching & Security Updates
+* **Linux Kernel Updates**: Docker containers share the host Linux kernel directly. To patch the kernel, update the host server OS (`sudo apt update && sudo apt upgrade` followed by a system reboot).
+* **Container Base Images**: Base images (`node:20-bookworm-slim` and `postgres:16-alpine`) receive upstream OS and runtime patches. Running `npm run deploy` automatically passes `--pull` during `docker compose build` to incorporate the latest base images.
 
 ### Manual Server-Side Deploy
 If you are logged directly into the production server, you can trigger updates using:
