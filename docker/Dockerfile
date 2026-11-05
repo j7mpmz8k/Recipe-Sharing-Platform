@@ -53,7 +53,7 @@ EXPOSE 3000
 
 # Container healthcheck: ping the local express server
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -f http://localhost:3000/ || exit 1
+  CMD curl -f http://localhost:3000/health || exit 1
 
 # dumb-init ensures SIGTERM/SIGINT are handled cleanly when stopping containers
 ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/docker-entrypoint.sh"]

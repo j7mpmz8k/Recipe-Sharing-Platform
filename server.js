@@ -41,6 +41,10 @@ app.use("/admin", adminRouter);
 app.use("/", userRecipiesRouter);
 app.use("/recipes", recipesRouter);
 app.use("/", favRouter);
+app.get("/health", (req, res) => {
+    res.status(200).send("OK");
+});
+
 app.get("/api/online-count", (req, res) => {
     res.json({ count: getOnlineCount() });
 });

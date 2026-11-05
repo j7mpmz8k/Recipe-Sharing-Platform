@@ -47,6 +47,18 @@ export function removeActiveUser(userId) {
 }
 
 export async function trackActivity(req, res, next) {
+    const userAgent = req.get("user-agent") || "";
+
+    // Ignore healthchecks, CLI tools (like curl), and polling endpoints from active visitor tracking
+    if (
+        req.path === "/health" ||
+        req.path === "/api/online-count" ||
+        userAgent.startsWith("curl/") ||
+        userAgent.toLowerCase().includes("healthcheck")
+    ) {
+        return next();
+    }
+
     const now = Date.now();
 
     // Use a unique visitor cookie for guest browsers to accurately distinguish different devices/tabs
