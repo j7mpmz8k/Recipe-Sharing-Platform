@@ -1,3 +1,42 @@
+<style>
+    .recipe-detail-description,
+    .recipe-header-card .recipe-description {
+        display: block !important;
+        -webkit-line-clamp: unset !important;
+        -webkit-box-orient: unset !important;
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+        white-space: pre-line !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        margin: 1rem 0;
+    }
+    @media (max-width: 600px) {
+        .recipe-header-card {
+            padding: 1.25rem 1rem !important;
+        }
+        .recipe-header-card .section-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.75rem !important;
+        }
+        .recipe-detail-description,
+        .recipe-header-card .recipe-description {
+            font-size: 1rem !important;
+            line-height: 1.55 !important;
+            margin: 0.75rem 0 !important;
+        }
+        .ingredients-card,
+        .instructions-card {
+            padding: 1.25rem 1rem !important;
+        }
+    }
+</style>
+
 <div class="recipe-detail-container">
     <!-- Header Card -->
     <header class="recipe-header-card">
@@ -37,7 +76,7 @@
         </div>
 
         {{#if recipe.description}}
-            <p class="recipe-description" style="font-size: 1.1rem; margin: 1rem 0;">{{recipe.description}}</p>
+            <p class="recipe-detail-description recipe-description">{{recipe.description}}</p>
         {{/if}}
 
         <div class="recipe-header-meta">
