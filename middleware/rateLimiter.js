@@ -105,10 +105,10 @@ export const authLimiter = createRateLimiter({
     message: "Too many authentication attempts. Please wait 15 minutes before trying again."
 });
 
-// General limiter for public endpoints (200 requests per 15 minutes)
+// General limiter for public endpoints (2000 requests per 15 minutes)
 export const generalLimiter = createRateLimiter({
     windowMs: 15 * 60 * 1000,
-    max: 200,
+    max: 2000,
     message: "Too many requests. Please slow down and try again in a few minutes."
 });
 
