@@ -37,8 +37,9 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 | **`npm run migrate`** | Local Laptop | Applies database migrations (auto-creates `recipe_db` if missing) |
 | **`npm run db:pull`** | Local Laptop | Encrypted SSH database sync from production PostgreSQL to local machine |
 | **`npm run deploy`** | Local Laptop | Triggers automated production deployment of `master` over SSH |
+| **`npm run prod:down`** | Local Laptop | Takes down and removes production Docker containers over SSH (`docker compose down`) |
 | **`npm run prod:stop`** | Local Laptop | Gracefully stops production Docker containers over SSH (`docker compose stop`) |
-| **`npm run prod:start`** | Local Laptop | Starts production Docker containers back up over SSH (`docker compose start`) |
+| **`npm run prod:start`** | Local Laptop | Starts production Docker containers back up over SSH (`docker compose up -d`) |
 | **`npm run tunnel`** | Local Laptop | Forwards remote `127.0.0.1:3000` to local `http://localhost:8080` via SSH |
 
 ### Project Structure
@@ -55,7 +56,8 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 │   └── js/                         # Client-side scripts
 ├── scripts/
 │   ├── deploy_prod.sh              # npm run deploy: pull master & rebuild on remote server
-│   ├── stop_prod.sh                # npm run prod:stop: shut down production containers
+│   ├── down_prod.sh                # npm run prod:down: take down production containers
+│   ├── stop_prod.sh                # npm run prod:stop: stop production containers
 │   ├── start_prod.sh               # npm run prod:start: bring production containers online
 │   ├── tunnel_prod.sh              # npm run tunnel: encrypted port-forwarding to port 8080
 │   ├── pull_prod_db.sh             # npm run db:pull: encrypted database sync from prod
@@ -435,19 +437,27 @@ This command:
 4. Prunes old container images and prints container health status.
 *(Note: It does not push any local branches—it assumes code has already been merged into `master` on GitHub).*
 
-### Production Operations: Stopping & Starting
+### Production Operations: Stopping, Taking Down & Starting
 To safely stop or start the production Docker containers from your laptop over SSH (e.g. for maintenance or testing the Nginx maintenance page):
-* **Stop production**:
+* **Take down production** (`docker compose down`):
+  ```bash
+  npm run prod:down
+  # Auto-confirm without prompt:
+  npm run prod:down -- -y
+  ```
+  *(Connects via SSH, prompts for confirmation, and runs `docker compose down`)*.
+* **Stop production** (`docker compose stop`):
   ```bash
   npm run prod:stop
-  # (alias: npm run prod:down)
+  # Auto-confirm without prompt:
+  npm run prod:stop -- -y
   ```
   *(Connects via SSH, prompts for confirmation, and runs `docker compose stop`)*.
-* **Start production**:
+* **Start production** (`docker compose up -d`):
   ```bash
   npm run prod:start
   ```
-  *(Connects via SSH and runs `docker compose start` to bring containers back online)*.
+  *(Connects via SSH and runs `docker compose up -d` to bring containers back online)*.
 
 ### Admin Control Center & Platform Features
 When logged into an account designated with administrative privileges (`ADMIN_USER_IDS` in `middleware/auth.js`), navigate to **👑 Admin Dashboard** (`/admin`):

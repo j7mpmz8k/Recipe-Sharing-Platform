@@ -17,7 +17,20 @@ if [ -f "${ENV_FILE}" ]; then
     set +a
 fi
 
-PROD_SSH_HOST="${1:-${PROD_SSH_HOST}}"
+AUTO_CONFIRM=false
+for arg in "$@"; do
+    case "$arg" in
+        -y|--yes|-f|--force)
+            AUTO_CONFIRM=true
+            ;;
+        *)
+            if [[ "$arg" != -* ]]; then
+                PROD_SSH_HOST="$arg"
+            fi
+            ;;
+    esac
+done
+
 PROD_SSH_PORT="${PROD_SSH_PORT:-48222}"
 
 if [ -z "$PROD_SSH_HOST" ]; then
@@ -35,10 +48,12 @@ echo "  Target Branch:    ${DEPLOY_BRANCH}"
 echo "  Action:           Pull & deploy merged '${DEPLOY_BRANCH}' (no local push)"
 echo ""
 
-read -rp "🚀 Deploy latest '${DEPLOY_BRANCH}' to production? [y/N]: " CONFIRM
-if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
-    echo "Deployment canceled by user."
-    exit 0
+if [ "$AUTO_CONFIRM" != "true" ]; then
+    read -rp "🚀 Deploy latest '${DEPLOY_BRANCH}' to production? [y/N]: " CONFIRM
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+        echo "Deployment canceled by user."
+        exit 0
+    fi
 fi
 
 echo ""

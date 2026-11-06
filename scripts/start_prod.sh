@@ -16,7 +16,18 @@ if [ -f "${ENV_FILE}" ]; then
     set +a
 fi
 
-PROD_SSH_HOST="${1:-${PROD_SSH_HOST}}"
+for arg in "$@"; do
+    case "$arg" in
+        -y|--yes|-f|--force)
+            ;;
+        *)
+            if [[ "$arg" != -* ]]; then
+                PROD_SSH_HOST="$arg"
+            fi
+            ;;
+    esac
+done
+
 PROD_SSH_PORT="${PROD_SSH_PORT:-48222}"
 
 if [ -z "$PROD_SSH_HOST" ]; then
@@ -31,14 +42,14 @@ echo "  Target Server: ${PROD_SSH_HOST}:${PROD_SSH_PORT}"
 echo ""
 
 echo "==> Starting production services..."
-ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" '
+ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" 'bash -s' << 'EOF'
     set -eo pipefail
     cd ~/docker_services/recipe-sharing-platform
-    docker compose start || docker compose up -d
+    docker compose up -d
     echo ""
     echo "==> Production services status:"
     docker compose ps
-'
+EOF
 
 echo ""
 echo "✓ Production containers are back online!"
