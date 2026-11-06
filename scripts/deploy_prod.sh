@@ -17,7 +17,7 @@ if [ -f "${ENV_FILE}" ]; then
     set +a
 fi
 
-PROD_SSH_HOST="${PROD_SSH_HOST:-$1}"
+PROD_SSH_HOST="${1:-${PROD_SSH_HOST}}"
 PROD_SSH_PORT="${PROD_SSH_PORT:-48222}"
 
 if [ -z "$PROD_SSH_HOST" ]; then
