@@ -35,12 +35,12 @@ usersRouter.get("/register", async (req, res) => {
     res.render("users/register", {
         inviteOnly: false,
         token: token,
-        email: invite.email
+        inviteName: invite.name
     });
 });
 
 usersRouter.post("/register", authLimiter, async (req, res) => {
-    const { token, username, password, confirmPassword, first_name, last_name } = req.body;
+    const { token, email, username, password, confirmPassword, first_name, last_name } = req.body;
     if (!token) {
         return res.render("users/register", {
             inviteOnly: true,
@@ -58,11 +58,26 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         });
     }
 
+    const cleanEmail = (email || "").trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+        return res.render("users/register", {
+            inviteOnly: false,
+            token: token,
+            inviteName: invite.name,
+            email: email,
+            username: username,
+            first_name: first_name,
+            last_name: last_name,
+            error: "A valid email address is required!"
+        });
+    }
+
     if (!first_name || first_name.trim().length === 0) {
         return res.render("users/register", {
             inviteOnly: false,
             token: token,
-            email: invite.email,
+            inviteName: invite.name,
+            email: cleanEmail,
             username: username,
             first_name: first_name,
             last_name: last_name,
@@ -75,7 +90,8 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         return res.render("users/register", {
             inviteOnly: false,
             token: token,
-            email: invite.email,
+            inviteName: invite.name,
+            email: cleanEmail,
             username: username,
             first_name: first_name,
             last_name: last_name,
@@ -87,7 +103,8 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         return res.render("users/register", {
             inviteOnly: false,
             token: token,
-            email: invite.email,
+            inviteName: invite.name,
+            email: cleanEmail,
             username: username,
             first_name: first_name,
             last_name: last_name,
@@ -98,7 +115,8 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         return res.render("users/register", {
             inviteOnly: false,
             token: token,
-            email: invite.email,
+            inviteName: invite.name,
+            email: cleanEmail,
             username: username,
             first_name: first_name,
             last_name: last_name,
@@ -108,7 +126,7 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
 
     let userId;
     try {
-        userId = await createUser(cleanUsername, invite.email, password, first_name, last_name);
+        userId = await createUser(cleanUsername, cleanEmail, password, first_name, last_name);
     } catch (err) {
         let errorMessage = "An error occurred while creating your account.";
         if (err.code === "23505") {
@@ -117,7 +135,8 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         return res.render("users/register", {
             inviteOnly: false,
             token: token,
-            email: invite.email,
+            inviteName: invite.name,
+            email: cleanEmail,
             username: username,
             first_name: first_name,
             last_name: last_name,
@@ -126,7 +145,7 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
     }
 
     // Invalidate invite token upon successful registration
-    await markInviteUsed(token);
+    await markInviteUsed(token, userId);
 
     const sessionId = await createSession(userId);
     res.cookie("session_id", sessionId, {

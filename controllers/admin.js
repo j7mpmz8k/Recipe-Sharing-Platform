@@ -2,7 +2,7 @@
 import express from "express";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
 import { getAllUsers, toggleUserBlocked, updateUsername, updateUserProfile, deleteUser } from "../models/users.js";
-import { createInvite, getAllInvites } from "../models/invites.js";
+import { createInvite, getAllInvites, deleteInvite } from "../models/invites.js";
 import { createPasswordReset, getAllPasswordResets } from "../models/passwordResets.js";
 import { getSiteBanner, updateSiteBanner } from "../models/banner.js";
 import { getTotalRateLimitedCount } from "../middleware/rateLimiter.js";
@@ -30,13 +30,15 @@ function calculateUserStats(users) {
     };
 }
 
-async function getDashboardData() {
+async function getDashboardData(req) {
     const users = await getAllUsers();
     const invites = await getAllInvites();
     const passwordResets = await getAllPasswordResets();
     const siteBanner = await getSiteBanner();
     const rateLimitedCount = getTotalRateLimitedCount();
     const stats = calculateUserStats(users);
+
+    const baseUrl = req ? `${req.protocol}://${req.get("host")}` : "";
 
     return {
         users: users,
@@ -46,13 +48,14 @@ async function getDashboardData() {
         rateLimitedCount: rateLimitedCount,
         invites: invites,
         passwordResets: passwordResets,
-        banner: siteBanner
+        banner: siteBanner,
+        baseUrl: baseUrl
     };
 }
 
 // Admin Main Dashboard
 adminRouter.get("/", async (req, res) => {
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
     res.render("admin/dashboard", data);
 });
 
@@ -68,7 +71,7 @@ adminRouter.post("/banner", async (req, res) => {
 
     await updateSiteBanner(message, banner_type, activeBool);
 
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
     let statusText = "published";
     if (!activeBool) {
         statusText = "updated (currently disabled)";
@@ -82,7 +85,7 @@ adminRouter.post("/banner/disable", async (req, res) => {
     const banner = await getSiteBanner();
     await updateSiteBanner(banner.message, banner.bannerType, false);
 
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
     data.bannerSuccess = "Site announcement banner has been deactivated.";
     res.render("admin/dashboard", data);
 });
@@ -92,7 +95,7 @@ adminRouter.post("/users/:id/edit", async (req, res) => {
     const targetUserId = parseInt(req.params.id, 10);
     const { username, first_name, last_name } = req.body;
 
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
 
     const cleanUsername = (username || "").trim();
     const cleanFirstName = (first_name || "").trim();
@@ -132,7 +135,7 @@ adminRouter.post("/users/:id/edit", async (req, res) => {
         return res.render("admin/dashboard", data);
     }
 
-    const updatedData = await getDashboardData();
+    const updatedData = await getDashboardData(req);
     let displayName = cleanFirstName;
     if (cleanLastName) {
         displayName = displayName + " " + cleanLastName;
@@ -146,7 +149,7 @@ adminRouter.post("/users/:id/change-username", async (req, res) => {
     const targetUserId = parseInt(req.params.id, 10);
     const { newUsername } = req.body;
 
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
 
     if (!newUsername || newUsername.trim().length < 3) {
         data.error = "Username must be at least 3 characters long.";
@@ -177,7 +180,7 @@ adminRouter.post("/users/:id/change-username", async (req, res) => {
         return res.render("admin/dashboard", data);
     }
 
-    const updatedData = await getDashboardData();
+    const updatedData = await getDashboardData(req);
     updatedData.actionSuccess = `Successfully changed username for User #${targetUserId} to "${newUsername.trim()}".`;
     res.render("admin/dashboard", updatedData);
 });
@@ -185,7 +188,7 @@ adminRouter.post("/users/:id/change-username", async (req, res) => {
 // Endpoint: Delete a User Account
 adminRouter.post("/users/:id/delete", async (req, res) => {
     const targetUserId = parseInt(req.params.id, 10);
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
 
     let targetUser = null;
     for (const u of data.users) {
@@ -207,7 +210,7 @@ adminRouter.post("/users/:id/delete", async (req, res) => {
 
     await deleteUser(targetUserId);
 
-    const updatedData = await getDashboardData();
+    const updatedData = await getDashboardData(req);
     updatedData.actionSuccess = `User account "${targetUser.username}" (#${targetUserId}) has been permanently deleted.`;
     res.render("admin/dashboard", updatedData);
 });
@@ -215,7 +218,7 @@ adminRouter.post("/users/:id/delete", async (req, res) => {
 // Endpoint: Toggle Block / Unblock a User
 adminRouter.post("/users/:id/toggle-block", async (req, res) => {
     const targetUserId = parseInt(req.params.id, 10);
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
 
     let targetUser = null;
     for (const u of data.users) {
@@ -242,7 +245,7 @@ adminRouter.post("/users/:id/toggle-block", async (req, res) => {
 // Endpoint: Generate Password Reset Link for a specific user
 adminRouter.post("/users/:id/reset-password", async (req, res) => {
     const targetUserId = parseInt(req.params.id, 10);
-    const data = await getDashboardData();
+    const data = await getDashboardData(req);
 
     let targetUser = null;
     for (const u of data.users) {
@@ -262,7 +265,7 @@ adminRouter.post("/users/:id/reset-password", async (req, res) => {
     let protocol = req.protocol;
     const resetUrl = `${protocol}://${host}/reset-password?token=${reset.token}`;
 
-    const updatedData = await getDashboardData();
+    const updatedData = await getDashboardData(req);
     updatedData.resetSuccess = `Generated password reset link for "${targetUser.username}"!`;
     updatedData.resetUrl = resetUrl;
 
@@ -275,25 +278,29 @@ adminRouter.get("/invites", async (req, res) => {
 });
 
 adminRouter.post("/invites", async (req, res) => {
-    const { email } = req.body;
-    const data = await getDashboardData();
+    const { name } = req.body;
+    const cleanName = (name || "").trim();
 
-    if (!email || !email.includes("@")) {
-        data.error = "Please enter a valid email address to issue an invite.";
-        return res.render("admin/dashboard", data);
-    }
-
-    const newInvite = await createInvite(email.trim().toLowerCase(), req.user.id);
+    const newInvite = await createInvite(cleanName, req.user.id);
 
     const host = req.get("host");
     let protocol = req.protocol;
     const inviteUrl = `${protocol}://${host}/register?token=${newInvite.token}`;
 
-    const updatedData = await getDashboardData();
-    updatedData.inviteSuccess = `Invite created for ${newInvite.email}!`;
+    const updatedData = await getDashboardData(req);
+    updatedData.inviteSuccess = newInvite.name ? `Invite created for "${newInvite.name}"!` : "Invite link created!";
     updatedData.inviteUrl = inviteUrl;
 
     res.render("admin/dashboard", updatedData);
+});
+
+// Endpoint: Delete an Account Invite Link
+adminRouter.post("/invites/:id/delete", async (req, res) => {
+    const inviteId = parseInt(req.params.id, 10);
+    if (!isNaN(inviteId)) {
+        await deleteInvite(inviteId);
+    }
+    res.redirect("/admin#invites");
 });
 
 export default adminRouter;
