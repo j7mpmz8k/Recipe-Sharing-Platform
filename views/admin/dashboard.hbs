@@ -1,4 +1,4 @@
-<div class="recipes-container" style="width: 100%; max-width: 1100px; margin: 0 auto;">
+<div class="recipes-container" style="width: 100%; max-width: 1200px; margin: 0 auto;">
     <!-- Admin Header -->
     <div class="section-header" style="margin-bottom: 2rem;">
         <div>
@@ -93,39 +93,39 @@
     {{/if}}
 
     <!-- Stat Metric Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Registered Users</div>
-            <div id="stat-total-users" style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{totalUsers}}</div>
+    <div class="admin-metrics-grid">
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Registered Users</div>
+            <div id="stat-total-users" style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: var(--text-primary);">{{totalUsers}}</div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Visitors Online</div>
-            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #16a34a; display: flex; align-items: center; gap: 0.5rem;">
-                <span style="display: inline-block; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e;"></span>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Visitors Online</div>
+            <div style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #16a34a; display: flex; align-items: center; gap: 0.4rem;">
+                <span style="display: inline-block; width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e;"></span>
                 <span id="stat-online-count">{{onlineCount}}</span>
             </div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Online Members</div>
-            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #2563eb; display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.15rem;">👥</span>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Online Members</div>
+            <div style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #2563eb; display: flex; align-items: center; gap: 0.4rem;">
+                <span style="font-size: 1.05rem;">👥</span>
                 <span id="stat-online-users">{{onlineUsersCount}}</span>
             </div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Online Guests (IP)</div>
-            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #0284c7; display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.15rem;">🌐</span>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Active Guests</div>
+            <div style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #0284c7; display: flex; align-items: center; gap: 0.4rem;">
+                <span style="font-size: 1.05rem;">🌐</span>
                 <span id="stat-active-guests">{{activeGuestsCount}}</span>
             </div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Rate-Limited Clients</div>
-            <div id="stat-rate-limited" style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #dc2626;">{{rateLimitedCount}}</div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Rate-Limited</div>
+            <div id="stat-rate-limited" style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #dc2626;">{{rateLimitedCount}}</div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Invites Issued</div>
-            <div id="stat-total-invites" style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{invites.length}}</div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Invites Issued</div>
+            <div id="stat-total-invites" style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: var(--text-primary);">{{invites.length}}</div>
         </div>
     </div>
 
