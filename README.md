@@ -40,6 +40,7 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 | **`npm run prod:down`** | Local Laptop | Takes down and removes production Docker containers over SSH (`docker compose down`) |
 | **`npm run prod:stop`** | Local Laptop | Gracefully stops production Docker containers over SSH (`docker compose stop`) |
 | **`npm run prod:start`** | Local Laptop | Starts production Docker containers back up over SSH (`docker compose up -d`) |
+| **`npm run prod:sql`** | Local Laptop | Run remote SQL query or open interactive `psql` shell on production over SSH |
 | **`npm run tunnel`** | Local Laptop | Forwards remote `127.0.0.1:3000` to local `http://localhost:8080` via SSH |
 
 ### Project Structure
@@ -59,6 +60,7 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 │   ├── down_prod.sh                # npm run prod:down: take down production containers
 │   ├── stop_prod.sh                # npm run prod:stop: stop production containers
 │   ├── start_prod.sh               # npm run prod:start: bring production containers online
+│   ├── sql_prod.sh                 # npm run prod:sql: run SQL query or open interactive psql shell
 │   ├── tunnel_prod.sh              # npm run tunnel: encrypted port-forwarding to port 8080
 │   ├── pull_prod_db.sh             # npm run db:pull: encrypted database sync from prod
 │   ├── migrate.js                  # Migration runner with auto-database creation

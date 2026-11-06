@@ -13,6 +13,8 @@
     "prod:stop": "./scripts/stop_prod.sh",
     "prod:down": "./scripts/down_prod.sh",
     "prod:start": "./scripts/start_prod.sh",
+    "prod:sql": "./scripts/sql_prod.sh",
+    "prod:psql": "./scripts/sql_prod.sh",
     "tunnel": "./scripts/tunnel_prod.sh"
   },
   "dependencies": {
