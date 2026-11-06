@@ -146,6 +146,119 @@
                 font-size: 1.35rem;
             }
         }
+        @media (max-width: 680px) {
+            #invites-table-wrapper > div,
+            .invites-scroll-container {
+                overflow-x: visible !important;
+            }
+            #invites-table-wrapper thead,
+            .invites-table thead {
+                display: none !important;
+            }
+            #invites-table-wrapper table,
+            #invites-table-wrapper tbody,
+            #invites-table-wrapper tr,
+            .invites-table,
+            .invites-table tbody,
+            .invites-table tr {
+                display: block !important;
+                width: 100% !important;
+            }
+            #invites-table-wrapper tr,
+            .invites-table tr {
+                margin-bottom: 0.85rem !important;
+                border: 1px solid var(--card-border, #e2e8f0) !important;
+                border-radius: 8px !important;
+                padding: 0.85rem 1rem !important;
+                background: var(--card-bg, #ffffff) !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+            }
+            #invites-table-wrapper td,
+            .invites-table td {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 0.35rem 0 !important;
+                border: none !important;
+                font-size: 0.85rem !important;
+                text-align: right !important;
+                gap: 0.5rem !important;
+                word-break: break-word !important;
+            }
+            #invites-table-wrapper td:nth-child(1)::before,
+            .invites-table td:nth-child(1)::before {
+                content: "Reference / Note";
+                font-weight: 600;
+                color: var(--text-muted, #718096);
+                font-size: 0.775rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+                text-align: left;
+                flex-shrink: 0;
+            }
+            #invites-table-wrapper td:nth-child(1),
+            .invites-table td:nth-child(1) {
+                font-size: 0.95rem !important;
+                font-weight: 600 !important;
+                color: var(--text-primary);
+                padding-bottom: 0.35rem !important;
+            }
+            #invites-table-wrapper td:nth-child(2)::before,
+            .invites-table td:nth-child(2)::before {
+                content: "Status";
+                font-weight: 600;
+                color: var(--text-muted, #718096);
+                font-size: 0.775rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+                text-align: left;
+                flex-shrink: 0;
+            }
+            #invites-table-wrapper td:nth-child(3)::before,
+            .invites-table td:nth-child(3)::before {
+                content: "Accepted By";
+                font-weight: 600;
+                color: var(--text-muted, #718096);
+                font-size: 0.775rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+                text-align: left;
+                flex-shrink: 0;
+            }
+            #invites-table-wrapper td:nth-child(4)::before,
+            .invites-table td:nth-child(4)::before {
+                content: "Created";
+                font-weight: 600;
+                color: var(--text-muted, #718096);
+                font-size: 0.775rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+                text-align: left;
+                flex-shrink: 0;
+            }
+            #invites-table-wrapper td:nth-child(5)::before,
+            .invites-table td:nth-child(5)::before {
+                content: "Expires";
+                font-weight: 600;
+                color: var(--text-muted, #718096);
+                font-size: 0.775rem;
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+                text-align: left;
+                flex-shrink: 0;
+            }
+            #invites-table-wrapper td:nth-child(6),
+            .invites-table td:nth-child(6) {
+                border-top: 1px solid var(--card-border, #edf2f7) !important;
+                padding-top: 0.6rem !important;
+                margin-top: 0.35rem !important;
+                justify-content: flex-end !important;
+            }
+            #invites-table-wrapper td:nth-child(6)::before,
+            .invites-table td:nth-child(6)::before {
+                display: none !important;
+            }
+        }
     </style>
 
     <!-- Stat Metric Cards -->
@@ -563,8 +676,8 @@
 
         <div id="invites-table-wrapper" {{#unless invites.length}}style="display: none;"{{/unless}}>
             <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-secondary);">Invitations</h3>
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+            <div class="invites-scroll-container" style="overflow-x: auto;">
+                <table class="invites-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
                     <thead>
                         <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
                             <th style="padding: 0.6rem 0.5rem;">Reference / Note</th>
