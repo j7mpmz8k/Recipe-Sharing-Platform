@@ -97,10 +97,24 @@
             <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{totalUsers}}</div>
         </div>
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Online Members</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Visitors Online</div>
             <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #16a34a; display: flex; align-items: center; gap: 0.5rem;">
                 <span style="display: inline-block; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e;"></span>
+                <span>{{onlineCount}}</span>
+            </div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Online Members</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #2563eb; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.15rem;">👥</span>
                 <span>{{onlineUsersCount}}</span>
+            </div>
+        </div>
+        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Online Guests (IP)</div>
+            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #0284c7; display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.15rem;">🌐</span>
+                <span>{{activeGuestsCount}}</span>
             </div>
         </div>
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
@@ -108,110 +122,9 @@
             <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #dc2626;">{{rateLimitedCount}}</div>
         </div>
         <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Visitors Online</div>
-            <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: #2563eb;">{{onlineCount}}</div>
-        </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.25rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
             <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Total Invites Issued</div>
             <div style="font-size: 1.85rem; font-weight: 700; margin-top: 0.35rem; color: var(--text-primary);">{{invites.length}}</div>
         </div>
-    </div>
-
-    <!-- Announcement Banner Manager Card -->
-    <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
-            <h2 style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                <span>📢</span> Site-Wide Announcement Banner
-            </h2>
-            {{#if banner.isActive}}
-                <span style="font-size: 0.8rem; background: #def7ec; color: #03543f; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
-                    ● LIVE ON SITE
-                </span>
-            {{else}}
-                <span style="font-size: 0.8rem; background: #f3f4f6; color: #6b7280; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 500;">
-                    ○ INACTIVE
-                </span>
-            {{/if}}
-        </div>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
-            Broadcast an urgent or informative notice across the top of all pages (e.g. <em>"Site shutdown in 1 hour for maintenance"</em>).
-        </p>
-
-        {{#if banner.isActive}}
-            <div style="margin-bottom: 1.25rem;">
-                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600;">Current Live Preview:</label>
-                <div style="padding: 0.75rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.925rem; text-align: center;
-                    {{#if banner.isWarning}}background: #fef08a; color: #854d0e; border: 1px solid #facc15;{{/if}}
-                    {{#if banner.isAlert}}background: #fee2e2; color: #991b1b; border: 1px solid #f87171;{{/if}}
-                    {{#if banner.isInfo}}background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;{{/if}}
-                    {{#if banner.isSuccess}}background: #dcfce7; color: #166534; border: 1px solid #4ade80;{{/if}}
-                ">
-                    {{#if banner.isWarning}}⚠️{{/if}}
-                    {{#if banner.isAlert}}🚨{{/if}}
-                    {{#if banner.isInfo}}ℹ️{{/if}}
-                    {{#if banner.isSuccess}}📢{{/if}}
-                    {{banner.message}}
-                </div>
-            </div>
-        {{/if}}
-
-        <form action="/admin/banner" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
-            <div>
-                <label for="bannerMessage" style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">
-                    Banner Message
-                </label>
-                <input 
-                    type="text" 
-                    id="bannerMessage" 
-                    name="message" 
-                    value="{{banner.message}}" 
-                    placeholder="e.g. Site shutdown in 1 hour for scheduled maintenance"
-                    required
-                    style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
-                >
-            </div>
-
-            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
-                <div>
-                    <label for="bannerType" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
-                        Banner Style
-                    </label>
-                    <select id="bannerType" name="banner_type" style="padding: 0.6rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.9rem; background: #fff;">
-                        <option value="warning" {{#if banner.isWarning}}selected{{/if}}>⚠️ Warning / Shutdown (Yellow)</option>
-                        <option value="alert" {{#if banner.isAlert}}selected{{/if}}>🚨 Urgent Alert (Red)</option>
-                        <option value="info" {{#if banner.isInfo}}selected{{/if}}>ℹ️ Informational Notice (Blue)</option>
-                        <option value="success" {{#if banner.isSuccess}}selected{{/if}}>📢 General Announcement (Green)</option>
-                    </select>
-                </div>
-
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.4rem;">
-                    <input 
-                        type="checkbox" 
-                        id="is_active" 
-                        name="is_active" 
-                        {{#if banner.isActive}}checked{{/if}} 
-                        style="width: 1.15rem; height: 1.15rem; cursor: pointer;"
-                    >
-                    <label for="is_active" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
-                        Active (Visible across all site pages)
-                    </label>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
-                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
-                    💾 Save &amp; Publish Banner
-                </button>
-            </div>
-        </form>
-
-        {{#if banner.isActive}}
-            <form action="/admin/banner/disable" method="POST" style="margin-top: 0.75rem;">
-                <button type="submit" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
-                    Disable Banner
-                </button>
-            </form>
-        {{/if}}
     </div>
 
     <!-- Section 1: Community Members -->
@@ -327,6 +240,242 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Section: Active Guest Visitors -->
+    <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2 style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🌐</span> Active Guest Visitors (by IP)
+            </h2>
+            <span style="font-size: 0.8rem; background: #e0f2fe; color: #0369a1; padding: 0.2rem 0.65rem; border-radius: 9999px; font-weight: 600;">
+                {{activeGuestsCount}} Online (Last 3 Mins)
+            </span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Real-time anonymous visitors tracked by IP address. Logged-in users are automatically excluded to avoid double-counting.
+        </p>
+
+        {{#if activeGuests.length}}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
+                            <th style="padding: 0.6rem 0.5rem;">IP Address</th>
+                            <th style="padding: 0.6rem 0.5rem;">Last Active</th>
+                            <th style="padding: 0.6rem 0.5rem;">Current / Last Page</th>
+                            <th style="padding: 0.6rem 0.5rem;">Device / OS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guests-table-body">
+                        {{#each activeGuests}}
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                                <td style="padding: 0.7rem 0.5rem; font-family: monospace; font-weight: 600; color: #1e40af;">
+                                    {{this.ip}}
+                                </td>
+                                <td style="padding: 0.7rem 0.5rem; color: #16a34a; font-weight: 500;">
+                                    ● {{this.lastSeen}}
+                                </td>
+                                <td style="padding: 0.7rem 0.5rem; color: var(--text-secondary); font-family: monospace; font-size: 0.85rem;">
+                                    {{this.lastPath}}
+                                </td>
+                                <td style="padding: 0.7rem 0.5rem; color: var(--text-muted);">
+                                    {{this.device}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{else}}
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0.75rem 0;">
+                No anonymous guest visitors active in the last 3 minutes.
+            </p>
+        {{/if}}
+    </div>
+
+    <!-- Section: Live Traffic & Request Logs -->
+    <div id="live-logs" style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2 style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📊</span> Live Traffic &amp; Request Logs
+            </h2>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <span id="log-count-badge" style="font-size: 0.8rem; background: #f3f4f6; color: #4b5563; padding: 0.2rem 0.65rem; border-radius: 9999px; font-weight: 600;">
+                    Latest {{recentLogs.length}} Requests
+                </span>
+                <button type="button" class="btn btn-secondary" onclick="refreshAdminLogs()" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; font-weight: 600;">
+                    🔄 Refresh Logs
+                </button>
+            </div>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+            Real-time in-memory circular buffer of server requests (capped at 100 entries, zero database overhead).
+        </p>
+
+        <div style="max-height: 420px; overflow-y: auto; border: 1px solid var(--card-border, #e2e8f0); border-radius: 6px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.825rem; text-align: left;">
+                <thead style="position: sticky; top: 0; background: #f8fafc; border-bottom: 2px solid var(--card-border, #e2e8f0); z-index: 1;">
+                    <tr style="color: var(--text-muted);">
+                        <th style="padding: 0.5rem 0.65rem;">Time</th>
+                        <th style="padding: 0.5rem 0.65rem;">Client IP</th>
+                        <th style="padding: 0.5rem 0.65rem;">User</th>
+                        <th style="padding: 0.5rem 0.65rem;">Method</th>
+                        <th style="padding: 0.5rem 0.65rem;">Request Path</th>
+                        <th style="padding: 0.5rem 0.65rem;">Status</th>
+                        <th style="padding: 0.5rem 0.65rem; text-align: right;">Latency</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-table-body">
+                    {{#if recentLogs.length}}
+                        {{#each recentLogs}}
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7); font-family: monospace;">
+                                <td style="padding: 0.5rem 0.65rem; color: var(--text-muted); white-space: nowrap;">
+                                    {{this.time}}
+                                </td>
+                                <td style="padding: 0.5rem 0.65rem; color: #1e40af; font-weight: 600; white-space: nowrap;">
+                                    {{this.ip}}
+                                </td>
+                                <td style="padding: 0.5rem 0.65rem; white-space: nowrap;">
+                                    {{#if this.isUser}}
+                                        <span style="background: #e0f2fe; color: #0369a1; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600;">
+                                            {{this.user}}
+                                        </span>
+                                    {{else}}
+                                        <span style="color: var(--text-muted);">
+                                            guest
+                                        </span>
+                                    {{/if}}
+                                </td>
+                                <td style="padding: 0.5rem 0.65rem; font-weight: 700;">
+                                    <span style="{{#if this.isSuccess}}color: #16a34a;{{/if}}{{#if this.isRedirect}}color: #2563eb;{{/if}}{{#if this.isClientError}}color: #d97706;{{/if}}{{#if this.isServerError}}color: #dc2626;{{/if}}">
+                                        {{this.method}}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.5rem 0.65rem; color: var(--text-primary); max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{this.path}}
+                                </td>
+                                <td style="padding: 0.5rem 0.65rem; white-space: nowrap;">
+                                    <span style="display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 700; font-size: 0.775rem;
+                                        {{#if this.isSuccess}}background: #def7ec; color: #03543f;{{/if}}
+                                        {{#if this.isRedirect}}background: #e1effe; color: #1e429f;{{/if}}
+                                        {{#if this.isClientError}}background: #fef3c7; color: #92400e;{{/if}}
+                                        {{#if this.isServerError}}background: #fee2e2; color: #991b1b;{{/if}}">
+                                        {{this.status}}
+                                    </span>
+                                </td>
+                                <td style="padding: 0.5rem 0.65rem; text-align: right; color: var(--text-muted); white-space: nowrap;">
+                                    {{this.duration}}
+                                </td>
+                            </tr>
+                        {{/each}}
+                    {{else}}
+                        <tr>
+                            <td colspan="7" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">
+                                No requests recorded in memory yet. Navigate around the site to populate live logs!
+                            </td>
+                        </tr>
+                    {{/if}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section: Site-Wide Announcement Banner -->
+    <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2 style="font-size: 1.25rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>📢</span> Site-Wide Announcement Banner
+            </h2>
+            {{#if banner.isActive}}
+                <span style="font-size: 0.8rem; background: #def7ec; color: #03543f; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
+                    ● LIVE ON SITE
+                </span>
+            {{else}}
+                <span style="font-size: 0.8rem; background: #f3f4f6; color: #6b7280; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 500;">
+                    ○ INACTIVE
+                </span>
+            {{/if}}
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+            Broadcast an urgent or informative notice across the top of all pages (e.g. <em>"Site shutdown in 1 hour for maintenance"</em>).
+        </p>
+
+        {{#if banner.isActive}}
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem; font-weight: 600;">Current Live Preview:</label>
+                <div style="padding: 0.75rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.925rem; text-align: center;
+                    {{#if banner.isWarning}}background: #fef08a; color: #854d0e; border: 1px solid #facc15;{{/if}}
+                    {{#if banner.isAlert}}background: #fee2e2; color: #991b1b; border: 1px solid #f87171;{{/if}}
+                    {{#if banner.isInfo}}background: #dbeafe; color: #1e40af; border: 1px solid #60a5fa;{{/if}}
+                    {{#if banner.isSuccess}}background: #dcfce7; color: #166534; border: 1px solid #4ade80;{{/if}}
+                ">
+                    {{#if banner.isWarning}}⚠️{{/if}}
+                    {{#if banner.isAlert}}🚨{{/if}}
+                    {{#if banner.isInfo}}ℹ️{{/if}}
+                    {{#if banner.isSuccess}}📢{{/if}}
+                    {{banner.message}}
+                </div>
+            </div>
+        {{/if}}
+
+        <form action="/admin/banner" method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+                <label for="bannerMessage" style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.35rem;">
+                    Banner Message
+                </label>
+                <input 
+                    type="text" 
+                    id="bannerMessage" 
+                    name="message" 
+                    value="{{banner.message}}" 
+                    placeholder="e.g. Site shutdown in 1 hour for scheduled maintenance"
+                    required
+                    style="width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
+                >
+            </div>
+
+            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                <div>
+                    <label for="bannerType" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">
+                        Banner Style
+                    </label>
+                    <select id="bannerType" name="banner_type" style="padding: 0.6rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.9rem; background: #fff;">
+                        <option value="warning" {{#if banner.isWarning}}selected{{/if}}>⚠️ Warning / Shutdown (Yellow)</option>
+                        <option value="alert" {{#if banner.isAlert}}selected{{/if}}>🚨 Urgent Alert (Red)</option>
+                        <option value="info" {{#if banner.isInfo}}selected{{/if}}>ℹ️ Informational Notice (Blue)</option>
+                        <option value="success" {{#if banner.isSuccess}}selected{{/if}}>📢 General Announcement (Green)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.4rem;">
+                    <input 
+                        type="checkbox" 
+                        id="is_active" 
+                        name="is_active" 
+                        {{#if banner.isActive}}checked{{/if}} 
+                        style="width: 1.15rem; height: 1.15rem; cursor: pointer;"
+                    >
+                    <label for="is_active" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+                        Active (Visible across all site pages)
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
+                    💾 Save &amp; Publish Banner
+                </button>
+            </div>
+        </form>
+
+        {{#if banner.isActive}}
+            <form action="/admin/banner/disable" method="POST" style="margin-top: 0.75rem;">
+                <button type="submit" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    Disable Banner
+                </button>
+            </form>
+        {{/if}}
     </div>
 
     <!-- Section 2: Account Invitations Form & Table -->
@@ -534,5 +683,67 @@
             closeEditUserModal();
         }
     });
+
+    // Client-side refresh for live logs and active guest visitors
+    async function refreshAdminLogs() {
+        try {
+            const res = await fetch('/admin/api/logs');
+            if (!res.ok) return;
+            const data = await res.json();
+            
+            const tbody = document.getElementById('logs-table-body');
+            if (tbody && data.logs) {
+                const badge = document.getElementById('log-count-badge');
+                if (badge) badge.textContent = 'Latest ' + data.logs.length + ' Requests';
+
+                if (data.logs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">No requests recorded yet.</td></tr>';
+                } else {
+                    tbody.innerHTML = data.logs.map(log => {
+                        let statusStyle = 'background: #def7ec; color: #03543f;';
+                        let methodColor = '#16a34a';
+                        if (log.isRedirect) { statusStyle = 'background: #e1effe; color: #1e429f;'; methodColor = '#2563eb'; }
+                        else if (log.isClientError) { statusStyle = 'background: #fef3c7; color: #92400e;'; methodColor = '#d97706'; }
+                        else if (log.isServerError) { statusStyle = 'background: #fee2e2; color: #991b1b;'; methodColor = '#dc2626'; }
+
+                        const userHtml = log.isUser 
+                            ? `<span style="background: #e0f2fe; color: #0369a1; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600;">${log.user}</span>`
+                            : `<span style="color: var(--text-muted);">guest</span>`;
+
+                        return `
+                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7); font-family: monospace;">
+                                <td style="padding: 0.5rem 0.65rem; color: var(--text-muted); white-space: nowrap;">${log.time}</td>
+                                <td style="padding: 0.5rem 0.65rem; color: #1e40af; font-weight: 600; white-space: nowrap;">${log.ip}</td>
+                                <td style="padding: 0.5rem 0.65rem; white-space: nowrap;">${userHtml}</td>
+                                <td style="padding: 0.5rem 0.65rem; font-weight: 700;"><span style="color: ${methodColor};">${log.method}</span></td>
+                                <td style="padding: 0.5rem 0.65rem; color: var(--text-primary); max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${log.path}</td>
+                                <td style="padding: 0.5rem 0.65rem; white-space: nowrap;">
+                                    <span style="display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 700; font-size: 0.775rem; ${statusStyle}">${log.status}</span>
+                                </td>
+                                <td style="padding: 0.5rem 0.65rem; text-align: right; color: var(--text-muted); white-space: nowrap;">${log.duration}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // Also refresh active guests table if available
+            const guestsTbody = document.getElementById('guests-table-body');
+            if (guestsTbody && data.guests) {
+                if (data.guests.length === 0) {
+                    guestsTbody.innerHTML = '<tr><td colspan="4" style="padding: 1rem; color: var(--text-muted);">No anonymous guest visitors active in the last 3 minutes.</td></tr>';
+                } else {
+                    guestsTbody.innerHTML = data.guests.map(g => `
+                        <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
+                            <td style="padding: 0.7rem 0.5rem; font-family: monospace; font-weight: 600; color: #1e40af;">${g.ip}</td>
+                            <td style="padding: 0.7rem 0.5rem; color: #16a34a; font-weight: 500;">● ${g.lastSeen}</td>
+                            <td style="padding: 0.7rem 0.5rem; color: var(--text-secondary); font-family: monospace; font-size: 0.85rem;">${g.lastPath}</td>
+                            <td style="padding: 0.7rem 0.5rem; color: var(--text-muted);">${g.device}</td>
+                        </tr>
+                    `).join('');
+                }
+            }
+        } catch (e) {}
+    }
     </script>
 </div>

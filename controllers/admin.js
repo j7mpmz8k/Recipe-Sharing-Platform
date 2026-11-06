@@ -6,6 +6,8 @@ import { createInvite, getAllInvites, deleteInvite } from "../models/invites.js"
 import { createPasswordReset, getAllPasswordResets } from "../models/passwordResets.js";
 import { getSiteBanner, updateSiteBanner } from "../models/banner.js";
 import { getTotalRateLimitedCount } from "../middleware/rateLimiter.js";
+import { getActiveGuests } from "../middleware/activity.js";
+import { getRecentLogs } from "../middleware/logging.js";
 
 const adminRouter = express.Router();
 
@@ -37,6 +39,8 @@ async function getDashboardData(req) {
     const siteBanner = await getSiteBanner();
     const rateLimitedCount = getTotalRateLimitedCount();
     const stats = calculateUserStats(users);
+    const activeGuests = getActiveGuests();
+    const recentLogs = getRecentLogs();
 
     const baseUrl = req ? `${req.protocol}://${req.get("host")}` : "";
 
@@ -49,9 +53,20 @@ async function getDashboardData(req) {
         invites: invites,
         passwordResets: passwordResets,
         banner: siteBanner,
-        baseUrl: baseUrl
+        baseUrl: baseUrl,
+        activeGuests: activeGuests,
+        activeGuestsCount: activeGuests.length,
+        recentLogs: recentLogs
     };
 }
+
+// Endpoint: Real-time logs and active guests polling endpoint for Admin Dashboard
+adminRouter.get("/api/logs", (req, res) => {
+    res.json({
+        logs: getRecentLogs(),
+        guests: getActiveGuests()
+    });
+});
 
 // Admin Main Dashboard
 adminRouter.get("/", async (req, res) => {
