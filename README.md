@@ -60,8 +60,7 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 │   ├── tunnel_prod.sh              # npm run tunnel: encrypted port-forwarding to port 8080
 │   ├── pull_prod_db.sh             # npm run db:pull: encrypted database sync from prod
 │   ├── migrate.js                  # Migration runner with auto-database creation
-│   ├── setup-wsl-portforward.ps1   # Self-elevating PowerShell script for WSL SSH port 48222
-│   └── deploy.sh                   # Manual server-side deployment script
+│   └── setup-wsl-portforward.ps1   # Self-elevating PowerShell script for WSL SSH port 48222
 ├── server_template.env             # Environment template for production server
 ├── client_template.env             # Environment template for local Linux laptop
 └── views/                          # Handlebars templates and user pages
@@ -485,12 +484,6 @@ This forwards `http://localhost:8080` on your laptop directly to `127.0.0.1:3000
 ### Patching & Security Updates
 * **Linux Kernel Updates**: Docker containers share the host Linux kernel directly. To patch the kernel, update the host server OS (`sudo apt update && sudo apt upgrade` followed by a system reboot).
 * **Container Base Images**: Base images (`node:20-bookworm-slim` and `postgres:16-alpine`) receive upstream OS and runtime patches. Running `npm run deploy` automatically passes `--pull` during `docker compose build` to incorporate the latest base images.
-
-### Manual Server-Side Deploy
-If you are logged directly into the production server, you can trigger updates using:
-```bash
-./scripts/deploy.sh
-```
 
 ### Changing the Database Password
 To update the PostgreSQL password on an active server:

@@ -1,15 +1,17 @@
 import query from "../db/connection.js";
 
-export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "") {
+export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "", category = "Other") {
+    const cleanCat = (category || "Other").trim();
     const r = (await query(`
-        INSERT INTO recipes (title, description, ingredients, instructions, prep_time, cook_time, servings, user_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO recipes (title, description, ingredients, instructions, prep_time, cook_time, servings, user_id, category)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id;
-        `, [title, description, ingredients, instructions, prepTime || 0, cooktime || 0, servings || 0, userId]))[0];
+        `, [title, description, ingredients, instructions, prepTime || 0, cooktime || 0, servings || 0, userId, cleanCat]))[0];
     return r.id;
 }
 
-export async function getAllRecipes(userId = 0, querySearch = "") {
+export async function getAllRecipes(userId = 0, querySearch = "", categoryFilter = "") {
+    const cleanCat = (categoryFilter || "").trim();
     const rows = (await query(`
             SELECT r.*, u.username, u.first_name, u.last_name,
                 COUNT(f.id) AS fav_count,
@@ -20,16 +22,48 @@ export async function getAllRecipes(userId = 0, querySearch = "") {
             FROM recipes r
             JOIN users u ON r.user_id = u.id
             LEFT JOIN favorites f ON r.id = f.recipe_id
-            WHERE u.username ILIKE '%' || $2 || '%'
+            WHERE (
+                u.username ILIKE '%' || $2 || '%'
                 OR u.first_name ILIKE '%' || $2 || '%'
                 OR r.title ILIKE '%' || $2 || '%'
                 OR r.description ILIKE '%' || $2 || '%'
                 OR r.ingredients ILIKE '%' || $2 || '%'
                 OR r.instructions ILIKE '%' || $2 || '%'
+                OR r.category ILIKE '%' || $2 || '%'
+            )
+            AND ($3 = '' OR r.category = $3)
             GROUP BY r.id, u.username, u.first_name, u.last_name
             ORDER BY r.id DESC;
-        `, [userId, querySearch]));
+        `, [userId, querySearch, cleanCat]));
     return rows.map(r => new Recipe(r)) || [];
+}
+
+export async function getRecipeById(id, userId = 0) {
+    const rows = await query(`
+        SELECT r.*, u.username, u.first_name, u.last_name,
+            COUNT(f.id) AS fav_count,
+            EXISTS(
+                SELECT 1 FROM favorites fav
+                WHERE fav.recipe_id = r.id AND fav.user_id = $2
+            ) AS is_favorite
+        FROM recipes r
+        JOIN users u ON r.user_id = u.id
+        LEFT JOIN favorites f ON r.id = f.recipe_id
+        WHERE r.id = $1
+        GROUP BY r.id, u.username, u.first_name, u.last_name;
+    `, [id, userId]);
+    if (rows.length === 0) return null;
+    return new Recipe(rows[0]);
+}
+
+export async function toggleRecipeFeatured(recipeId) {
+    const rows = await query(`
+        UPDATE recipes
+        SET is_featured = NOT COALESCE(is_featured, FALSE)
+        WHERE id = $1
+        RETURNING id, is_featured;
+    `, [recipeId]);
+    return rows[0] || null;
 }
 export async function getUserRecipes(userId, viewerId = 0) {
     const rows = (await query(`
@@ -61,8 +95,8 @@ export async function getFeaturedRecipes(userId = 0) {
         JOIN users u ON r.user_id = u.id
         LEFT JOIN favorites f ON r.id = f.recipe_id
         GROUP BY r.id, u.username, u.first_name, u.last_name
-        ORDER BY fav_count DESC, r.id DESC
-        LIMIT 6;
+        ORDER BY r.is_featured DESC, fav_count DESC, r.id DESC
+        LIMIT 8;
     `, [userId]));
     return rows.map(r => new Recipe(r)) || [];
 }
@@ -98,6 +132,8 @@ class Recipe {
         this.prepTime = row.prep_time;//minutes
         this.cooktime = row.cook_time;//minutes
         this.servings = row.servings;
+        this.category = row.category || "Other";
+        this.isFeatured = Boolean(row.is_featured);
         this.userId = row.user_id;
         this.username = row.username;
         this.firstName = row.first_name || "";
@@ -139,9 +175,10 @@ class Recipe {
                 prep_time = $7,
                 cook_time = $8,
                 servings = $9,
+                category = $10,
                 updated_at = NOW()
             WHERE id = $1;
-        `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cooktime, this.servings]);
+        `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cooktime, this.servings, this.category || "Other"]);
     }
     toggleFavorite = async (userId) => {
         if (!this.isFavorite) {

@@ -39,6 +39,11 @@ services:
         reservations:
           cpus: "0.20"
           memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   db:
     image: postgres:16-alpine
@@ -72,6 +77,11 @@ services:
         reservations:
           cpus: "0.25"
           memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   postgres_data:

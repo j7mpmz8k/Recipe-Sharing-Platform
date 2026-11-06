@@ -11,8 +11,16 @@
                     Member since {{userProfile.createdAt}}
                 </p>
                 {{#if user}}
-                    <p class="text-muted" style="margin: 0.25rem 0 0; font-size: 0.9rem;">
-                        ✉️ <a href="mailto:{{userProfile.email}}" style="color: inherit; text-decoration: underline;">{{userProfile.email}}</a>
+                    <p class="text-muted" style="margin: 0.25rem 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <span>✉️</span>
+                        <a href="mailto:{{userProfile.email}}" style="color: inherit; text-decoration: underline;">{{userProfile.email}}</a>
+                        <button 
+                            type="button" 
+                            class="btn btn-secondary" 
+                            onclick="navigator.clipboard.writeText('{{userProfile.email}}').then(()=>{const orig=this.innerText;this.innerText='Copied!';setTimeout(()=>{this.innerText=orig;},2000);}).catch(()=>{prompt('Copy email:', '{{userProfile.email}}');});"
+                            title="Copy email to clipboard" 
+                            style="padding: 0.2rem 0.55rem; font-size: 0.75rem; font-weight: 600; border-radius: 6px; line-height: 1.2; cursor: pointer;"
+                        >📋 Copy</button>
                     </p>
                 {{/if}}
                 {{#if userProfile.isSelf}}

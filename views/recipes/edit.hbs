@@ -7,9 +7,23 @@
         {{/if}}
 
         <form id="edit-form" action="/recipes/{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}" method="POST" class="auth-form" style="gap: 0.9rem;">
-            <div class="form-group">
-                <label for="title">Recipe Title *</label>
-                <input type="text" id="title" name="title" required value="{{recipe.title}}">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 240px;">
+                    <label for="title">Recipe Title *</label>
+                    <input type="text" id="title" name="title" required value="{{recipe.title}}">
+                </div>
+
+                <div class="form-group" style="width: 200px; min-width: 160px;">
+                    <label for="category">Category</label>
+                    <select id="category" name="category">
+                        <option value="Breakfast" {{#if (eq recipe.category "Breakfast")}}selected{{/if}}>🍳 Breakfast</option>
+                        <option value="Entree" {{#if (eq recipe.category "Entree")}}selected{{/if}}>🍲 Entrée</option>
+                        <option value="Sides" {{#if (eq recipe.category "Sides")}}selected{{/if}}>🥗 Sides</option>
+                        <option value="Desserts" {{#if (eq recipe.category "Desserts")}}selected{{/if}}>🍰 Desserts</option>
+                        <option value="Drinks" {{#if (eq recipe.category "Drinks")}}selected{{/if}}>🍹 Drinks</option>
+                        <option value="Other" {{#if (eq recipe.category "Other")}}selected{{else unless recipe.category}}selected{{/if}}>🍽️ Other</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">

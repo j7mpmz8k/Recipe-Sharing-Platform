@@ -862,6 +862,34 @@ main {
     background-color: var(--card-footer-bg);
 }
 
+.category-filter-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.category-reset-btn {
+    position: absolute;
+    right: calc(100% + 0.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    border-radius: 20px;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.775rem;
+    font-weight: 600;
+    text-decoration: none;
+    z-index: 2;
+}
+
+@media (max-width: 640px) {
+    .category-reset-btn {
+        position: static !important;
+        transform: none !important;
+        margin-right: 0.35rem;
+    }
+}
+
 .search-input-wrapper input:focus {
     border-color: #3498db;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.25);

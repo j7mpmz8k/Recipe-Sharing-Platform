@@ -11,15 +11,29 @@
 
     <!-- Search Bar -->
     <div class="search-section">
-        <form action="/recipes" method="GET" class="search-form">
-            <div class="search-input-wrapper">
+        <form action="/recipes" method="GET" class="search-form" style="max-width: 780px; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <div class="category-filter-wrapper">
+                {{#if categoryFilter}}
+                    <a href="/recipes{{#if searchQuery}}?search={{searchQuery}}{{/if}}" class="btn btn-secondary category-reset-btn" title="Clear category filter">Reset Category ✕</a>
+                {{/if}}
+                <select name="category" onchange="this.form.submit()" class="category-filter-select" style="padding: 0.75rem 1rem; border-radius: 30px; border: 1px solid var(--input-border, #cbd5e0); background-color: var(--card-bg, #ffffff); color: var(--text-primary, #2c3e50); font-size: 0.95rem; font-weight: 500; cursor: pointer; outline: none;" title="Filter by category">
+                    <option value="">All Categories</option>
+                    <option value="Breakfast" {{#if (eq categoryFilter "Breakfast")}}selected{{/if}}>🍳 Breakfast</option>
+                    <option value="Entree" {{#if (eq categoryFilter "Entree")}}selected{{/if}}>🍲 Entrée</option>
+                    <option value="Sides" {{#if (eq categoryFilter "Sides")}}selected{{/if}}>🥗 Sides</option>
+                    <option value="Desserts" {{#if (eq categoryFilter "Desserts")}}selected{{/if}}>🍰 Desserts</option>
+                    <option value="Drinks" {{#if (eq categoryFilter "Drinks")}}selected{{/if}}>🍹 Drinks</option>
+                    <option value="Other" {{#if (eq categoryFilter "Other")}}selected{{/if}}>🍽️ Other</option>
+                </select>
+            </div>
+            <div class="search-input-wrapper" style="min-width: 250px;">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="search-input" name="search" placeholder="Search recipes by title or ingredients..." value="{{searchQuery}}">
+                <input type="text" id="search-input" name="search" placeholder="Search recipes by title, ingredients, or category..." value="{{searchQuery}}">
                 {{#if searchQuery}}
-                    <a href="/recipes" class="search-clear-btn" title="Clear search" aria-label="Clear search">✕</a>
+                    <a href="/recipes{{#if categoryFilter}}?category={{categoryFilter}}{{/if}}" class="search-clear-btn" title="Clear search" aria-label="Clear search">✕</a>
                 {{/if}}
             </div>
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary" style="border-radius: 30px; padding: 0.75rem 1.35rem;">Search</button>
         </form>
     </div>
 
@@ -79,9 +93,11 @@
         </div>
     {{else}}
         <div class="empty-state">
-            <p>No recipes found{{#if searchQuery}} matching "{{searchQuery}}"{{/if}}.</p>
+            <p>No recipes found{{#if searchQuery}} matching "{{searchQuery}}"{{/if}}{{#if categoryFilter}} in category "{{categoryFilter}}"{{/if}}.</p>
             {{#if searchQuery}}
-                <a href="/recipes" class="btn btn-secondary">Clear Search</a>
+                <a href="/recipes" class="btn btn-secondary">Clear Filters</a>
+            {{else if categoryFilter}}
+                <a href="/recipes" class="btn btn-secondary">Clear Filters</a>
             {{else}}
                 {{#if user}}
                     <a href="/recipes/new" class="btn btn-primary">Share the First Recipe</a>

@@ -34,7 +34,12 @@ app.use(loggingMiddleware);
 app.use(trackActivity);
 
 // global handlebars
-app.engine("hbs", engine({ extname: ".hbs" }));
+app.engine("hbs", engine({
+    extname: ".hbs",
+    helpers: {
+        eq: (a, b) => a === b
+    }
+}));
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 

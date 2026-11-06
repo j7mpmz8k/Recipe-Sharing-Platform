@@ -61,6 +61,8 @@ ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" '
 
     echo "==> Ensuring database schema is up to date..."
     docker compose exec -T db psql -U postgres -d recipe_db -c "ALTER TABLE invites ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMP WITH TIME ZONE;" || true
+    docker compose exec -T db psql -U postgres -d recipe_db -c "ALTER TABLE recipes ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'Other';" || true
+    docker compose exec -T db psql -U postgres -d recipe_db -c "ALTER TABLE recipes ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;" || true
 
     echo "==> Cleaning up unused images..."
     docker image prune -f

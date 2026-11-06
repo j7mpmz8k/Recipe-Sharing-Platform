@@ -3,7 +3,14 @@
     <header class="recipe-header-card">
         <div class="section-header">
             <div>
-                <h1>{{recipe.title}}</h1>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                    <h1 style="margin: 0;">{{recipe.title}}</h1>
+                    {{#if recipe.category}}
+                        <span class="recipe-category-pill" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">
+                            🏷️ {{recipe.category}}
+                        </span>
+                    {{/if}}
+                </div>
                 <div class="author-badge">
                     <span>By <a href="/users/{{#if recipe.userId}}{{recipe.userId}}{{else}}{{recipe.user_id}}{{/if}}">{{#if recipe.authorName}}{{recipe.authorName}}{{else}}{{recipe.username}}{{/if}}</a></span>
                     <span class="text-muted">• {{recipe.createdAt}}</span>
@@ -13,12 +20,20 @@
                 </div>
             </div>
 
-            <!-- Action buttons for recipe owner -->
-            {{#if recipe.canEdit}}
-                <div class="recipe-owner-actions">
-                    <a href="/recipes/{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}/edit" class="btn btn-secondary btn-sm">✏️ Edit</a>
-                </div>
-            {{/if}}
+            <!-- Action buttons: Edit (for owner) & Feature toggle (for admin) -->
+            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                {{#if user.isAdmin}}
+                    <button type="button" id="adminFeatureBtn" class="btn btn-secondary btn-sm" onclick="toggleAdminFeature({{recipe.recipeId}})" style="{{#if recipe.isFeatured}}background: #fef3c7; color: #92400e; border-color: #facc15; font-weight: 600;{{/if}}" title="Toggle featured recipe on homepage">
+                        <span id="adminFeatureText">{{#if recipe.isFeatured}}★ Featured on Home{{else}}☆ Feature on Home{{/if}}</span>
+                    </button>
+                {{/if}}
+
+                {{#if recipe.canEdit}}
+                    <div class="recipe-owner-actions">
+                        <a href="/recipes/{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}/edit" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                    </div>
+                {{/if}}
+            </div>
         </div>
 
         {{#if recipe.description}}
@@ -26,7 +41,7 @@
         {{/if}}
 
         <div class="recipe-header-meta">
-            <div class="recipe-meta">
+            <div class="recipe-meta" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                 {{#if recipe.prepTime}}
                     <span>⏱ Prep: {{recipe.prepTime}} min</span>
                 {{else if recipe.prep_time}}
@@ -40,6 +55,11 @@
                 {{#if recipe.servings}}
                     <span>🍽 Servings: {{recipe.servings}}</span>
                 {{/if}}
+
+                <!-- Screen Wake Lock indicator -->
+                <span id="wakeLockBadge" style="display: none; align-items: center; gap: 0.3rem; font-size: 0.775rem; color: #16a34a; background: #dcfce7; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600;" title="Screen kept awake automatically while viewing this recipe">
+                    <span>💡</span> Screen awake
+                </span>
             </div>
 
             <!-- Favorite Button -->
@@ -83,4 +103,68 @@
             <div class="instructions-text">{{recipe.instructions}}</div>
         </section>
     </div>
+
+    <script>
+    // 1. Screen Wake Lock: automatically prevent screen from sleeping while viewing this recipe
+    let wakeLockSentinel = null;
+    async function acquireWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                wakeLockSentinel = await navigator.wakeLock.request('screen');
+                const badge = document.getElementById('wakeLockBadge');
+                if (badge) badge.style.display = 'inline-flex';
+                wakeLockSentinel.addEventListener('release', () => {
+                    if (badge) badge.style.display = 'none';
+                });
+            } catch (err) {
+                // Wake lock request failed or rejected by browser policy
+            }
+        }
+    }
+
+    // Automatically acquire on page load
+    acquireWakeLock();
+
+    // Re-acquire if user navigates away and returns to this tab
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            acquireWakeLock();
+        }
+    });
+
+    // 2. Admin Feature Toggle helper
+    async function toggleAdminFeature(id) {
+        try {
+            const btn = document.getElementById('adminFeatureBtn');
+            const text = document.getElementById('adminFeatureText');
+            if (btn) btn.disabled = true;
+
+            const res = await fetch('/recipes/' + encodeURIComponent(id) + '/feature', {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.isFeatured) {
+                    text.textContent = '★ Featured on Home';
+                    btn.style.background = '#fef3c7';
+                    btn.style.color = '#92400e';
+                    btn.style.borderColor = '#facc15';
+                    btn.style.fontWeight = '600';
+                } else {
+                    text.textContent = '☆ Feature on Home';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                    btn.style.fontWeight = '';
+                }
+            }
+        } catch (e) {
+            console.error('Error toggling feature:', e);
+        } finally {
+            const btn = document.getElementById('adminFeatureBtn');
+            if (btn) btn.disabled = false;
+        }
+    }
+    </script>
 </div>

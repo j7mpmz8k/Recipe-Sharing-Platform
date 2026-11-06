@@ -8,12 +8,14 @@ export async function loadRecipes(req, res, next) {
         userId = req.user.id;
     }
     const search = req.query.search || "";
-    const recipes = await getAllRecipes(userId, search);
+    const category = req.query.category || "";
+    const recipes = await getAllRecipes(userId, search, category);
     if (req.session) {
         recipes.forEach(recipe => recipe.isOwnedBy(req.user.id));
     }
     req.recipes = res.locals.recipes = recipes;
     res.locals.searchQuery = search;
+    res.locals.categoryFilter = category;
     next();
 }
 

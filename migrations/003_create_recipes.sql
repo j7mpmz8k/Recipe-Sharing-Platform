@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS recipes (
     prep_time INTEGER, --minutes
     cook_time INTEGER, --minutes
     servings INTEGER,
+    category VARCHAR(50) DEFAULT 'Other',
+    is_featured BOOLEAN DEFAULT FALSE,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
