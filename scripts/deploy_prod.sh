@@ -43,7 +43,7 @@ fi
 
 echo ""
 echo "==> Connecting to production server to deploy '${DEPLOY_BRANCH}'..."
-ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" '
+ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" 'bash -s' << 'EOF'
     set -eo pipefail
     cd ~/docker_services/recipe-sharing-platform
 
@@ -69,7 +69,7 @@ ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" '
 
     echo "==> Production services status:"
     docker compose ps
-'
+EOF
 
 echo ""
 echo "✓ Production deployment of master completed successfully!"
