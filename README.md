@@ -37,6 +37,8 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 | **`npm run migrate`** | Local Laptop | Applies database migrations (auto-creates `recipe_db` if missing) |
 | **`npm run db:pull`** | Local Laptop | Encrypted SSH database sync from production PostgreSQL to local machine |
 | **`npm run deploy`** | Local Laptop | Triggers automated production deployment of `master` over SSH |
+| **`npm run prod:stop`** | Local Laptop | Gracefully stops production Docker containers over SSH (`docker compose stop`) |
+| **`npm run prod:start`** | Local Laptop | Starts production Docker containers back up over SSH (`docker compose start`) |
 | **`npm run tunnel`** | Local Laptop | Forwards remote `127.0.0.1:3000` to local `http://localhost:8080` via SSH |
 
 ### Project Structure
@@ -47,8 +49,14 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 │   └── docker-entrypoint.sh        # Container entrypoint: runs migrations then node
 ├── docker-compose.yml              # Root stack orchestration (127.0.0.1 bindings)
 ├── migrations/                     # SQL schema migrations (000_create_database to 008)
+├── public/
+│   ├── maintenance.html            # Static downtime fallback page with dark mode
+│   ├── styles.css                  # 4-column responsive grid & site theme
+│   └── js/                         # Client-side scripts
 ├── scripts/
 │   ├── deploy_prod.sh              # npm run deploy: pull master & rebuild on remote server
+│   ├── stop_prod.sh                # npm run prod:stop: shut down production containers
+│   ├── start_prod.sh               # npm run prod:start: bring production containers online
 │   ├── tunnel_prod.sh              # npm run tunnel: encrypted port-forwarding to port 8080
 │   ├── pull_prod_db.sh             # npm run db:pull: encrypted database sync from prod
 │   ├── migrate.js                  # Migration runner with auto-database creation
@@ -245,7 +253,20 @@ The application listens internally on `127.0.0.1:3000`. A reverse proxy handles 
 3. Under the **SSL** tab:
    - Select **Request a new SSL Certificate** (Let's Encrypt).
    - Check **Force SSL** and **HTTP/2 Support**.
-   - Agree to terms and click **Save**.
+   - Agree to terms.
+4. Under the **Advanced** tab (Custom Nginx Configuration):
+   - To serve a custom maintenance page whenever the Docker container is stopped or restarting (intercepting 502/503/504 errors):
+   ```nginx
+   proxy_intercept_errors on;
+   error_page 502 503 504 /maintenance.html;
+
+   location = /maintenance.html {
+       root /data/html;
+       internal;
+   }
+   ```
+   *(Place `public/maintenance.html` into your NPM host directory at `~/docker_services/nginx/data/html/maintenance.html`)*.
+5. Click **Save**.
 
 ### Option B: Standalone Nginx Configuration
 Create `/etc/nginx/sites-available/recipe-platform`:
@@ -414,6 +435,37 @@ This command:
 3. Rebuilds and reloads the Docker containers with zero downtime (`docker compose build --pull && docker compose up -d`).
 4. Prunes old container images and prints container health status.
 *(Note: It does not push any local branches—it assumes code has already been merged into `master` on GitHub).*
+
+### Production Operations: Stopping & Starting
+To safely stop or start the production Docker containers from your laptop over SSH (e.g. for maintenance or testing the Nginx maintenance page):
+* **Stop production**:
+  ```bash
+  npm run prod:stop
+  # (alias: npm run prod:down)
+  ```
+  *(Connects via SSH, prompts for confirmation, and runs `docker compose stop`)*.
+* **Start production**:
+  ```bash
+  npm run prod:start
+  ```
+  *(Connects via SSH and runs `docker compose start` to bring containers back online)*.
+
+### Admin Control Center & Platform Features
+When logged into an account designated with administrative privileges (`ADMIN_USER_IDS` in `middleware/auth.js`), navigate to **👑 Admin Dashboard** (`/admin`):
+* **Real-Time Visitor & Member Analytics**:
+  * **Total Visitors Online**: Prominently displayed in green with a live indicator dot; auto-syncs every 10 seconds across all pages in the top navigation header.
+  * **Online Members & Guest Visitors**: Separately tracks authenticated members vs. anonymous guests by client IP address (Cloudflare/proxy normalized), eliminating duplicate counting.
+  * **Live Traffic & Request Logs**: In-memory circular buffer (capped at 100 entries, 0 DB overhead) capturing request timestamps, client IPs, user handles, HTTP methods, paths, status codes, and latency.
+* **Account Invitation System**:
+  * **Zero-Jump AJAX Generation**: Generate 48-hour invite links with optional reference names without page reload or jump. Automatically copies the link to your clipboard and inserts the row dynamically.
+  * **Retention & Sorting**: Active invites always stay at the top (newest first). Accepted invites move to the bottom, displaying the accepting user and acceptance timestamp, and remain visible for **14 days** before automatic pruning.
+  * **Crash-Proof Deletion**: Safely delete any active or accepted invite at any time via AJAX without affecting registered user accounts.
+* **Site-Wide Announcement Banners**:
+  * Broadcast emergency or informational banners across the top of all site pages with 4 customizable styles (Yellow Warning, Red Alert, Blue Info, Green Announcement).
+* **One-Time Password Reset Links**:
+  * Generate 48-hour password reset tokens directly from the user table for community members who forget their credentials.
+* **4-Column Recipe Grid**:
+  * Responsive desktop layout displaying up to 4 recipe cards per row (collapsing cleanly to 3, 2, or 1 column on smaller tablets and mobile screens).
 
 ### Accessing Production via SSH Tunnel (From Laptop)
 To view or test the production website securely in your laptop browser without opening port 3000 to the public:
