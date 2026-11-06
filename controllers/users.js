@@ -19,7 +19,7 @@ usersRouter.get("/register", async (req, res) => {
     if (!token) {
         return res.render("users/register", {
             inviteOnly: true,
-            contactEmail: "recipes.online872@passmail.com"
+            contactEmail: "contact@recipes.jcardon.me"
         });
     }
 
@@ -27,7 +27,7 @@ usersRouter.get("/register", async (req, res) => {
     if (!invite) {
         return res.render("users/register", {
             inviteOnly: true,
-            contactEmail: "recipes.online872@passmail.com",
+            contactEmail: "contact@recipes.jcardon.me",
             error: "This invitation link is invalid or has expired. Please request a new invite."
         });
     }
@@ -44,7 +44,7 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
     if (!token) {
         return res.render("users/register", {
             inviteOnly: true,
-            contactEmail: "recipes.online872@passmail.com",
+            contactEmail: "contact@recipes.jcardon.me",
             error: "Registration requires a valid invite link."
         });
     }
@@ -53,7 +53,7 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
     if (!invite) {
         return res.render("users/register", {
             inviteOnly: true,
-            contactEmail: "recipes.online872@passmail.com",
+            contactEmail: "contact@recipes.jcardon.me",
             error: "This invitation link is invalid or has expired."
         });
     }

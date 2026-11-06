@@ -19,6 +19,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
+// Trust the first proxy hop (Nginx) for real client IPs and secure HTTPS cookies
+app.set("trust proxy", 1);
+
 // global middleware
 app.use(securityHeaders);
 app.use(express.static(path.join(__dirname, "public")));

@@ -30,6 +30,7 @@ services:
         condition: service_healthy
     networks:
       - internal_backend
+      - nginx_default
     deploy:
       resources:
         limits:
@@ -79,3 +80,5 @@ volumes:
 networks:
   internal_backend:
     driver: bridge
+  nginx_default:
+    external: true

@@ -52,7 +52,7 @@ export async function loadSession(req, res, next) {
             return res.status(403).render("error", {
                 statusCode: 403,
                 statusMessage: "Account Suspended",
-                message: "Your account has been suspended by an administrator. Please contact recipes.online872@passmail.com for assistance."
+                message: "Your account has been suspended by an administrator. Please contact contact@recipes.jcardon.me for assistance."
             });
         } else {
             user.isAdmin = isAdminUser(user.id);
