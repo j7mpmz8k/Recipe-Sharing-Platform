@@ -104,6 +104,7 @@ export async function trackActivity(req, res, next) {
         req.path === "/health" ||
         req.path === "/api/online-count" ||
         req.path === "/admin/api/logs" ||
+        req.path === "/admin/api/dashboard" ||
         userAgent.startsWith("curl/") ||
         userAgent.toLowerCase().includes("healthcheck")
     ) {

@@ -36,7 +36,7 @@ export async function findValidInvite(token) {
 export async function markInviteUsed(token, userId = null) {
     await query(`
         UPDATE invites
-        SET used = TRUE, used_by = $2
+        SET used = TRUE, used_by = $2, accepted_at = NOW()
         WHERE token = $1;
     `, [token, userId]);
 }
@@ -50,13 +50,14 @@ export async function deleteInvite(id) {
 
 export async function getAllInvites() {
     const rows = await query(`
-        SELECT i.id, i.token, i.name, i.expires_at, i.used, i.used_by, i.created_at,
+        SELECT i.id, i.token, i.name, i.expires_at, i.used, i.used_by, i.accepted_at, i.created_at,
                u.username AS created_by_username,
                u2.username AS used_by_username, u2.first_name AS used_by_first_name, u2.last_name AS used_by_last_name
         FROM invites i
         JOIN users u ON i.created_by = u.id
         LEFT JOIN users u2 ON i.used_by = u2.id
-        ORDER BY i.id DESC;
+        WHERE NOT (i.used = TRUE AND COALESCE(i.accepted_at, i.created_at) < NOW() - INTERVAL '14 days')
+        ORDER BY i.used ASC, i.id DESC;
     `);
 
     const now = new Date();
@@ -90,6 +91,13 @@ export async function getAllInvites() {
             isExpired: status === "Expired",
             isUsable: !invite.used && !isExpired,
             acceptedBy: acceptedByText,
+            acceptedAt: invite.accepted_at ? new Date(invite.accepted_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }) : null,
             createdAt: new Date(invite.created_at).toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",

@@ -63,7 +63,7 @@
     </footer>
 
     <script>
-        // Smoothly refresh online counter every 15 seconds
+        // Smoothly refresh online counter every 10 seconds
         setInterval(async function() {
             try {
                 const res = await fetch('/api/online-count');
@@ -75,7 +75,7 @@
                     }
                 }
             } catch (err) {}
-        }, 15000);
+        }, 10000);
     </script>
 </body>
 </html>

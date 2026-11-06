@@ -13,7 +13,8 @@ export function loggingMiddleware(req, res, next) {
     if (
         req.path === "/health" ||
         req.path === "/api/online-count" ||
-        req.path === "/admin/api/logs"
+        req.path === "/admin/api/logs" ||
+        req.path === "/admin/api/dashboard"
     ) {
         return next();
     }

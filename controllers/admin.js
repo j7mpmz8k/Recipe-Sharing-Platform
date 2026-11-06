@@ -6,7 +6,7 @@ import { createInvite, getAllInvites, deleteInvite } from "../models/invites.js"
 import { createPasswordReset, getAllPasswordResets } from "../models/passwordResets.js";
 import { getSiteBanner, updateSiteBanner } from "../models/banner.js";
 import { getTotalRateLimitedCount } from "../middleware/rateLimiter.js";
-import { getActiveGuests } from "../middleware/activity.js";
+import { getActiveGuests, getOnlineCount } from "../middleware/activity.js";
 import { getRecentLogs } from "../middleware/logging.js";
 
 const adminRouter = express.Router();
@@ -47,6 +47,7 @@ async function getDashboardData(req) {
     return {
         users: users,
         totalUsers: users.length,
+        onlineCount: getOnlineCount(),
         onlineUsersCount: stats.onlineCount,
         blockedUsersCount: stats.blockedCount,
         rateLimitedCount: rateLimitedCount,
@@ -59,6 +60,30 @@ async function getDashboardData(req) {
         recentLogs: recentLogs
     };
 }
+
+// Endpoint: Live data polling endpoint for Admin Dashboard
+adminRouter.get("/api/dashboard", async (req, res) => {
+    try {
+        const data = await getDashboardData(req);
+        res.json({
+            success: true,
+            onlineCount: data.onlineCount,
+            totalUsers: data.totalUsers,
+            onlineUsersCount: data.onlineUsersCount,
+            blockedUsersCount: data.blockedUsersCount,
+            activeGuestsCount: data.activeGuestsCount,
+            rateLimitedCount: data.rateLimitedCount,
+            totalInvites: data.invites.length,
+            users: data.users,
+            guests: data.activeGuests,
+            logs: data.recentLogs,
+            invites: data.invites
+        });
+    } catch (err) {
+        console.error("Dashboard API error:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 // Endpoint: Real-time logs and active guests polling endpoint for Admin Dashboard
 adminRouter.get("/api/logs", (req, res) => {
@@ -293,29 +318,83 @@ adminRouter.get("/invites", async (req, res) => {
 });
 
 adminRouter.post("/invites", async (req, res) => {
-    const { name } = req.body;
-    const cleanName = (name || "").trim();
+    try {
+        const { name } = req.body;
+        const cleanName = (name || "").trim();
 
-    const newInvite = await createInvite(cleanName, req.user.id);
+        const newInvite = await createInvite(cleanName, req.user.id);
 
-    const host = req.get("host");
-    let protocol = req.protocol;
-    const inviteUrl = `${protocol}://${host}/register?token=${newInvite.token}`;
+        const host = req.get("host");
+        const protocol = req.protocol;
+        const inviteUrl = `${protocol}://${host}/register?token=${newInvite.token}`;
 
-    const updatedData = await getDashboardData(req);
-    updatedData.inviteSuccess = newInvite.name ? `Invite created for "${newInvite.name}"!` : "Invite link created!";
-    updatedData.inviteUrl = inviteUrl;
+        if (req.xhr || req.headers["content-type"] === "application/json" || req.headers.accept?.includes("application/json")) {
+            const expiresDate = new Date(newInvite.expires_at);
+            return res.json({
+                success: true,
+                inviteUrl: inviteUrl,
+                invite: {
+                    id: newInvite.id,
+                    token: newInvite.token,
+                    name: newInvite.name || "Unnamed invite",
+                    createdBy: req.user.username,
+                    status: "Active",
+                    isActive: true,
+                    isAccepted: false,
+                    isExpired: false,
+                    isUsable: true,
+                    acceptedBy: "",
+                    acceptedAt: null,
+                    createdAt: new Date(newInvite.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }),
+                    expiresAt: expiresDate.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    })
+                }
+            });
+        }
 
-    res.render("admin/dashboard", updatedData);
+        const updatedData = await getDashboardData(req);
+        updatedData.inviteSuccess = newInvite.name ? `Invite created for "${newInvite.name}"!` : "Invite link created!";
+        updatedData.inviteUrl = inviteUrl;
+
+        res.render("admin/dashboard", updatedData);
+    } catch (err) {
+        console.error("Error creating invite:", err);
+        if (req.xhr || req.headers.accept?.includes("application/json")) {
+            return res.status(500).json({ success: false, error: "Failed to generate invite" });
+        }
+        res.redirect("/admin#invites");
+    }
 });
 
 // Endpoint: Delete an Account Invite Link
 adminRouter.post("/invites/:id/delete", async (req, res) => {
-    const inviteId = parseInt(req.params.id, 10);
-    if (!isNaN(inviteId)) {
-        await deleteInvite(inviteId);
+    try {
+        const inviteId = parseInt(req.params.id, 10);
+        if (!isNaN(inviteId)) {
+            await deleteInvite(inviteId);
+        }
+        if (req.xhr || req.headers.accept?.includes("application/json") || req.headers["content-type"] === "application/json") {
+            return res.json({ success: true, id: inviteId });
+        }
+        res.redirect("/admin#invites");
+    } catch (err) {
+        console.error("Error deleting invite:", err);
+        if (req.xhr || req.headers.accept?.includes("application/json")) {
+            return res.status(500).json({ success: false, error: err.message });
+        }
+        res.redirect("/admin#invites");
     }
-    res.redirect("/admin#invites");
 });
 
 export default adminRouter;

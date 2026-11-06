@@ -59,6 +59,9 @@ ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" '
     echo "==> Starting updated services..."
     docker compose up -d --remove-orphans
 
+    echo "==> Ensuring database schema is up to date..."
+    docker compose exec -T db psql -U postgres -d recipe_db -c "ALTER TABLE invites ADD COLUMN IF NOT EXISTS accepted_at TIMESTAMP WITH TIME ZONE;" || true
+
     echo "==> Cleaning up unused images..."
     docker image prune -f
 
