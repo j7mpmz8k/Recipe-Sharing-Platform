@@ -102,9 +102,15 @@
                                 </td>
                                 <td style="padding: 0.85rem 0.5rem; text-align: right;">
                                     {{#if this.isUsable}}
-                                        <a href="/register?token={{this.token}}" class="btn-text" target="_blank" style="font-size: 0.825rem;">
-                                            Open Link ↗
-                                        </a>
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-secondary" 
+                                            style="padding: 0.35rem 0.75rem; font-size: 0.775rem; font-weight: 600;"
+                                            onclick="navigator.clipboard.writeText('{{@root.baseUrl}}/register?token={{this.token}}'); const orig = this.innerText; this.innerText = 'Copied!'; setTimeout(() => { this.innerText = orig; }, 2000);"
+                                            title="Copy registration link"
+                                        >
+                                            📋 Copy
+                                        </button>
                                     {{else}}
                                         <span style="color: var(--text-muted); font-size: 0.825rem;">-</span>
                                     {{/if}}
