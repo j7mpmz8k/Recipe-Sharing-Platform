@@ -92,40 +92,96 @@
         </div>
     {{/if}}
 
+    <style>
+        .admin-metrics-grid {
+            display: grid !important;
+            grid-template-columns: repeat(6, 1fr) !important;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .admin-metric-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--card-border, #e2e8f0);
+            border-radius: 8px;
+            padding: 1rem 0.85rem;
+            box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .admin-metric-title {
+            font-size: 0.785rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            line-height: 1.25;
+        }
+        .admin-metric-value {
+            font-size: 1.65rem;
+            font-weight: 700;
+            margin-top: 0.25rem;
+        }
+        @media (max-width: 1040px) {
+            .admin-metrics-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 0.75rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .admin-metrics-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 0.45rem;
+            }
+            .admin-metric-card {
+                padding: 0.75rem 0.45rem;
+                text-align: center;
+                align-items: center;
+            }
+            .admin-metric-title {
+                font-size: 0.68rem;
+                letter-spacing: 0.02em;
+            }
+            .admin-metric-value {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+
     <!-- Stat Metric Cards -->
     <div class="admin-metrics-grid">
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Registered Users</div>
-            <div id="stat-total-users" style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: var(--text-primary);">{{totalUsers}}</div>
+        <div class="admin-metric-card">
+            <div class="admin-metric-title">Registered Users</div>
+            <div id="stat-total-users" class="admin-metric-value" style="color: var(--text-primary);">{{totalUsers}}</div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Visitors Online</div>
+        <div class="admin-metric-card">
+            <div class="admin-metric-title">Visitors Online</div>
             <div style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #16a34a; display: flex; align-items: center; gap: 0.4rem;">
                 <span style="display: inline-block; width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 6px #22c55e;"></span>
                 <span id="stat-online-count">{{onlineCount}}</span>
             </div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Online Members</div>
+        <div class="admin-metric-card">
+            <div class="admin-metric-title">Online Members</div>
             <div style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #2563eb; display: flex; align-items: center; gap: 0.4rem;">
                 <span style="font-size: 1.05rem;">👥</span>
                 <span id="stat-online-users">{{onlineUsersCount}}</span>
             </div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Active Guests</div>
+        <div class="admin-metric-card">
+            <div class="admin-metric-title">Active Guests</div>
             <div style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #0284c7; display: flex; align-items: center; gap: 0.4rem;">
                 <span style="font-size: 1.05rem;">🌐</span>
                 <span id="stat-active-guests">{{activeGuestsCount}}</span>
             </div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Rate-Limited</div>
-            <div id="stat-rate-limited" style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: #dc2626;">{{rateLimitedCount}}</div>
+        <div class="admin-metric-card">
+            <div class="admin-metric-title">Rate-Limited</div>
+            <div id="stat-rate-limited" class="admin-metric-value" style="color: #dc2626;">{{rateLimitedCount}}</div>
         </div>
-        <div style="background: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1rem 0.85rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-            <div style="font-size: 0.785rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em;">Invites Issued</div>
-            <div id="stat-total-invites" style="font-size: 1.65rem; font-weight: 700; margin-top: 0.25rem; color: var(--text-primary);">{{invites.length}}</div>
+        <div class="admin-metric-card">
+            <div class="admin-metric-title">Invites Issued</div>
+            <div id="stat-total-invites" class="admin-metric-value" style="color: var(--text-primary);">{{invites.length}}</div>
         </div>
     </div>
 
