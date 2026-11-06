@@ -10,6 +10,9 @@
     "migrate": "node scripts/migrate.js",
     "db:pull": "./scripts/pull_prod_db.sh",
     "deploy": "./scripts/deploy_prod.sh",
+    "prod:stop": "./scripts/stop_prod.sh",
+    "prod:down": "./scripts/stop_prod.sh",
+    "prod:start": "./scripts/start_prod.sh",
     "tunnel": "./scripts/tunnel_prod.sh"
   },
   "dependencies": {
