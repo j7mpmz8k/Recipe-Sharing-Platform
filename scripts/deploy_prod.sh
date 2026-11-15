@@ -65,8 +65,9 @@ ssh -p "${PROD_SSH_PORT}" "${PROD_SSH_HOST}" 'bash -s' << 'EOF'
     echo "==> Ensuring repository is on master branch..."
     git checkout master
 
-    echo "==> Pulling latest merged master changes..."
-    git pull origin master
+    echo "==> Syncing to latest merged master from origin..."
+    git fetch origin master
+    git reset --hard origin/master
 
     echo "==> Building container image..."
     docker compose build --pull
