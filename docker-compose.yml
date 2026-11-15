@@ -15,7 +15,7 @@ services:
       - ALL
     ports:
       # Bind strictly to localhost so public internet traffic cannot bypass Nginx
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
     environment:
       NODE_ENV: production
       PORT: 3000

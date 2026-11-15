@@ -10,11 +10,14 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 +------------------------------------+                    +------------------------------------------------------+
 |    CLIENT MACHINE (Linux Laptop)   |                    |               PRODUCTION SERVER (Linux / WSL 2)      |
 |                                    |                    |                                                      |
-|  - Local Dev (`npm run dev`)       |    HTTPS (443)     |  [ Reverse Proxy: Nginx / Nginx Proxy Manager ]       |
-|  - Push Deploy (`npm run deploy`)  | -----------------> |       │ (forwards to 127.0.0.1:3000)                 |
+|  - Local Dev (`npm run dev`)       |    HTTPS (443)     |  [ Cloudflare Edge Worker ] (Downtime Fallback)      |
+|  - Push Deploy (`npm run deploy`)  | -----------------> |       │                                              |
 |  - Pull DB (`npm run db:pull`)     |                    |       ▼                                              |
-|                                    |    SSH (48222)     |  [ App Container ] (Node 20, non-root, read-only)   |
-|                                    | -----------------> |       │                                              |
+|                                    |                    |  [ Reverse Proxy: Nginx / Nginx Proxy Manager ]       |
+|                                    |                    |       │ (forwards to host LAN IP:3000)               |
+|                                    |    SSH (48222)     |       ▼                                              |
+|                                    | -----------------> |  [ App Container ] (Node 20, non-root, read-only)   |
+|                                    |                    |       │                                              |
 |                                    |                    |       ▼ (internal bridge network: db:5432)           |
 |                                    |                    |  [ Database Container ] (PostgreSQL 16, volume)      |
 +------------------------------------+                    +------------------------------------------------------+
@@ -25,7 +28,8 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 - **Unprivileged Execution**: The Node.js application runs under the unprivileged `node` user (`UID 1000`). Root execution is disabled.
 - **Read-Only Root Filesystem**: The container filesystem is mounted `read_only: true`. Temporary runtime storage is provided via an isolated in-memory `tmpfs` (`/tmp:noexec,nosuid,size=64m`).
 - **Capability Hardening**: Drops all Linux kernel capabilities (`cap_drop: [ ALL ]`) and enforces `no-new-privileges:true`.
-- **Localhost-Only Port Bindings**: Ports `3000` (Node.js) and `5432` (PostgreSQL) are bound strictly to `127.0.0.1` on the host, preventing the public internet from bypassing the reverse proxy or accessing the raw database.
+- **Internal Port Isolation**: Node.js port `3000` is bound internally on the host (`3000:3000`) so local reverse proxies (Nginx Proxy Manager) can connect, while direct public ingress is blocked at the router/firewall level. PostgreSQL (`5432`) is isolated to Docker's internal bridge network.
+- **Edge Downtime Fallback (Cloudflare Worker)**: If the home server, WSL, or container is stopped or restarting (502, 503, 504, 521, 522), Cloudflare edge instantly serves `public/maintenance.html` so visitors never see broken connection errors.
 - **Automatic Database Migrations**: Self-contained migrations auto-create the database and tables on container startup via `docker/docker-entrypoint.sh` only after the PostgreSQL service reports healthy.
 
 ### Quick Reference: NPM Commands
@@ -46,6 +50,8 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 ### Project Structure
 
 ```text
+├── cloudflare/
+│   ├── worker.js                   # Edge reverse proxy & downtime fallback script
 ├── docker/
 │   ├── Dockerfile                  # Hardened multi-stage container build
 │   └── docker-entrypoint.sh        # Container entrypoint: runs migrations then node
@@ -262,26 +268,26 @@ The application listens internally on `127.0.0.1:3000`. A reverse proxy handles 
 2. Navigate to **Proxy Hosts -> Add Proxy Host**:
    - **Domain Names**: `recipes.your-domain.com`
    - **Scheme**: `http`
-   - **Forward Hostname / IP**: `127.0.0.1` (or host LAN IP)
+   - **Forward Hostname / IP**: `YOUR_HOST_LAN_IP` (e.g. `192.168.1.50` or host gateway IP)
    - **Forward Port**: `3000`
    - Enable: **Block Common Exploits**, **Websockets Support**
 3. Under the **SSL** tab:
    - Select **Request a new SSL Certificate** (Let's Encrypt).
    - Check **Force SSL** and **HTTP/2 Support**.
    - Agree to terms.
-4. Under the **Advanced** tab (Custom Nginx Configuration):
-   - To serve a custom maintenance page whenever the Docker container is stopped or restarting (intercepting 502/503/504 errors):
-   ```nginx
-   proxy_intercept_errors on;
-   error_page 502 503 504 /maintenance.html;
+4. Click **Save**.
 
-   location = /maintenance.html {
-       root /data/html;
-       internal;
-   }
-   ```
-   *(Place `public/maintenance.html` into your NPM host directory at `~/docker_services/nginx/data/html/maintenance.html`)*.
-5. Click **Save**.
+### Cloudflare Edge Fallback (Zero-Downtime Maintenance)
+To guarantee visitors see a friendly maintenance screen even if Nginx, Docker, WSL, or the entire home server is rebooting or offline:
+1. In Cloudflare Dashboard, navigate to **Workers & Pages -> Create application -> Start with Hello World!**.
+2. Name the worker (e.g. `recipe-maintenance-proxy`) and click **Deploy**.
+3. Click **Edit code**, paste the complete script from [`cloudflare/worker.js`](cloudflare/worker.js), and click **Deploy**.
+4. In the worker dashboard, navigate to **Domains and routes**:
+   - Click **Add -> Route**.
+   - **Route**: `recipes.your-domain.com/*`
+   - **Zone**: `your-domain.com`
+   - **Failure mode**: `Fail open (proceed)`
+   - Click **Add Route**.
 
 ### Option B: Standalone Nginx Configuration
 Create `/etc/nginx/sites-available/recipe-platform`:
@@ -452,7 +458,7 @@ This command:
 *(Note: It does not push any local branches—it assumes code has already been merged into `master` on GitHub).*
 
 ### Production Operations: Stopping, Taking Down & Starting
-To safely stop or start the production Docker containers from your laptop over SSH (e.g. for maintenance or testing the Nginx maintenance page):
+To safely stop or start the production Docker containers from your laptop over SSH (e.g. for maintenance or testing the Cloudflare Edge maintenance fallback):
 * **Take down production** (`docker compose down`):
   ```bash
   npm run prod:down
