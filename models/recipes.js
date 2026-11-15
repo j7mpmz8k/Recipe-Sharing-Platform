@@ -1,12 +1,12 @@
 import query from "../db/connection.js";
 import { getRatings } from "./ratings.js";
 
-export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "") {
+export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cookTime = 0, servings = 0, userId = 0, username = "") {
     const r = (await query(`
         INSERT INTO recipes (title, description, ingredients, instructions, prep_time, cook_time, servings, user_id)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id;
-        `, [title, description, ingredients, instructions, prepTime || 0, cooktime || 0, servings || 0, userId]))[0];
+        `, [title, description, ingredients, instructions, prepTime || 0, cookTime || 0, servings || 0, userId]))[0];
     return r.id;
 }
 
@@ -100,7 +100,7 @@ class Recipe {
         }
         this.instructions = row.instructions;
         this.prepTime = row.prep_time;//minutes
-        this.cooktime = row.cook_time;//minutes
+        this.cookTime = row.cook_time;//minutes
         this.servings = row.servings;
         this.userId = row.user_id;
         this.username = row.username;
@@ -167,7 +167,7 @@ class Recipe {
                 servings = $9,
                 updated_at = NOW()
             WHERE id = $1;
-        `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cooktime, this.servings]);
+        `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cookTime, this.servings]);
     }
     toggleFavorite = async (userId) => {
         if (!this.isFavorite) {
