@@ -63,8 +63,7 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 │   ├── sql_prod.sh                 # npm run prod:sql: run SQL query or open interactive psql shell
 │   ├── tunnel_prod.sh              # npm run tunnel: encrypted port-forwarding to port 8080
 │   ├── pull_prod_db.sh             # npm run db:pull: encrypted database sync from prod
-│   ├── migrate.js                  # Migration runner with auto-database creation
-│   └── setup-wsl-portforward.ps1   # Self-elevating PowerShell script for WSL SSH port 48222
+│   └── migrate.js                  # Migration runner with auto-database creation
 ├── server_template.env             # Environment template for production server
 ├── client_template.env             # Environment template for local Linux laptop
 └── views/                          # Handlebars templates and user pages
@@ -206,13 +205,26 @@ EOF
 sudo service fail2ban restart
 ```
 
-### Step 2.3: Forward the SSH Port in Windows
-Because Windows owns the physical network card, inbound traffic hits Windows first. 
+### Step 2.3: Enable Mirrored Networking in WSL
+WSL 2 supports **Mirrored Networking Mode**, where WSL directly mirrors the Windows host's network interfaces and IP address. This completely eliminates the need for dynamic IP tracking, portproxy scripts, or port-forwarding rules when connecting to WSL from external devices.
 
-To route port 48222 directly into your WSL distribution:
-1. Open File Explorer in Windows and browse to the project's `scripts/` folder.
-2. **Right-click `setup-wsl-portforward.ps1` &rarr; Run with PowerShell**.
-3. The script automatically self-elevates to Administrator, detects the current internal WSL IP, adds the Windows Firewall rule, and configures `netsh portproxy`.
+1. On Windows, create or edit your `.wslconfig` file in your user profile folder (`%USERPROFILE%\.wslconfig` or `C:\Users\<YourUsername>\.wslconfig`):
+   ```ini
+   [wsl2]
+   networkingMode=mirrored
+   ```
+
+2. Open **PowerShell as Administrator** on Windows and allow the custom SSH port (48222) through the Windows Firewall:
+   ```powershell
+   New-NetFirewallRule -DisplayName "WSL-SSH-48222" -Direction Inbound -LocalPort 48222 -Protocol TCP -Action Allow
+   ```
+
+3. Restart WSL from PowerShell or Command Prompt to apply the new networking mode:
+   ```powershell
+   wsl --shutdown
+   ```
+
+When WSL starts back up, any service listening inside WSL (such as SSH on port `48222` or Nginx/Docker on ports `80`/`443`) is immediately accessible on the Windows host's physical network IP address.
 
 ### Step 2.4: Deploy in WSL
 Inside your WSL terminal:
