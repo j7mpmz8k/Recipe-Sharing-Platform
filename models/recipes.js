@@ -1,12 +1,12 @@
 import query from "../db/connection.js";
 
-export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cooktime = 0, servings = 0, userId = 0, username = "", category = "Other") {
+export async function createRecipe(title = "", description = "", ingredients = "", instructions = "", prepTime = 0, cookTime = 0, servings = 0, userId = 0, username = "", category = "Other") {
     const cleanCat = (category || "Other").trim();
     const r = (await query(`
         INSERT INTO recipes (title, description, ingredients, instructions, prep_time, cook_time, servings, user_id, category)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         RETURNING id;
-        `, [title, description, ingredients, instructions, prepTime || 0, cooktime || 0, servings || 0, userId, cleanCat]))[0];
+        `, [title, description, ingredients, instructions, prepTime || 0, cookTime || 0, servings || 0, userId, cleanCat]))[0];
     return r.id;
 }
 
@@ -130,7 +130,7 @@ class Recipe {
         }
         this.instructions = row.instructions;
         this.prepTime = row.prep_time;//minutes
-        this.cooktime = row.cook_time;//minutes
+        this.cookTime = row.cook_time;//minutes
         this.servings = row.servings;
         this.category = row.category || "Other";
         this.isFeatured = Boolean(row.is_featured);
@@ -178,7 +178,7 @@ class Recipe {
                 category = $10,
                 updated_at = NOW()
             WHERE id = $1;
-        `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cooktime, this.servings, this.category || "Other"]);
+        `, [this.recipeId, this.userId, this.title, this.description, this.ingredients, this.instructions, this.prepTime, this.cookTime, this.servings, this.category || "Other"]);
     }
     toggleFavorite = async (userId) => {
         if (!this.isFavorite) {
