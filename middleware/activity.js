@@ -97,60 +97,76 @@ export function removeActiveUser(userId) {
 }
 
 export async function trackActivity(req, res, next) {
-    const userAgent = req.get("user-agent") || "";
-
-    // Ignore healthchecks, CLI tools (like curl), and polling endpoints from active visitor tracking
+    // Skip internal polling and lightweight healthcheck endpoint immediately
     if (
         req.path === "/health" ||
         req.path === "/api/online-count" ||
         req.path === "/admin/api/logs" ||
-        req.path === "/admin/api/dashboard" ||
-        userAgent.startsWith("curl/") ||
-        userAgent.toLowerCase().includes("healthcheck")
+        req.path === "/admin/api/dashboard"
     ) {
         return next();
     }
 
-    const now = Date.now();
-    const ip = getClientIp(req);
+    const userAgent = req.get("user-agent") || "";
+    const uaLower = userAgent.toLowerCase();
 
-    if (req.user && req.user.id) {
-        const userKey = "user:" + req.user.id;
-        activeVisitors.set(userKey, {
-            type: "user",
-            userId: req.user.id,
-            username: req.user.username,
-            firstName: req.user.first_name,
-            ip: ip,
-            lastSeen: now,
-            lastPath: req.originalUrl || req.path
-        });
+    // Check if request is from automated uptime monitors, bots, or CLI tools
+    const isUptimeBot = (
+        userAgent.startsWith("curl/") ||
+        uaLower.includes("healthcheck") ||
+        uaLower.includes("uptimerobot") ||
+        uaLower.includes("pingdom") ||
+        uaLower.includes("betteruptime") ||
+        uaLower.includes("uptime-kuma") ||
+        uaLower.includes("statuscake")
+    );
 
-        // Remove anonymous guest entry for this IP so logged-in users aren't counted twice
-        activeVisitors.delete("guest:" + ip);
+    if (!isUptimeBot) {
+        const now = Date.now();
+        const ip = getClientIp(req);
 
-        // Throttle database update to at most once per 60 seconds
-        let lastDbTime = lastDbUpdateByUser.get(req.user.id);
-        if (!lastDbTime || (now - lastDbTime) > 60 * 1000) {
-            lastDbUpdateByUser.set(req.user.id, now);
-            updateUserLastActive(req.user.id).catch(err => {
-                console.error("Failed to update last_active_at for user:", req.user.id, err);
+        if (req.user && req.user.id) {
+            const userKey = "user:" + req.user.id;
+            activeVisitors.set(userKey, {
+                type: "user",
+                userId: req.user.id,
+                username: req.user.username,
+                firstName: req.user.first_name,
+                ip: ip,
+                lastSeen: now,
+                lastPath: req.originalUrl || req.path
+            });
+
+            // Remove anonymous guest entry for this IP so logged-in users aren't counted twice
+            activeVisitors.delete("guest:" + ip);
+
+            // Throttle database update to at most once per 60 seconds
+            let lastDbTime = lastDbUpdateByUser.get(req.user.id);
+            if (!lastDbTime || (now - lastDbTime) > 60 * 1000) {
+                lastDbUpdateByUser.set(req.user.id, now);
+                updateUserLastActive(req.user.id).catch(err => {
+                    console.error("Failed to update last_active_at for user:", req.user.id, err);
+                });
+            }
+        } else {
+            const guestKey = "guest:" + ip;
+            activeVisitors.set(guestKey, {
+                type: "guest",
+                ip: ip,
+                lastSeen: now,
+                lastPath: req.originalUrl || req.path,
+                userAgent: userAgent
             });
         }
-    } else {
-        const guestKey = "guest:" + ip;
-        activeVisitors.set(guestKey, {
-            type: "guest",
-            ip: ip,
-            lastSeen: now,
-            lastPath: req.originalUrl || req.path,
-            userAgent: userAgent
-        });
     }
 
     // Make online count and site banner available to all Handlebars templates
     res.locals.onlineCount = getOnlineCount();
-    res.locals.siteBanner = await getSiteBanner();
+    try {
+        res.locals.siteBanner = await getSiteBanner();
+    } catch {
+        res.locals.siteBanner = null;
+    }
 
     next();
 }

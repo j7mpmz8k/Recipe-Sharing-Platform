@@ -39,12 +39,21 @@ export function getRecentLogs() {
 }
 
 export function loggingMiddleware(req, res, next) {
-    // Skip automated background health checks and polling requests to keep logs clean
+    const userAgent = req.get("user-agent") || "";
+    const uaLower = userAgent.toLowerCase();
+
+    // Skip automated background health checks, bot monitors, and polling requests to keep logs clean
     if (
         req.path === "/health" ||
         req.path === "/api/online-count" ||
         req.path === "/admin/api/logs" ||
-        req.path === "/admin/api/dashboard"
+        req.path === "/admin/api/dashboard" ||
+        uaLower.includes("healthcheck") ||
+        uaLower.includes("uptimerobot") ||
+        uaLower.includes("pingdom") ||
+        uaLower.includes("betteruptime") ||
+        uaLower.includes("uptime-kuma") ||
+        uaLower.includes("statuscake")
     ) {
         return next();
     }
