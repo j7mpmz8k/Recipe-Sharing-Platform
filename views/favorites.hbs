@@ -34,16 +34,19 @@
                                     <span>🕒 {{this.cook_time}}m cook</span>
                                 {{/if}}
                                 {{#if this.servings}}
-                                    <span>🍽 {{this.servings}} servings</span>
+                                    <span title="{{this.servings}} servings">🍽 {{this.servings}}</span>
                                 {{/if}}
                             </div>
                         </div>
                     </div>
                     <div class="recipe-card-footer">
-                        <button type="button" class="btn-link favorite-btn favorited" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="Unfavorite this recipe">
-                            <span class="heart-icon">❤️</span>
-                            <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
-                        </button>
+                        <div class="card-footer-left">
+                            <button type="button" class="btn-link share-card-btn" data-action="copy-share" data-title="{{this.title}}" data-author="{{#if this.authorName}}{{this.authorName}}{{else}}{{this.username}}{{/if}}" data-url="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" title="Copy shareable link">🔗</button>
+                            <button type="button" class="btn-link favorite-btn favorited" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" title="Unfavorite this recipe">
+                                <span class="heart-icon">❤️</span>
+                                <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
+                            </button>
+                        </div>
                         <div class="card-footer-actions">
                             {{#if this.canEdit}}
                                 <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>

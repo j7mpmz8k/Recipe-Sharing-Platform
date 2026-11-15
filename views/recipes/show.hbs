@@ -1,51 +1,20 @@
-<style>
-    .recipe-detail-description,
-    .recipe-header-card .recipe-description {
-        display: block !important;
-        -webkit-line-clamp: unset !important;
-        -webkit-box-orient: unset !important;
-        overflow: visible !important;
-        height: auto !important;
-        max-height: none !important;
-        white-space: pre-line !important;
-        word-break: break-word !important;
-        overflow-wrap: break-word !important;
-        font-size: 1.1rem;
-        line-height: 1.6;
-        color: var(--text-secondary);
-        margin: 1rem 0;
-    }
-    @media (max-width: 600px) {
-        .recipe-header-card {
-            padding: 1.25rem 1rem !important;
-        }
-        .recipe-header-card .section-header {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 0.75rem !important;
-        }
-        .recipe-detail-description,
-        .recipe-header-card .recipe-description {
-            font-size: 1rem !important;
-            line-height: 1.55 !important;
-            margin: 0.75rem 0 !important;
-        }
-        .ingredients-card,
-        .instructions-card {
-            padding: 1.25rem 1rem !important;
-        }
-    }
-</style>
-
+<!-- views/recipes/show.hbs -->
 <div class="recipe-detail-container">
     <!-- Header Card -->
     <header class="recipe-header-card">
         <div class="section-header">
             <div>
-                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
-                    <h1 style="margin: 0;">{{recipe.title}}</h1>
+                {{#if user.isAdmin}}
+                    <div class="admin-feature-wrapper">
+                        <button type="button" id="adminFeatureBtn" class="btn btn-secondary btn-sm {{#if recipe.isFeatured}}is-featured{{/if}}" data-recipe-id="{{recipe.recipeId}}" title="Toggle featured recipe on homepage">
+                            <span id="adminFeatureText">{{#if recipe.isFeatured}}★ Featured on Home{{else}}☆ Feature on Home{{/if}}</span>
+                        </button>
+                    </div>
+                {{/if}}
+                <div class="recipe-title-wrapper">
+                    <h1>{{recipe.title}}</h1>
                     {{#if recipe.category}}
-                        <span class="recipe-category-pill" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">
+                        <span class="recipe-category-pill">
                             🏷️ {{recipe.category}}
                         </span>
                     {{/if}}
@@ -59,20 +28,12 @@
                 </div>
             </div>
 
-            <!-- Action buttons: Edit (for owner) & Feature toggle (for admin) -->
-            <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                {{#if user.isAdmin}}
-                    <button type="button" id="adminFeatureBtn" class="btn btn-secondary btn-sm" onclick="toggleAdminFeature({{recipe.recipeId}})" style="{{#if recipe.isFeatured}}background: #fef3c7; color: #92400e; border-color: #facc15; font-weight: 600;{{/if}}" title="Toggle featured recipe on homepage">
-                        <span id="adminFeatureText">{{#if recipe.isFeatured}}★ Featured on Home{{else}}☆ Feature on Home{{/if}}</span>
-                    </button>
-                {{/if}}
-
-                {{#if recipe.canEdit}}
-                    <div class="recipe-owner-actions">
-                        <a href="/recipes/{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}/edit" class="btn btn-secondary btn-sm">✏️ Edit</a>
-                    </div>
-                {{/if}}
-            </div>
+            <!-- Action buttons: Edit (for owner) -->
+            {{#if recipe.canEdit}}
+                <div class="recipe-owner-actions">
+                    <a href="/recipes/{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}/edit" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                </div>
+            {{/if}}
         </div>
 
         {{#if recipe.description}}
@@ -80,7 +41,7 @@
         {{/if}}
 
         <div class="recipe-header-meta">
-            <div class="recipe-meta" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <div class="recipe-meta recipe-meta-row">
                 {{#if recipe.prepTime}}
                     <span>⏱ Prep: {{recipe.prepTime}} min</span>
                 {{else if recipe.prep_time}}
@@ -95,14 +56,10 @@
                     <span>🍽 Servings: {{recipe.servings}}</span>
                 {{/if}}
 
-                <!-- Screen Wake Lock indicator -->
-                <span id="wakeLockBadge" style="display: none; align-items: center; gap: 0.3rem; font-size: 0.775rem; color: #16a34a; background: #dcfce7; padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 600;" title="Screen kept awake automatically while viewing this recipe">
-                    <span>💡</span> Screen awake
-                </span>
             </div>
 
-            <!-- Favorite Button -->
-            <div class="favorite-section">
+            <!-- Recipe Actions: Favorite & Copy Link -->
+            <div class="recipe-meta-actions">
                 {{#if user}}
                     <button type="button" class="btn btn-secondary btn-sm favorite-btn {{#if isFavorited}}favorited{{else if recipe.isFavorite}}favorited{{/if}}" data-recipe-id="{{#if recipe.recipeId}}{{recipe.recipeId}}{{else}}{{recipe.id}}{{/if}}" title="{{#if isFavorited}}Unfavorite this recipe{{else if recipe.isFavorite}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
                         <span class="heart-icon">{{#if isFavorited}}❤️{{else if recipe.isFavorite}}❤️{{else}}🤍{{/if}}</span>
@@ -110,8 +67,19 @@
                         (<span class="favorite-count">{{#if recipe.favCount}}{{recipe.favCount}}{{else}}0{{/if}}</span>)
                     </button>
                 {{else}}
-                    <span class="favorites-badge">❤️ {{#if recipe.favCount}}{{recipe.favCount}}{{else}}0{{/if}} favorites</span>
+                    <span class="btn btn-secondary btn-sm favorites-display-btn" title="Log in to favorite this recipe">
+                        <span class="heart-icon">🤍</span>
+                        <span class="favorite-text">Favorites</span>
+                        (<span class="favorite-count">{{#if recipe.favCount}}{{recipe.favCount}}{{else}}0{{/if}}</span>)
+                    </span>
                 {{/if}}
+
+                <div class="recipe-copy-wrapper">
+                    <button type="button" class="btn btn-secondary btn-sm recipe-copy-btn" data-action="copy-share" data-title="{{recipe.title}}" data-author="{{#if recipe.authorName}}{{recipe.authorName}}{{else}}{{recipe.username}}{{/if}}" title="Copy shareable link with recipe info">
+                        🔗 Copy link
+                    </button>
+                    <span class="copy-hint-finger" title="Share this recipe!">👈</span>
+                </div>
             </div>
         </div>
     </header>
@@ -142,68 +110,4 @@
             <div class="instructions-text">{{recipe.instructions}}</div>
         </section>
     </div>
-
-    <script>
-    // 1. Screen Wake Lock: automatically prevent screen from sleeping while viewing this recipe
-    let wakeLockSentinel = null;
-    async function acquireWakeLock() {
-        if ('wakeLock' in navigator) {
-            try {
-                wakeLockSentinel = await navigator.wakeLock.request('screen');
-                const badge = document.getElementById('wakeLockBadge');
-                if (badge) badge.style.display = 'inline-flex';
-                wakeLockSentinel.addEventListener('release', () => {
-                    if (badge) badge.style.display = 'none';
-                });
-            } catch (err) {
-                // Wake lock request failed or rejected by browser policy
-            }
-        }
-    }
-
-    // Automatically acquire on page load
-    acquireWakeLock();
-
-    // Re-acquire if user navigates away and returns to this tab
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-            acquireWakeLock();
-        }
-    });
-
-    // 2. Admin Feature Toggle helper
-    async function toggleAdminFeature(id) {
-        try {
-            const btn = document.getElementById('adminFeatureBtn');
-            const text = document.getElementById('adminFeatureText');
-            if (btn) btn.disabled = true;
-
-            const res = await fetch('/recipes/' + encodeURIComponent(id) + '/feature', {
-                method: 'POST',
-                headers: { 'Accept': 'application/json' }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.isFeatured) {
-                    text.textContent = '★ Featured on Home';
-                    btn.style.background = '#fef3c7';
-                    btn.style.color = '#92400e';
-                    btn.style.borderColor = '#facc15';
-                    btn.style.fontWeight = '600';
-                } else {
-                    text.textContent = '☆ Feature on Home';
-                    btn.style.background = '';
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                    btn.style.fontWeight = '';
-                }
-            }
-        } catch (e) {
-            console.error('Error toggling feature:', e);
-        } finally {
-            const btn = document.getElementById('adminFeatureBtn');
-            if (btn) btn.disabled = false;
-        }
-    }
-    </script>
 </div>

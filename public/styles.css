@@ -109,6 +109,12 @@ nav {
     background-color: transparent !important;
 }
 
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
 nav a {
     color: var(--text-primary);
     text-decoration: none;
@@ -121,6 +127,107 @@ nav a {
 nav a:hover {
     color: #3498db;
     background-color: rgba(52, 152, 219, 0.08);
+}
+
+/* User Account Dropdown */
+.nav-user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-user-btn {
+    background-color: var(--card-footer-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    font-family: inherit;
+}
+
+.nav-user-btn:hover {
+    background-color: var(--card-bg);
+    border-color: #3498db;
+}
+
+.dropdown-arrow {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: transform 0.2s ease;
+}
+
+.nav-user-btn[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.4rem);
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    min-width: 195px;
+    z-index: 1000;
+    padding: 0.35rem 0;
+}
+
+.nav-dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-header {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--card-border);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    border-radius: 0;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.dropdown-item.logout-item {
+    color: #ef4444;
+}
+
+.dropdown-item.logout-item:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--card-border);
+    margin: 0.35rem 0;
 }
 
 .nav-user {
@@ -620,16 +727,16 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.35rem;
     margin-top: auto;
     padding-top: 0.4rem;
 }
 
 .recipe-meta-badges {
     display: flex;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.35rem;
 }
 
 .recipe-meta span {
@@ -655,9 +762,118 @@ main {
     transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.favorites-badge {
-    font-size: 0.85rem;
-    color: #e53e3e;
+.card-footer-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.share-card-btn {
+    font-size: 1.05rem;
+    padding: 0.1rem 0.25rem;
+    line-height: 1;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+    user-select: none;
+}
+
+.share-card-btn:hover {
+    transform: scale(1.18);
+    opacity: 0.8;
+}
+
+/* Floating Copy Tooltip */
+.copy-tooltip {
+    position: fixed;
+    z-index: 10000;
+    background: #0f172a;
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translate(-50%, 4px);
+    transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    line-height: 1.2;
+}
+
+.copy-tooltip.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.copy-tooltip.fade-out {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+}
+
+.copy-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #0f172a transparent transparent transparent;
+}
+
+.copy-tooltip.flipped::after {
+    top: auto;
+    bottom: 100%;
+    border-color: transparent transparent #0f172a transparent;
+}
+
+/* Animated pointing finger clue for Copy Link */
+.recipe-copy-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.copy-hint-finger {
+    display: inline-flex;
+    align-items: center;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    animation: pointAtButton 1.2s ease-in-out infinite;
+}
+
+@keyframes pointAtButton {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(-5px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .copy-hint-finger {
+        animation: none;
+    }
+}
+
+.favorites-badge,
+.favorites-display-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: default;
+    user-select: none;
+    font-weight: 500;
 }
 
 .btn-text {
@@ -1065,14 +1281,69 @@ main {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     nav {
-        padding: 1rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
+        padding: 0.65rem 1rem 0.5rem 1rem;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "brand right"
+            "links links";
+        row-gap: 0.45rem;
+        column-gap: 0.75rem;
+        align-items: center;
     }
 
+    .nav-left {
+        display: contents;
+    }
+
+    .nav-brand {
+        grid-area: brand;
+        margin-right: 0;
+        font-size: 1.15rem;
+    }
+
+    .nav-right {
+        grid-area: right;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .nav-links {
+        grid-area: links;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        padding-top: 0.35rem;
+        border-top: 1px solid var(--card-border);
+        width: 100%;
+    }
+
+    .nav-links::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-links a {
+        padding: 0.25rem 0.65rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        background-color: var(--card-footer-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 9999px;
+    }
+
+    .nav-links a:hover {
+        border-color: #3498db;
+    }
+}
+
+@media (max-width: 600px) {
     .hero-section {
         padding: 2rem 1rem;
     }
@@ -1132,177 +1403,438 @@ footer {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-/* Admin Dashboard Metric Counter Grid */
-.admin-metrics-grid {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 1rem;
-    margin-bottom: 2rem;
+/* ==========================================================================
+   Public Component Classes (Refactored from inline styles)
+   ========================================================================== */
+
+.hidden {
+    display: none !important;
 }
 
-.admin-metric-card {
-    background: var(--card-bg, #ffffff);
+/* Navigation items */
+.nav-admin-link,
+.dropdown-item.admin-item {
+    color: #d97706 !important;
+    font-weight: 600;
+}
+
+.online-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: #16a34a;
+    background: #dcfce7;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+}
+
+.online-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #22c55e;
+}
+
+/* Site Announcement Banner */
+.site-announcement-banner {
+    text-align: center;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.site-banner-warning {
+    background-color: #fef08a;
+    color: #854d0e;
+    border-bottom: 2px solid #facc15;
+}
+
+.site-banner-alert {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-bottom: 2px solid #f87171;
+}
+
+.site-banner-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border-bottom: 2px solid #60a5fa;
+}
+
+.site-banner-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border-bottom: 2px solid #4ade80;
+}
+
+/* Footer elements */
+.footer-donate-text {
+    font-size: 0.85rem;
+    color: var(--text-muted, #718096);
+    margin: 0 0 0.35rem 0;
+}
+
+.footer-donate-link {
+    color: #008cff;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.footer-contact-text {
+    font-size: 0.825rem;
+    color: var(--text-muted, #718096);
+    margin: 0;
+}
+
+.footer-contact-link {
+    color: var(--text-secondary, #4a5568);
+    text-decoration: underline;
+}
+
+/* Recipe Detail view styles */
+.recipe-header-card .section-header {
+    align-items: flex-start;
+}
+
+.admin-feature-wrapper {
+    margin-bottom: 0.5rem;
+}
+
+#adminFeatureBtn.is-featured {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #facc15;
+    font-weight: 600;
+}
+
+.recipe-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.35rem;
+}
+
+.recipe-title-wrapper h1 {
+    margin: 0;
+}
+
+.recipe-category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.recipe-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.recipe-meta-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.recipe-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* Recipe Search & Filter */
+.recipes-search-form {
+    max-width: 780px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.category-filter-select {
+    padding: 0.75rem 1rem;
+    border-radius: 30px;
+    border: 1px solid var(--input-border, #cbd5e0);
+    background-color: var(--card-bg, #ffffff);
+    color: var(--text-primary, #2c3e50);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+}
+
+.recipes-search-input-wrapper {
+    min-width: 250px;
+}
+
+.recipes-search-btn {
+    border-radius: 30px;
+    padding: 0.75rem 1.35rem;
+}
+
+/* Recipe Card Footer Favorite Button */
+.recipe-card-footer .favorite-btn {
+    font-size: 1.1rem;
+    padding: 0.1rem 0.35rem;
+    line-height: 1;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+/* Recipe Form (New & Edit) */
+.recipe-form-container {
+    max-width: 650px;
+}
+
+.recipe-form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.recipe-form-group-flex {
+    flex: 1;
+    min-width: 240px;
+}
+
+.recipe-form-group-fixed {
+    width: 200px;
+    min-width: 160px;
+}
+
+.recipe-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.recipe-form-actions-left {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.recipe-create-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.recipe-create-submit {
+    flex: 1;
+}
+
+/* Auth Cards (Register, Change Password, Reset Password) */
+.auth-card-compact {
+    max-width: 460px;
+}
+
+.auth-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-header-icon {
+    font-size: 1.6rem;
+}
+
+.auth-header-row h2 {
+    margin: 0;
+}
+
+.auth-card-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-muted, #718096);
+    margin-bottom: 1.5rem;
+}
+
+.auth-alert-spaced {
+    margin-bottom: 1.25rem;
+}
+
+.auth-btn-full {
+    width: 100%;
+    margin-top: 0.5rem;
+    height: 42px;
+    font-weight: 600;
+}
+
+.auth-switch-spaced {
+    margin-top: 1.5rem;
+}
+
+.register-invite-notice {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.register-lock-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.register-notice-text {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+}
+
+.register-info-box {
+    background-color: var(--card-footer-bg, #f7fafc);
     border: 1px solid var(--card-border, #e2e8f0);
     border-radius: 8px;
-    padding: 1rem 0.85rem;
-    box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.register-info-title {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.register-info-desc {
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.register-request-btn {
+    display: inline-block;
+    padding: 0.65rem 1.25rem;
+    text-decoration: none;
+}
+
+.register-names-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.register-name-field {
+    flex: 1;
+    min-width: 140px;
+}
+
+.text-muted-sm {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* User Profile view */
+.profile-container {
+    max-width: 900px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 2rem;
 }
 
-.admin-metric-title {
-    font-size: 0.785rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
+.profile-header-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.profile-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.6rem;
+}
+
+.profile-name {
+    margin: 0;
+    font-size: 1.75rem;
+}
+
+.profile-joined {
+    margin: 0.35rem 0 0;
+    font-size: 0.95rem;
+}
+
+.profile-email-row {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.profile-email-link {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.profile-copy-email-btn {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    line-height: 1.25;
+    border-radius: 6px;
+    line-height: 1.2;
+    cursor: pointer;
 }
 
-.admin-metric-value {
-    font-size: 1.65rem;
+.profile-stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-footer-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    min-width: 130px;
+    text-align: center;
+}
+
+.profile-stat-number {
+    font-size: 1.75rem;
     font-weight: 700;
-    margin-top: 0.25rem;
+    color: #3498db;
+    line-height: 1;
 }
 
-@media (max-width: 1040px) {
-    .admin-metrics-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 0.75rem;
-    }
+.profile-stat-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 0.35rem;
 }
 
-@media (max-width: 600px) {
-    .admin-metrics-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 0.45rem;
-    }
-    .admin-metric-card {
-        padding: 0.75rem 0.45rem;
-        text-align: center;
-        align-items: center;
-    }
-    .admin-metric-title {
-        font-size: 0.68rem;
-        letter-spacing: 0.02em;
-    }
-    .admin-metric-value {
-        font-size: 1.35rem;
-    }
-}
-
-/* Responsive Invites Table for Mobile (Card Layout) */
-@media (max-width: 680px) {
-    #invites-table-wrapper > div,
-    .invites-scroll-container {
-        overflow-x: visible !important;
-    }
-    #invites-table-wrapper thead,
-    .invites-table thead {
-        display: none !important;
-    }
-    #invites-table-wrapper table,
-    #invites-table-wrapper tbody,
-    #invites-table-wrapper tr,
-    .invites-table,
-    .invites-table tbody,
-    .invites-table tr {
-        display: block !important;
-        width: 100% !important;
-    }
-    #invites-table-wrapper tr,
-    .invites-table tr {
-        margin-bottom: 0.85rem !important;
-        border: 1px solid var(--card-border, #e2e8f0) !important;
-        border-radius: 8px !important;
-        padding: 0.85rem 1rem !important;
-        background: var(--card-bg, #ffffff) !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-    }
-    #invites-table-wrapper td,
-    .invites-table td {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 0.35rem 0 !important;
-        border: none !important;
-        font-size: 0.85rem !important;
-        text-align: right !important;
-        gap: 0.5rem !important;
-        word-break: break-word !important;
-    }
-    #invites-table-wrapper td:nth-child(1)::before,
-    .invites-table td:nth-child(1)::before {
-        content: "Reference / Note";
-        font-weight: 600;
-        color: var(--text-muted, #718096);
-        font-size: 0.775rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        text-align: left;
-        flex-shrink: 0;
-    }
-    #invites-table-wrapper td:nth-child(1),
-    .invites-table td:nth-child(1) {
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-        color: var(--text-primary);
-        padding-bottom: 0.35rem !important;
-    }
-    #invites-table-wrapper td:nth-child(2)::before,
-    .invites-table td:nth-child(2)::before {
-        content: "Status";
-        font-weight: 600;
-        color: var(--text-muted, #718096);
-        font-size: 0.775rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        text-align: left;
-        flex-shrink: 0;
-    }
-    #invites-table-wrapper td:nth-child(3)::before,
-    .invites-table td:nth-child(3)::before {
-        content: "Accepted By";
-        font-weight: 600;
-        color: var(--text-muted, #718096);
-        font-size: 0.775rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        text-align: left;
-        flex-shrink: 0;
-    }
-    #invites-table-wrapper td:nth-child(4)::before,
-    .invites-table td:nth-child(4)::before {
-        content: "Created";
-        font-weight: 600;
-        color: var(--text-muted, #718096);
-        font-size: 0.775rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        text-align: left;
-        flex-shrink: 0;
-    }
-    #invites-table-wrapper td:nth-child(5)::before,
-    .invites-table td:nth-child(5)::before {
-        content: "Expires";
-        font-weight: 600;
-        color: var(--text-muted, #718096);
-        font-size: 0.775rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        text-align: left;
-        flex-shrink: 0;
-    }
-    #invites-table-wrapper td:nth-child(6),
-    .invites-table td:nth-child(6) {
-        border-top: 1px solid var(--card-border, #edf2f7) !important;
-        padding-top: 0.6rem !important;
-        margin-top: 0.35rem !important;
-        justify-content: flex-end !important;
-    }
-    #invites-table-wrapper td:nth-child(6)::before,
-    .invites-table td:nth-child(6)::before {
-        display: none !important;
-    }
+.profile-recipes-heading {
+    margin: 0;
 }

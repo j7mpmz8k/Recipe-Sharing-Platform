@@ -1,50 +1,43 @@
-<div class="user-profile-container" style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+<div class="user-profile-container profile-container">
     <!-- Profile Header Card -->
-    <header class="recipe-header-card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
-        <div style="display: flex; align-items: center; gap: 1.25rem;">
-            <div class="avatar-circle" style="width: 60px; height: 60px; font-size: 1.6rem;">
+    <header class="recipe-header-card profile-header-card">
+        <div class="profile-user-info">
+            <div class="avatar-circle profile-avatar">
                 👤
             </div>
             <div>
-                <h1 style="margin: 0; font-size: 1.75rem;">{{#if userProfile.first_name}}{{userProfile.first_name}}{{#if userProfile.last_name}} {{userProfile.last_name}}{{/if}}{{else}}{{userProfile.username}}{{/if}}</h1>
-                <p class="text-muted" style="margin: 0.35rem 0 0; font-size: 0.95rem;">
+                <h1 class="profile-name">{{#if userProfile.first_name}}{{userProfile.first_name}}{{#if userProfile.last_name}} {{userProfile.last_name}}{{/if}}{{else}}{{userProfile.username}}{{/if}}</h1>
+                <p class="text-muted profile-joined">
                     Member since {{userProfile.createdAt}}
                 </p>
                 {{#if user}}
-                    <p class="text-muted" style="margin: 0.25rem 0 0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <p class="text-muted profile-email-row">
                         <span>✉️</span>
-                        <a href="mailto:{{userProfile.email}}" style="color: inherit; text-decoration: underline;">{{userProfile.email}}</a>
+                        <a href="mailto:{{userProfile.email}}" class="profile-email-link">{{userProfile.email}}</a>
                         <button 
                             type="button" 
-                            class="btn btn-secondary" 
-                            onclick="navigator.clipboard.writeText('{{userProfile.email}}').then(()=>{const orig=this.innerText;this.innerText='Copied!';setTimeout(()=>{this.innerText=orig;},2000);}).catch(()=>{prompt('Copy email:', '{{userProfile.email}}');});"
-                            title="Copy email to clipboard" 
-                            style="padding: 0.2rem 0.55rem; font-size: 0.75rem; font-weight: 600; border-radius: 6px; line-height: 1.2; cursor: pointer;"
+                            class="btn btn-secondary profile-copy-email-btn" 
+                            data-copy-text="{{userProfile.email}}"
+                            data-copied-text="Copied!"
+                            title="Copy email to clipboard"
                         >📋 Copy</button>
                     </p>
-                {{/if}}
-                {{#if userProfile.isSelf}}
-                    <div style="margin-top: 0.75rem;">
-                        <a href="/change-password" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; padding: 0.4rem 0.85rem; border-radius: 6px; text-decoration: none; border: 1px solid var(--card-border, #cbd5e0); background: var(--bg-secondary, #f8fafc); color: var(--text-primary, #2d3748); font-weight: 500;">
-                            <span>🔐</span> Change Password
-                        </a>
-                    </div>
                 {{/if}}
             </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card-footer-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 0.75rem 1.5rem; min-width: 130px; text-align: center;">
-            <span style="font-size: 1.75rem; font-weight: 700; color: #3498db; line-height: 1;">
+        <div class="profile-stat-box">
+            <span class="profile-stat-number">
                 {{#if userProfile.recipes.length}}{{userProfile.recipes.length}}{{else}}0{{/if}}
             </span>
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-top: 0.35rem;">
+            <span class="profile-stat-label">
                 🍳 Recipes Shared
             </span>
         </div>
     </header>
 
     {{#if passwordSuccess}}
-        <div class="alert alert-success" style="margin: 0;">
+        <div class="alert alert-success">
             {{passwordSuccess}}
         </div>
     {{/if}}
@@ -52,7 +45,7 @@
     <!-- User's Recipes Grid -->
     <section>
         <div class="section-header">
-            <h2>Recipes by {{#if userProfile.first_name}}{{userProfile.first_name}}{{else}}{{userProfile.username}}{{/if}}</h2>
+            <h2 class="profile-recipes-heading">Recipes by {{#if userProfile.first_name}}{{userProfile.first_name}}{{else}}{{userProfile.username}}{{/if}}</h2>
         </div>
 
         {{#if userProfile.recipes.length}}
@@ -82,23 +75,26 @@
                                         <span>🕒 {{this.cook_time}}m cook</span>
                                     {{/if}}
                                     {{#if this.servings}}
-                                        <span>🍽 {{this.servings}} servings</span>
+                                        <span title="{{this.servings}} servings">🍽 {{this.servings}}</span>
                                     {{/if}}
                                 </div>
                             </div>
                         </div>
                         <div class="recipe-card-footer">
-                            {{#if @root.user}}
-                                <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="{{#if this.isFavorite}}Unfavorite this recipe{{else if this.isFavorited}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
-                                    <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
-                                    <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
-                                </button>
-                            {{else}}
-                                <span class="favorites-display">
-                                    <span class="heart-icon">❤️</span>
-                                    <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
-                                </span>
-                            {{/if}}
+                            <div class="card-footer-left">
+                                <button type="button" class="btn-link share-card-btn" data-action="copy-share" data-title="{{this.title}}" data-author="{{#if this.authorName}}{{this.authorName}}{{else}}{{this.username}}{{/if}}" data-url="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" title="Copy shareable link">🔗</button>
+                                {{#if @root.user}}
+                                    <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" title="{{#if this.isFavorite}}Unfavorite this recipe{{else if this.isFavorited}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
+                                        <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                                        <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
+                                    </button>
+                                {{else}}
+                                    <span class="favorites-display" title="Log in to favorite recipes">
+                                        <span class="heart-icon">🤍</span>
+                                        <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
+                                    </span>
+                                {{/if}}
+                            </div>
                             <div class="card-footer-actions">
                                 {{#if this.canEdit}}
                                     <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>
@@ -111,7 +107,7 @@
             </div>
         {{else}}
             <div class="empty-state">
-                <p>{{#if userProfile.first_name}}{{userProfile.first_name}}{{else}}{{userProfile.username}}{{/if}} hasn't posted any recipes yet.</p>
+                <p>No recipes posted yet.</p>
             </div>
         {{/if}}
     </section>

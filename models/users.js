@@ -25,6 +25,15 @@ export async function findUser(username) {
     `, [cleanUsername]))[0];
     return user || null;
 }
+export async function findUserByEmail(email) {
+    const cleanEmail = (email || "").trim().toLowerCase();
+    const user = (await query(`
+        SELECT id, username, email, password_hash, first_name, last_name, is_blocked
+        FROM users
+        WHERE LOWER(email) = LOWER($1);
+    `, [cleanEmail]))[0];
+    return user || null;
+}
 export async function loadUser(sessionId) {
     const user = (await query(`
         SELECT u.id, u.username, u.email, u.first_name, u.last_name, u.is_blocked

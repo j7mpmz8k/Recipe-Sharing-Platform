@@ -420,7 +420,45 @@ if (document.readyState === 'loading') {
     initAdminDashboard();
 }
 
-// Ensure global functions are accessible to inline HTML onclick handlers
+// Delegated click handling for data-action attributes
+document.addEventListener('click', (e) => {
+    const editBtn = e.target.closest('[data-action="open-edit-user"]');
+    if (editBtn) {
+        openEditUserModal(
+            editBtn.dataset.userId,
+            editBtn.dataset.username,
+            editBtn.dataset.firstName,
+            editBtn.dataset.lastName
+        );
+        return;
+    }
+
+    const closeBtn = e.target.closest('[data-action="close-modal"]');
+    if (closeBtn) {
+        closeEditUserModal();
+        return;
+    }
+
+    const refreshLogsBtn = e.target.closest('[data-action="refresh-logs"]');
+    if (refreshLogsBtn) {
+        refreshAdminLogs();
+        return;
+    }
+
+    const copyInviteBtn = e.target.closest('[data-action="copy-invite"]');
+    if (copyInviteBtn) {
+        copyInviteLink(copyInviteBtn.dataset.url, copyInviteBtn);
+        return;
+    }
+
+    const deleteInviteBtn = e.target.closest('[data-action="delete-invite"]');
+    if (deleteInviteBtn) {
+        deleteInviteAjax(deleteInviteBtn.dataset.inviteId, deleteInviteBtn);
+        return;
+    }
+});
+
+// Ensure global functions are accessible to any remaining callers
 window.openEditUserModal = openEditUserModal;
 window.closeEditUserModal = closeEditUserModal;
 window.copyInviteLink = copyInviteLink;

@@ -1,6 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import { createUser, findUser, updateUserPassword, getUserPasswordHash } from "../models/users.js";
+import { createUser, findUser, findUserByEmail, updateUserPassword, getUserPasswordHash } from "../models/users.js";
 import { createSession, deleteSession } from "../models/sessions.js";
 import { requireAuth } from "../middleware/auth.js";
 import { loadUserProfile } from "../middleware/content.js";
@@ -124,13 +124,49 @@ usersRouter.post("/register", authLimiter, async (req, res) => {
         });
     }
 
+    // Check if username is already taken (case-insensitive)
+    const existingUser = await findUser(cleanUsername);
+    if (existingUser) {
+        return res.render("users/register", {
+            inviteOnly: false,
+            token: token,
+            inviteName: invite.name,
+            email: cleanEmail,
+            username: username,
+            first_name: first_name,
+            last_name: last_name,
+            error: `The username "${cleanUsername}" is already taken! Please choose another.`
+        });
+    }
+
+    // Check if email is already registered (case-insensitive)
+    const existingEmail = await findUserByEmail(cleanEmail);
+    if (existingEmail) {
+        return res.render("users/register", {
+            inviteOnly: false,
+            token: token,
+            inviteName: invite.name,
+            email: cleanEmail,
+            username: username,
+            first_name: first_name,
+            last_name: last_name,
+            error: `An account with the email "${cleanEmail}" already exists! Please log in instead.`
+        });
+    }
+
     let userId;
     try {
         userId = await createUser(cleanUsername, cleanEmail, password, first_name, last_name);
     } catch (err) {
         let errorMessage = "An error occurred while creating your account.";
         if (err.code === "23505") {
-            errorMessage = "A user with that username or email already exists!";
+            if (err.constraint && err.constraint.includes("username")) {
+                errorMessage = `The username "${cleanUsername}" is already taken! Please choose another.`;
+            } else if (err.constraint && err.constraint.includes("email")) {
+                errorMessage = `An account with the email "${cleanEmail}" already exists! Please log in instead.`;
+            } else {
+                errorMessage = "A user with that username or email already exists!";
+            }
         }
         return res.render("users/register", {
             inviteOnly: false,

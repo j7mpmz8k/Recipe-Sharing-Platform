@@ -6,32 +6,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}{{#if title}} - {{/if}}Recipe Sharing Platform</title>
     <link rel="stylesheet" href="/styles.css?v=1.4">
-    <script src="/js/favorites.js" defer></script>
+    <script src="/js/app.js" defer></script>
 </head>
 <body>
     <nav>
         <div class="nav-left">
             <a href="/" class="nav-brand">🍽 RecipeShare</a>
-            <a href="/">Home</a>
-            <a href="/recipes">Recipes</a>
-            {{#if user}}
-                <a href="/my-recipes">My Recipes</a>
-                <a href="/favorites">Favorites</a>
-                {{#if user.isAdmin}}
-                    <a href="/admin" style="color: #d97706; font-weight: 600;">👑 Admin Dashboard</a>
+            <div class="nav-links">
+                <a href="/recipes">Recipes</a>
+                {{#if user}}
+                    <a href="/my-recipes">My Recipes</a>
+                    <a href="/favorites">Favorites</a>
                 {{/if}}
-            {{/if}}
+            </div>
         </div>
         <div class="nav-right">
-            <span class="online-status-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.825rem; font-weight: 500; color: #16a34a; background: #dcfce7; padding: 0.2rem 0.6rem; border-radius: 9999px;">
-                <span style="display: inline-block; width: 7px; height: 7px; background-color: #22c55e; border-radius: 50%; box-shadow: 0 0 4px #22c55e;"></span>
+            <span class="online-status-badge">
+                <span class="online-dot"></span>
                 <span id="online-count-text">{{onlineCount}} online</span>
             </span>
             {{#if user}}
-                <span class="nav-user">Welcome, <a href="/users/{{user.id}}">{{#if user.first_name}}{{user.first_name}}{{else}}{{user.username}}{{/if}}</a></span>
-                <form action="/logout" method="POST" class="logout-form">
-                    <button type="submit" class="btn-link">Logout</button>
-                </form>
+                <div class="nav-user-dropdown" id="navUserDropdown">
+                    <button type="button" class="nav-user-btn" id="userMenuBtn" aria-expanded="false" aria-haspopup="true">
+                        <span class="nav-user-name">{{#if user.first_name}}{{user.first_name}}{{else}}{{user.username}}{{/if}}</span>
+                        <span class="dropdown-arrow">▾</span>
+                    </button>
+                    <div class="nav-dropdown-menu" id="userDropdownMenu">
+                        <div class="dropdown-header">
+                            Signed in as <strong>{{#if user.first_name}}{{user.first_name}}{{else}}{{user.username}}{{/if}}</strong>
+                        </div>
+                        <a href="/users/{{user.id}}" class="dropdown-item">👤 My Profile</a>
+                        <a href="/change-password" class="dropdown-item">🔑 Change Password</a>
+                        {{#if user.isAdmin}}
+                            <a href="/admin" class="dropdown-item admin-item">👑 Admin Dashboard</a>
+                        {{/if}}
+                        <div class="dropdown-divider"></div>
+                        <form action="/logout" method="POST" class="logout-form">
+                            <button type="submit" class="dropdown-item logout-item">🚪 Logout</button>
+                        </form>
+                    </div>
+                </div>
             {{else}}
                 <a href="/login">Login</a>
                 <a href="/register">Register</a>
@@ -40,7 +54,7 @@
     </nav>
 
     {{#if siteBanner.isActive}}
-        <div class="site-announcement-banner site-banner-{{siteBanner.bannerType}}" role="alert" style="text-align: center; padding: 0.75rem 1rem; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); {{#if siteBanner.isWarning}}background-color: #fef08a; color: #854d0e; border-bottom: 2px solid #facc15;{{/if}}{{#if siteBanner.isAlert}}background-color: #fee2e2; color: #991b1b; border-bottom: 2px solid #f87171;{{/if}}{{#if siteBanner.isInfo}}background-color: #dbeafe; color: #1e40af; border-bottom: 2px solid #60a5fa;{{/if}}{{#if siteBanner.isSuccess}}background-color: #dcfce7; color: #166534; border-bottom: 2px solid #4ade80;{{/if}}">
+        <div class="site-announcement-banner site-banner-{{siteBanner.bannerType}}" role="alert">
             {{#if siteBanner.isWarning}}<span>⚠️</span>{{/if}}
             {{#if siteBanner.isAlert}}<span>🚨</span>{{/if}}
             {{#if siteBanner.isInfo}}<span>ℹ️</span>{{/if}}
@@ -54,28 +68,12 @@
     </main>
 
     <footer>
-        <p class="donate-text" style="font-size: 0.85rem; color: var(--text-muted, #718096); margin: 0 0 0.35rem 0;">
-            ☕ Enjoying the site? Please consider supporting on Venmo: <a href="https://venmo.com/u/Jacob-Cardon" target="_blank" rel="noopener noreferrer" style="color: #008cff; font-weight: 600; text-decoration: underline;">@Jacob-Cardon</a>
+        <p class="footer-donate-text">
+            ☕ Enjoying the site? Please consider supporting on Venmo: <a href="https://venmo.com/u/Jacob-Cardon" target="_blank" rel="noopener noreferrer" class="footer-donate-link">@Jacob-Cardon</a>
         </p>
-        <p class="contact-text" style="font-size: 0.825rem; color: var(--text-muted, #718096); margin: 0;">
-            ✉️ Questions, feedback, or invite requests? <a href="mailto:contact@recipes.jcardon.me" style="color: var(--text-secondary, #4a5568); text-decoration: underline;">contact@recipes.jcardon.me</a>
+        <p class="footer-contact-text">
+            ✉️ Questions, feedback, or invite requests? <a href="mailto:contact@recipes.jcardon.me" class="footer-contact-link">contact@recipes.jcardon.me</a>
         </p>
     </footer>
-
-    <script>
-        // Smoothly refresh online counter every 10 seconds
-        setInterval(async function() {
-            try {
-                const res = await fetch('/api/online-count');
-                if (res.ok) {
-                    const data = await res.json();
-                    const el = document.getElementById('online-count-text');
-                    if (el && typeof data.count === 'number') {
-                        el.textContent = data.count + ' online';
-                    }
-                }
-            } catch (err) {}
-        }, 10000);
-    </script>
 </body>
 </html>

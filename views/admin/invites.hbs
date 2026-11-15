@@ -1,46 +1,48 @@
-<div class="recipes-container" style="width: 100%; max-width: 950px; margin: 0 auto;">
-    <div class="section-header" style="margin-bottom: 2rem;">
+<link rel="stylesheet" href="/admin.css">
+
+<div class="recipes-container admin-container admin-container-narrow">
+    <div class="section-header admin-header">
         <div>
-            <h1 style="font-size: 1.75rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary);">
+            <h1 class="admin-title">
                 <span>🔑</span> Admin: Member Invitations
             </h1>
-            <p class="section-subtitle" style="margin: 0; color: var(--text-muted);">
+            <p class="section-subtitle admin-subtitle">
                 Manage and issue private invitation links for friends and family. Only registered invitees can create an account.
             </p>
         </div>
     </div>
 
     {{#if error}}
-        <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+        <div class="alert alert-error admin-alert-spaced">
             {{error}}
         </div>
     {{/if}}
 
     {{#if success}}
-        <div class="alert alert-success" style="margin-bottom: 1.5rem; padding: 1.25rem; border-radius: 8px;">
-            <p style="font-weight: 600; margin-bottom: 0.75rem;">{{success}}</p>
+        <div class="alert alert-success admin-alert-box">
+            <p class="admin-alert-box-title">{{success}}</p>
             <div>
-                <label for="inviteLinkInput" style="display: block; font-size: 0.875rem; margin-bottom: 0.35rem; color: var(--text-secondary);">
+                <label for="inviteLinkInput" class="admin-field-label">
                     Share this unique registration link with your guest:
                 </label>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <div class="admin-input-row">
                     <input 
                         type="text" 
                         id="inviteLinkInput" 
                         value="{{inviteUrl}}" 
                         readonly 
-                        style="flex: 1; padding: 0.65rem 0.75rem; font-family: monospace; font-size: 0.9rem; border-radius: 6px; border: 1px solid var(--input-border, #cbd5e0); background: #fff;"
+                        class="admin-input-copyable"
                     >
                     <button 
                         type="button" 
-                        class="btn btn-primary" 
-                        onclick="navigator.clipboard.writeText(document.getElementById('inviteLinkInput').value); this.innerText = 'Copied!';"
-                        style="white-space: nowrap; padding: 0.65rem 1rem;"
+                        class="btn btn-primary admin-copy-btn" 
+                        data-copy-target="inviteLinkInput"
+                        data-copied-text="Copied!"
                     >
                         📋 Copy Link
                     </button>
                 </div>
-                <small style="display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.825rem;">
+                <small class="admin-hint-text">
                     ⏳ This temporary link is valid for 48 hours and automatically becomes invalid once used.
                 </small>
             </div>
@@ -48,75 +50,72 @@
     {{/if}}
 
     <!-- Generate Invite Form Card -->
-    <div style="background-color: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-        <h2 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Issue a New Invitation</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+    <div class="admin-card">
+        <h2 class="admin-card-title">Issue a New Invitation</h2>
+        <p class="admin-card-desc">
             Enter the email address of the person you want to invite.
         </p>
 
-        <form action="/admin/invites" method="POST" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <form action="/admin/invites" method="POST" class="admin-form-row">
             <input 
                 type="email" 
                 name="email" 
                 placeholder="friend@example.com" 
                 required 
-                style="flex: 1; min-width: 250px; padding: 0.65rem 0.85rem; border: 1px solid var(--input-border, #cbd5e0); border-radius: 6px; font-size: 0.95rem;"
+                class="admin-input-flex"
             >
-            <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.25rem; font-weight: 600;">
+            <button type="submit" class="btn btn-primary admin-btn-action">
                 ✉️ Create Invite Link
             </button>
         </form>
     </div>
 
     <!-- Invites History Card -->
-    <div style="background-color: var(--card-bg, #ffffff); border: 1px solid var(--card-border, #e2e8f0); border-radius: 8px; padding: 1.5rem; box-shadow: var(--card-shadow, 0 1px 3px rgba(0,0,0,0.05));">
-        <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">Invitation History</h2>
+    <div class="admin-card">
+        <h2 class="admin-card-title">Invitation History</h2>
 
         {{#if invites.length}}
-            <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left;">
+            <div class="admin-table-wrapper">
+                <table class="admin-table">
                     <thead>
-                        <tr style="border-bottom: 2px solid var(--card-border, #e2e8f0); color: var(--text-muted);">
-                            <th style="padding: 0.75rem 0.5rem;">Email</th>
-                            <th style="padding: 0.75rem 0.5rem;">Status</th>
-                            <th style="padding: 0.75rem 0.5rem;">Created</th>
-                            <th style="padding: 0.75rem 0.5rem;">Expires</th>
-                            <th style="padding: 0.75rem 0.5rem; text-align: right;">Action</th>
+                        <tr>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Expires</th>
+                            <th class="admin-table-right">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {{#each invites}}
-                            <tr style="border-bottom: 1px solid var(--card-border, #edf2f7);">
-                                <td style="padding: 0.85rem 0.5rem; font-weight: 500;">
-                                    {{this.email}}
+                            <tr>
+                                <td>
+                                    <strong>{{this.email}}</strong>
                                 </td>
-                                <td style="padding: 0.85rem 0.5rem;">
-                                    <span style="display: inline-block; padding: 0.2rem 0.55rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; 
-                                        {{#if this.isActive}}background: #def7ec; color: #03543f;{{/if}}
-                                        {{#if this.isUsed}}background: #e1effe; color: #1e429f;{{/if}}
-                                        {{#if this.isExpired}}background: #fde8e8; color: #9b1c1c;{{/if}}">
+                                <td>
+                                    <span class="status-badge {{#if this.isActive}}status-badge-active{{/if}}{{#if this.isUsed}}status-badge-used{{/if}}{{#if this.isExpired}}status-badge-expired{{/if}}">
                                         {{this.status}}
                                     </span>
                                 </td>
-                                <td style="padding: 0.85rem 0.5rem; color: var(--text-muted);">
+                                <td class="text-muted">
                                     {{this.createdAt}}
                                 </td>
-                                <td style="padding: 0.85rem 0.5rem; color: var(--text-muted);">
+                                <td class="text-muted">
                                     {{this.expiresAt}}
                                 </td>
-                                <td style="padding: 0.85rem 0.5rem; text-align: right;">
+                                <td class="admin-table-right">
                                     {{#if this.isUsable}}
                                         <button 
                                             type="button" 
-                                            class="btn btn-secondary" 
-                                            style="padding: 0.35rem 0.75rem; font-size: 0.775rem; font-weight: 600;"
-                                            onclick="navigator.clipboard.writeText('{{@root.baseUrl}}/register?token={{this.token}}'); const orig = this.innerText; this.innerText = 'Copied!'; setTimeout(() => { this.innerText = orig; }, 2000);"
+                                            class="btn btn-secondary admin-btn-sm" 
+                                            data-copy-text="{{@root.baseUrl}}/register?token={{this.token}}"
+                                            data-copied-text="Copied!"
                                             title="Copy registration link"
                                         >
                                             📋 Copy
                                         </button>
                                     {{else}}
-                                        <span style="color: var(--text-muted); font-size: 0.825rem;">-</span>
+                                        <span class="text-muted">-</span>
                                     {{/if}}
                                 </td>
                             </tr>
@@ -125,7 +124,7 @@
                 </table>
             </div>
         {{else}}
-            <p style="color: var(--text-muted); text-align: center; padding: 2rem 0;">
+            <p class="text-muted admin-empty-message">
                 No invitations have been generated yet. Use the form above to invite your first member!
             </p>
         {{/if}}

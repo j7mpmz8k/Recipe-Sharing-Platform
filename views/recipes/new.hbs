@@ -1,4 +1,4 @@
-<div class="auth-container" style="max-width: 650px;">
+<div class="auth-container recipe-form-container">
     <div class="auth-card">
         <h2>Post a New Recipe</h2>
 
@@ -7,13 +7,13 @@
         {{/if}}
 
         <form action="/recipes" method="POST" class="auth-form">
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <div class="form-group" style="flex: 1; min-width: 240px;">
+            <div class="recipe-form-row">
+                <div class="form-group recipe-form-group-flex">
                     <label for="title">Recipe Title *</label>
                     <input type="text" id="title" name="title" required placeholder="e.g. Grandma's Classic Lasagna" value="{{formData.title}}">
                 </div>
 
-                <div class="form-group" style="width: 200px; min-width: 160px;">
+                <div class="form-group recipe-form-group-fixed">
                     <label for="category">Category</label>
                     <select id="category" name="category">
                         <option value="Breakfast" {{#if (eq formData.category "Breakfast")}}selected{{/if}}>🍳 Breakfast</option>
@@ -43,7 +43,7 @@
                     </div>
                     <div class="form-group">
                         <label for="servings">Servings</label>
-                        <input type="number" id="servings" name="servings" min="1" placeholder="4" value="{{formData.servings}}">
+                        <input type="number" id="servings" name="servings" min="0" placeholder="4" value="{{formData.servings}}">
                     </div>
                 </div>
 
@@ -60,8 +60,8 @@
                 <textarea id="instructions" name="instructions" rows="8" required placeholder="1. Preheat the oven to 375°F...&#10;2. Mix dry ingredients...">{{formData.instructions}}</textarea>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">Create Recipe</button>
+            <div class="recipe-create-actions">
+                <button type="submit" class="btn btn-primary recipe-create-submit">Create Recipe</button>
                 <a href="/recipes" class="btn btn-secondary">Cancel</a>
             </div>
         </form>

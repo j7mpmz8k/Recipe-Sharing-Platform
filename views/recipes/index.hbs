@@ -11,12 +11,12 @@
 
     <!-- Search Bar -->
     <div class="search-section">
-        <form action="/recipes" method="GET" class="search-form" style="max-width: 780px; flex-wrap: wrap; justify-content: center; align-items: center;">
+        <form action="/recipes" method="GET" class="search-form recipes-search-form">
             <div class="category-filter-wrapper">
                 {{#if categoryFilter}}
                     <a href="/recipes{{#if searchQuery}}?search={{searchQuery}}{{/if}}" class="btn btn-secondary category-reset-btn" title="Clear category filter">Reset Category ✕</a>
                 {{/if}}
-                <select name="category" onchange="this.form.submit()" class="category-filter-select" style="padding: 0.75rem 1rem; border-radius: 30px; border: 1px solid var(--input-border, #cbd5e0); background-color: var(--card-bg, #ffffff); color: var(--text-primary, #2c3e50); font-size: 0.95rem; font-weight: 500; cursor: pointer; outline: none;" title="Filter by category">
+                <select name="category" data-auto-submit class="category-filter-select" title="Filter by category">
                     <option value="">All Categories</option>
                     <option value="Breakfast" {{#if (eq categoryFilter "Breakfast")}}selected{{/if}}>🍳 Breakfast</option>
                     <option value="Entree" {{#if (eq categoryFilter "Entree")}}selected{{/if}}>🍲 Entrée</option>
@@ -26,14 +26,14 @@
                     <option value="Other" {{#if (eq categoryFilter "Other")}}selected{{/if}}>🍽️ Other</option>
                 </select>
             </div>
-            <div class="search-input-wrapper" style="min-width: 250px;">
+            <div class="search-input-wrapper recipes-search-input-wrapper">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="search-input" name="search" placeholder="Search recipes by title, ingredients, or category..." value="{{searchQuery}}">
                 {{#if searchQuery}}
                     <a href="/recipes{{#if categoryFilter}}?category={{categoryFilter}}{{/if}}" class="search-clear-btn" title="Clear search" aria-label="Clear search">✕</a>
                 {{/if}}
             </div>
-            <button type="submit" class="btn btn-primary" style="border-radius: 30px; padding: 0.75rem 1.35rem;">Search</button>
+            <button type="submit" class="btn btn-primary recipes-search-btn">Search</button>
         </form>
     </div>
 
@@ -64,23 +64,26 @@
                                     <span>🕒 {{this.cook_time}}m cook</span>
                                 {{/if}}
                                 {{#if this.servings}}
-                                    <span>🍽 {{this.servings}} servings</span>
+                                    <span title="{{this.servings}} servings">🍽 {{this.servings}}</span>
                                 {{/if}}
                             </div>
                         </div>
                     </div>
                     <div class="recipe-card-footer">
-                        {{#if ../user}}
-                            <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" style="font-size: 1.1rem; padding: 0.1rem 0.35rem; line-height: 1; cursor: pointer; background: none; border: none;" title="{{#if this.isFavorite}}Unfavorite this recipe{{else if this.isFavorited}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
-                                <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
-                                <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
-                            </button>
-                        {{else}}
-                            <span class="favorites-display">
-                                <span class="heart-icon">❤️</span>
-                                <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
-                            </span>
-                        {{/if}}
+                        <div class="card-footer-left">
+                            <button type="button" class="btn-link share-card-btn" data-action="copy-share" data-title="{{this.title}}" data-author="{{#if this.authorName}}{{this.authorName}}{{else}}{{this.username}}{{/if}}" data-url="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" title="Copy shareable link">🔗</button>
+                            {{#if ../user}}
+                                <button type="button" class="btn-link favorite-btn {{#if this.isFavorite}}favorited{{else if this.isFavorited}}favorited{{/if}}" data-recipe-id="{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}" title="{{#if this.isFavorite}}Unfavorite this recipe{{else if this.isFavorited}}Unfavorite this recipe{{else}}Favorite this recipe{{/if}}">
+                                    <span class="heart-icon">{{#if this.isFavorite}}❤️{{else if this.isFavorited}}❤️{{else}}🤍{{/if}}</span>
+                                    <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
+                                </button>
+                            {{else}}
+                                <span class="favorites-display" title="Log in to favorite recipes">
+                                    <span class="heart-icon">🤍</span>
+                                    <span class="favorite-count">{{#if this.favCount}}{{this.favCount}}{{else}}0{{/if}}</span>
+                                </span>
+                            {{/if}}
+                        </div>
                         <div class="card-footer-actions">
                             {{#if this.canEdit}}
                                 <a href="/recipes/{{#if this.recipeId}}{{this.recipeId}}{{else}}{{this.id}}{{/if}}/edit" class="btn-text btn-text-edit">✏️ Edit</a>

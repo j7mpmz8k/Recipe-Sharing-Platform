@@ -61,17 +61,14 @@ export function createRateLimiter(options) {
             res.setHeader("X-RateLimit-Limit", max);
             res.setHeader("X-RateLimit-Remaining", 0);
 
-            // If the request accepts JSON, return JSON; otherwise render error view or send plain text
+            // If the request accepts JSON, return JSON; otherwise send plain text
             const acceptsJson = req.headers.accept && req.headers.accept.includes("application/json");
             if (acceptsJson) {
                 return res.status(statusCode).json({ error: message });
             }
 
-            return res.status(statusCode).render("error", {
-                statusCode: statusCode,
-                statusMessage: "Too Many Requests",
-                message: message
-            });
+            res.setHeader("Content-Type", "text/plain");
+            return res.status(statusCode).send(message);
         }
 
         timestamps.push(now);

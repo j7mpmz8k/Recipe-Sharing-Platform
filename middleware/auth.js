@@ -24,9 +24,8 @@ export function requireAdmin(req, res, next) {
     if (req.user && isAdminUser(req.user.id)) {
         next();
     } else {
-        res.status(403).render("error", {
-            statusCode: 403,
-            statusMessage: "Forbidden",
+        res.status(403).render("unauthorized", {
+            title: "Admin Access Required",
             message: "You must be an administrator to access this page."
         });
     }
@@ -49,9 +48,8 @@ export async function loadSession(req, res, next) {
             req.session = null;
             await deleteSession(session_id);
             res.clearCookie("session_id");
-            return res.status(403).render("error", {
-                statusCode: 403,
-                statusMessage: "Account Suspended",
+            return res.status(403).render("unauthorized", {
+                title: "Account Suspended",
                 message: "Your account has been suspended by an administrator. Please contact contact@recipes.jcardon.me for assistance."
             });
         } else {
