@@ -30,18 +30,18 @@ A full-stack, authenticated Recipe Sharing web application built with Node.js, E
 
 ### Quick Reference: NPM Commands
 
-| Command | Target Environment | Purpose |
-| :--- | :--- | :--- |
-| **`npm run dev`** | Local Laptop | Runs local Node.js application with automatic hot-reloading (`--watch`) |
-| **`npm start`** | Production / Container | Starts Node.js application (`node server.js`) |
-| **`npm run migrate`** | Local Laptop | Applies database migrations (auto-creates `recipe_db` if missing) |
-| **`npm run db:pull`** | Local Laptop | Encrypted SSH database sync from production PostgreSQL to local machine |
-| **`npm run deploy`** | Local Laptop | Triggers automated production deployment of `master` over SSH |
-| **`npm run prod:down`** | Local Laptop | Takes down and removes production Docker containers over SSH (`docker compose down`) |
-| **`npm run prod:stop`** | Local Laptop | Gracefully stops production Docker containers over SSH (`docker compose stop`) |
-| **`npm run prod:start`** | Local Laptop | Starts production Docker containers back up over SSH (`docker compose up -d`) |
-| **`npm run prod:sql`** | Local Laptop | Run remote SQL query or open interactive `psql` shell on production over SSH |
-| **`npm run tunnel`** | Local Laptop | Forwards remote `127.0.0.1:3000` to local `http://localhost:8080` via SSH |
+| Command | Purpose |
+| :--- | :--- |
+| **`npm run dev`** | Runs local Node.js application with automatic hot-reloading (`--watch`) |
+| **`npm start`** | Starts Node.js application (`node server.js`) |
+| **`npm run migrate`** | Applies database migrations (auto-creates `recipe_db` if missing) |
+| **`npm run db:pull`** | Encrypted SSH database sync from production PostgreSQL to local machine |
+| **`npm run deploy`** | Triggers automated production deployment of `master` over SSH |
+| **`npm run prod:down`** | Takes down and removes production Docker containers over SSH (`docker compose down`) |
+| **`npm run prod:stop`** | Gracefully stops production Docker containers over SSH (`docker compose stop`) |
+| **`npm run prod:start`** | Starts production Docker containers back up over SSH (`docker compose up -d`) |
+| **`npm run prod:sql`** | Run remote SQL query or open interactive `psql` shell on production over SSH |
+| **`npm run tunnel`** | Forwards remote `127.0.0.1:3000` to local `http://localhost:8080` via SSH |
 
 ### Project Structure
 
